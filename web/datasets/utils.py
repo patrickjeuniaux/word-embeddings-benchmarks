@@ -770,7 +770,7 @@ def _fetch_file(url, data_dir=TEMP, uncompress=False, move=False,md5sum=None,
                 abort = str(e)
     else:
         if verbose > 0:
-            print("File already downloaded --- download skipped")
+            print("File already downloaded - download skipped")
 
         if move:
             target_file = os.path.join(data_dir, move)
