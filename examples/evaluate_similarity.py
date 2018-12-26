@@ -9,12 +9,23 @@ from web.datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999
 from web.embeddings import fetch_GloVe
 from web.evaluate import evaluate_similarity
 
+print("\nEvaluate similarity")
+print("---")
+
 # Configure logging
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+
+print("\n1. Load embeddings")
+print("Embeddings: GloVe")
+print("Warning: it might take few minutes")
+print("---")
 
 # Fetch GloVe embedding (warning: it might take few minutes)
 w_glove = fetch_GloVe(corpus="wiki-6B", dim=300)
 
+print("\n2. Define tasks")
+print("Tasks: MEN, WS353, SIMLEX999")
+print("---")
 # Define tasks
 tasks = {
     "MEN": fetch_MEN(),
@@ -22,10 +33,20 @@ tasks = {
     "SIMLEX999": fetch_SimLex999()
 }
 
+print("\n3. Print sample data")
+print("---")
 # Print sample data
 for name, data in iteritems(tasks):
-    print("Sample data from {}: pair \"{}\" and \"{}\" is assigned score {}".format(name, data.X[0][0], data.X[0][1], data.y[0]))
 
+    print("Sample data from {}: pair \"{}\" and \"{}\" is assigned score {}".
+          format(name, data.X[0][0], data.X[0][1], data.y[0]))
+
+print("\n4. Calculate results")
+print("---")
 # Calculate results using helper function
 for name, data in iteritems(tasks):
-    print("Spearman correlation of scores on {} {}".format(name, evaluate_similarity(w_glove, data.X, data.y)))
+
+    print("Spearman correlation of scores on {} {}".
+          format(name, evaluate_similarity(w_glove, data.X, data.y)))
+
+print("\n--- THE END ---")
