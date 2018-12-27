@@ -35,7 +35,7 @@ Included datasets:
 * Google Analogy
 * MSR Analogy
 * SemEval2012
-* AP 
+* AP
 * BLESS
 * Battig
 * ESSLI (2b, 2a, 1c)
@@ -86,4 +86,9 @@ See `examples` folder.
 License
 =======
 Code is licensed under MIT, however available embeddings distributed within package might be under different license. If you are unsure please reach to authors (references are included in docstrings)
+
+Updates
+=======
+
+See `updates.rst`.
 

@@ -94,7 +94,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
         if missing_words > 0:
             logger.warning("Missing {} words. Will replace them with mean vector".format(missing_words))
 
-        # Batch due to memory constaints (in dot operation)
+        # Batch due to memory constraints (in dot operation)
         for id_batch, batch in enumerate(batched(range(len(X)), self.batch_size)):
             ids = list(batch)
             X_b = X[ids]

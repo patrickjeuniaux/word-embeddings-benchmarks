@@ -362,10 +362,14 @@ def fetch_TR9856():
     print("\nFetch '{}' dataset\n---\n".
           format("TR9856"))
 
-    data = pd.read_csv(os.path.join(_fetch_file(
-        'https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_TR9856.v2.zip',
-        'similarity', uncompress=True, verbose=0),
-        'IBM_Debater_(R)_TR9856.v0.2', 'TermRelatednessResults.csv'), encoding="iso-8859-1")
+    url = 'https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_TR9856.v2.zip'
+
+    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=0)
+
+    input_path = os.path.join(folder,
+                              'IBM_Debater_(R)_TR9856.v0.2', 'TermRelatednessResults.csv')
+
+    data = pd.read_csv(input_path, encoding="iso-8859-1")
 
     # We basically select all the columns available
     X = data[['term1', 'term2']].values
@@ -373,3 +377,55 @@ def fetch_TR9856():
     topic = data['topic'].values
 
     return Bunch(X=X.astype("object"), y=y, topic=topic)
+
+
+def fetch_SimVerb3500():
+
+    """
+    Fetch SimVerb-3500 dataset for testing verbs similarity
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores
+
+    References
+    ----------
+    Gerz, D., Vulić, I., Hill, F., Reichart, R., & Korhonen, A. (2016). SimVerb-3500: A Large-Scale Evaluation Set of Verb Similarity. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (pp. 2173–2182). Stroudsburg, PA. Retrieved from http://arxiv.org/abs/1608.00869
+
+    Notes
+    -----
+     SimVerb-3500 (...) provides human ratings for the similarity of 3,500 verb pairs.
+    """
+
+
+    """
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores
+    -------
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("SimVerb-3500"))
+
+    url = 'http://people.ds.cam.ac.uk/dsg40/paper/simverb/simverb-3500-data.zip'
+
+    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=1)
+
+    input_path = os.path.join(folder, 'data', 'SimVerb-3500.txt')
+
+    df = pd.read_csv(input_path, header=None, encoding='utf-8', sep="\t")
+
+    data = df.values
+
+    X = data[:, 0:2].astype("object")
+
+    y = data[:, 3].astype(np.float)
+
+    return Bunch(X=X, y=y)
