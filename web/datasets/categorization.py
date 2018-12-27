@@ -50,6 +50,10 @@ def fetch_AP():
     highly ambiguous; nouns with 2 or 3 senses medium
     ambiguous; and nouns with a single sense as not ambiguous.
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("AP"))
+
     return _get_cluster_assignments(dataset_name="EN-AP",
                                     url="https://www.dropbox.com/sh/6xu1c1aan8f83p3/AACMyoLwncNhRkUkqvGurYB6a?dl=1")
 
@@ -77,6 +81,10 @@ def fetch_BLESS():
     Data set includes 200 concrete nouns (100 animate and 100 inanimate nouns)
     from different classes (e.g., tools, clothing, vehicles, animals, etc.).
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("BLESS"))
+
     return _get_cluster_assignments(dataset_name="EN-BLESS",
                                     url="https://www.dropbox.com/sh/5qbl5cmh17o3eh0/AACyCEqpMktdMI05zwphJRI7a?dl=1")
 
@@ -114,12 +122,15 @@ def fetch_battig():
     This is not the same dataset as 'battig' in Baroni et al. "Don’t count, predict! A systematic comparison of
     context-counting vs. context-predicting semantic vectors"
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("battig"))
+
     data = _get_cluster_assignments(dataset_name="EN-BATTIG",
                                     url="https://www.dropbox.com/sh/ckp4yu7k7xl7u2a/AABhmpgU3ake3T9liA9BR8EBa?dl=1",
                                     sep=",", skip_header=True)
     return Bunch(X=data.X[:, 0], y=data.y,
                  freq=data.X[:, 1], frequency=data.X[:, 2], rank=data.X[:, 3], rfreq=data.X[:, 4])
-
 
 
 def fetch_ESSLI_2c():
@@ -146,6 +157,10 @@ def fetch_ESSLI_2c():
     nouns, belonging to 6 semantic categories (four animates and two inanimates). The nouns are included in the
     feature norms described in McRae et al. (2005)
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("ESSLI 2c"))
+
     return _get_cluster_assignments(dataset_name="EN-ESSLI-2c",
                                     url="https://www.dropbox.com/sh/d3mcyl3b5mawfhm/AAABygW1rguhI4L0XSw_I68ta?dl=1")
 
@@ -175,6 +190,10 @@ def fetch_ESSLI_2b():
     on the concreteness scale. The nouns have been classified into three classes: HI, LO and ME being highly,
     low and medium abstract nouns.
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("ESSLI 2b"))
+
     return _get_cluster_assignments(dataset_name="EN-ESSLI-2b",
                                     url="https://www.dropbox.com/sh/7gdv52gy9vb4mf2/AACExLgHdbvbBrRZBP6CcdDaa?dl=1")
 
@@ -200,5 +219,9 @@ def fetch_ESSLI_1a():
     The data set consists of 44 concrete nouns, belonging to 6 semantic categories (four animates and two inanimates).
     The nouns are included in the feature norms described in McRae et al. (2005)
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("ESSLI 1a"))
+
     return _get_cluster_assignments(dataset_name="EN-ESSLI-1a",
                                     url="https://www.dropbox.com/sh/h362565r1sk5wii/AADjcdYy3nRo-MjuFUSvb-0ya?dl=1")

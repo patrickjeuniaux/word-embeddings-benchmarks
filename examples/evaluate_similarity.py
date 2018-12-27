@@ -16,7 +16,6 @@ print("---")
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
 print("\n1. Load embeddings")
-print("Embeddings: GloVe")
 print("Warning: it might take few minutes")
 print("---")
 
@@ -24,7 +23,6 @@ print("---")
 w_glove = fetch_GloVe(corpus="wiki-6B", dim=300)
 
 print("\n2. Define tasks")
-print("Tasks: MEN, WS353, SIMLEX999")
 print("---")
 # Define tasks
 tasks = {

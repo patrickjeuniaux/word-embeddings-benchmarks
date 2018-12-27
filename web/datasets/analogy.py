@@ -41,6 +41,10 @@ def fetch_wordrep(subsample=None, rng=None):
     why it returns word paris
 
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("wordrep"))
+
     path = _fetch_file(url="https://www.dropbox.com/sh/5k78h9gllvc44vt/AAALLQq-Bge605OIMlmGBbNJa?dl=1",
                        data_dir="analogy",
                        uncompress=True,
@@ -59,7 +63,7 @@ def fetch_wordrep(subsample=None, rng=None):
 
     for file_name in files:
         c = os.path.basename(file_name).split(".")[0]
-        c = c[c.index("-")+1:]
+        c = c[c.index("-") + 1:]
         with open(file_name, "r") as f:
             for l in f.read().splitlines():
                 word_pairs.append(standardize_string(l).split())
@@ -75,31 +79,31 @@ def fetch_wordrep(subsample=None, rng=None):
         category_high_level = [category_high_level[i] for i in ids]
 
     wordnet_categories = {'Antonym',
-     'Attribute',
-     'Causes',
-     'DerivedFrom',
-     'Entails',
-     'HasContext',
-     'InstanceOf',
-     'IsA',
-     'MadeOf',
-     'MemberOf',
-     'PartOf',
-     'RelatedTo',
-     'SimilarTo'}
+                          'Attribute',
+                          'Causes',
+                          'DerivedFrom',
+                          'Entails',
+                          'HasContext',
+                          'InstanceOf',
+                          'IsA',
+                          'MadeOf',
+                          'MemberOf',
+                          'PartOf',
+                          'RelatedTo',
+                          'SimilarTo'}
 
     wikipedia_categories = {'adjective-to-adverb',
-     'all-capital-cities',
-     'city-in-state',
-     'comparative',
-     'currency',
-     'man-woman',
-     'nationality-adjective',
-     'past-tense',
-     'plural-nouns',
-     'plural-verbs',
-     'present-participle',
-     'superlative'}
+                            'all-capital-cities',
+                            'city-in-state',
+                            'comparative',
+                            'currency',
+                            'man-woman',
+                            'nationality-adjective',
+                            'past-tense',
+                            'plural-nouns',
+                            'plural-verbs',
+                            'present-participle',
+                            'superlative'}
 
     return Bunch(category_high_level=np.array(category_high_level),
                  X=np.array(word_pairs),
@@ -132,6 +136,9 @@ def fetch_google_analogy():
 
     """
 
+    print("\nFetch '{}' dataset\n---\n".
+          format("Google analogy"))
+
     url = "https://www.dropbox.com/s/eujtyfb5zem1mim/EN-GOOGLE.txt?dl=1"
     with open(_fetch_file(url, "analogy/EN-GOOGLE", verbose=0), "r") as f:
         L = f.read().splitlines()
@@ -143,31 +150,29 @@ def fetch_google_analogy():
     cat = None
     for l in L:
         if l.startswith(":"):
-            cat =l.lower().split()[1]
+            cat = l.lower().split()[1]
         else:
-            words =  standardize_string(l).split()
+            words = standardize_string(l).split()
             questions.append(words[0:3])
             answers.append(words[3])
             category.append(cat)
 
     assert set(category) == set(['gram3-comparative', 'gram8-plural', 'capital-common-countries',
-                                         'city-in-state', 'family', 'gram9-plural-verbs', 'gram2-opposite',
-                                         'currency', 'gram4-superlative', 'gram6-nationality-adjective',
-                                         'gram7-past-tense',
-                                         'gram5-present-participle', 'capital-world', 'gram1-adjective-to-adverb'])
-
+                                 'city-in-state', 'family', 'gram9-plural-verbs', 'gram2-opposite',
+                                 'currency', 'gram4-superlative', 'gram6-nationality-adjective',
+                                 'gram7-past-tense',
+                                 'gram5-present-participle', 'capital-world', 'gram1-adjective-to-adverb'])
 
     syntactic = set([c for c in set(category) if c.startswith("gram")])
     category_high_level = []
     for cat in category:
-         category_high_level.append("syntactic" if cat in syntactic else "semantic")
+        category_high_level.append("syntactic" if cat in syntactic else "semantic")
 
     # dtype=object for memory efficiency
     return Bunch(X=np.vstack(questions).astype("object"),
                  y=np.hstack(answers).astype("object"),
                  category=np.hstack(category).astype("object"),
                  category_high_level=np.hstack(category_high_level).astype("object"))
-
 
 
 def fetch_msr_analogy():
@@ -196,6 +201,10 @@ def fetch_msr_analogy():
     We then systematically generated analogy questions by randomly matching each of the 100 words with 5 other words
     from the same category, and creating variants.
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("MSR analogy"))
+
     url = "https://www.dropbox.com/s/ne0fib302jqbatw/EN-MSR.txt?dl=1"
     with open(_fetch_file(url, "analogy/EN-MSR", verbose=0), "r") as f:
         L = f.read().splitlines()
@@ -214,16 +223,16 @@ def fetch_msr_analogy():
     noun = set([c for c in set(category) if c.startswith("NN")])
     category_high_level = []
     for cat in category:
-         if cat in verb:
-             category_high_level.append("verb")
-         elif cat in noun:
-             category_high_level.append("noun")
-         else:
-             category_high_level.append("adjective")
+        if cat in verb:
+            category_high_level.append("verb")
+        elif cat in noun:
+            category_high_level.append("noun")
+        else:
+            category_high_level.append("adjective")
 
     assert set([c.upper() for c in category]) == set(['VBD_VBZ', 'VB_VBD', 'VBZ_VBD',
-                                         'VBZ_VB', 'NNPOS_NN', 'JJR_JJS', 'JJS_JJR', 'NNS_NN', 'JJR_JJ',
-                                         'NN_NNS', 'VB_VBZ', 'VBD_VB', 'JJS_JJ', 'NN_NNPOS', 'JJ_JJS', 'JJ_JJR'])
+                                                      'VBZ_VB', 'NNPOS_NN', 'JJR_JJS', 'JJS_JJR', 'NNS_NN', 'JJR_JJ',
+                                                      'NN_NNS', 'VB_VBZ', 'VBD_VB', 'JJS_JJ', 'NN_NNPOS', 'JJ_JJS', 'JJ_JJR'])
 
     return Bunch(X=np.vstack(questions).astype("object"),
                  y=np.hstack(answers).astype("object"),
@@ -272,6 +281,10 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     given reference word pair and a variety of other pairs, mostly in the same general semantic relation class as the
     reference pair.
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("SEMEVAL 2012 task 2 competition"))
+
     assert which in ['all', 'train', 'test']
     assert which_scoring in ['golden', 'platinium']
 
@@ -282,9 +295,9 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
                        verbose=0)
 
     train_files = set(glob.glob(os.path.join(path, "train*.txt"))) - \
-                  set(glob.glob(os.path.join(path, "train*_meta.txt")))
+        set(glob.glob(os.path.join(path, "train*_meta.txt")))
     test_files = set(glob.glob(os.path.join(path, "test*.txt"))) - \
-                 set(glob.glob(os.path.join(path, "test*_meta.txt")))
+        set(glob.glob(os.path.join(path, "test*_meta.txt")))
 
     if which == "train":
         files = train_files
@@ -318,7 +331,7 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
         categories_names[c] = meta[2] + "_" + meta[3]
         categories_descriptions[c] = meta[4]
 
-        prototypes[c] = [l.split(":") for l in \
+        prototypes[c] = [l.split(":") for l in
                          platinium[0].replace(": ", ":").replace(" ", ",").replace(".", "").split(",")]
         golden_scores[c] = {}
         platinium_scores[c] = {}
@@ -342,5 +355,3 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
                  y=scores[which_scoring],
                  categories_names=categories_names,
                  categories_descriptions=categories_descriptions)
-
-

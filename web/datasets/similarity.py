@@ -36,6 +36,10 @@ def fetch_MTurk():
 
     Additionally scores were multiplied by factor of 2.
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("MTurk"))
+
     data = _get_as_pd('https://www.dropbox.com/s/f1v4ve495mmd9pw/EN-TRUK.txt?dl=1',
                       'similarity', header=None, sep=" ").values
     return Bunch(X=data[:, 0:2].astype("object"),
@@ -72,6 +76,10 @@ def fetch_MEN(which="all", form="natural"):
     Turk via the CrowdFlower interface. The collection can be used to train and/or test computer algorithms
     implementing semantic similarity and relatedness measures.
     """
+
+    print("\nFetch '{}' dataset, which: {}, form: {}\n---\n".
+          format("MEN", which, form))
+
     if which == "dev":
         data = _get_as_pd('https://www.dropbox.com/s/c0hm5dd95xapenf/EN-MEN-LEM-DEV.txt?dl=1',
                           'similarity', header=None, sep=" ")
@@ -120,6 +128,10 @@ def fetch_WS353(which="all"):
         'y': vector with scores,
         'sd': vector of std of scores if available (for set1 and set2)
     """
+
+    print("\nFetch '{}' dataset, which: {}\n---\n".
+          format("WS353", which))
+
     if which == "all":
         data = _get_as_pd('https://www.dropbox.com/s/eqal5qj97ajaycz/EN-WS353.txt?dl=1',
                           'similarity', header=0, sep="\t")
@@ -171,6 +183,10 @@ def fetch_RG65():
     -----
     Scores were scaled by factor 10/4
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("RG65"))
+
     data = _get_as_pd('https://www.dropbox.com/s/chopke5zqly228d/EN-RG-65.txt?dl=1',
                       'similarity', header=None, sep="\t").values
 
@@ -204,6 +220,10 @@ def fetch_RW():
     frequencies above five, there are still many non-English words. To counter such problems,
     each word selected is required to have a non-zero number of synsets in WordNet(Miller, 1995).
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("RW"))
+
     data = _get_as_pd('https://www.dropbox.com/s/xhimnr51kcla62k/EN-RW.txt?dl=1',
                       'similarity', header=None, sep="\t").values
     return Bunch(X=data[:, 0:2].astype("object"),
@@ -245,6 +265,10 @@ def fetch_multilingual_SimLex999(which="EN"):
     and to evaluate vector space models on a truly multilingual setup (i.e. when both the training and the
     test data are multilingual).
     """
+
+    print("\nFetch '{}' dataset, which: {}\n---\n".
+          format("multilingual SimLex999", which))
+
     if which == "EN":
         data = _get_as_pd('https://www.dropbox.com/s/nczc4ao6koqq7qm/EN-MSIM999.txt?dl=1',
                           'similarity', header=None, encoding='utf-8', sep=" ")
@@ -297,6 +321,10 @@ def fetch_SimLex999():
      difference - note that clothes are not similar to closets (different materials, function etc.),
      even though they are very much related: coast - shore 9.00 9.10, clothes - closet 1.96 8.00
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("SimLex999"))
+
     data = _get_as_pd('https://www.dropbox.com/s/0jpa1x8vpmk3ych/EN-SIM999.txt?dl=1',
                       'similarity', sep="\t")
 
@@ -330,6 +358,10 @@ def fetch_TR9856():
     Notes
     -----
     """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("TR9856"))
+
     data = pd.read_csv(os.path.join(_fetch_file(
         'https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_TR9856.v2.zip',
         'similarity', uncompress=True, verbose=0),
