@@ -69,7 +69,7 @@ In web.datasets.similarity,
 
 added
 
-def fetch_SimVerb3500
+    def fetch_SimVerb3500
 
 to fetch the SimVerb3500 dataset.
 
