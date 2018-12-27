@@ -1,5 +1,5 @@
-Major updates
-=============
+Main updates
+============
 
 This is a list of changes made to the original project.
 
