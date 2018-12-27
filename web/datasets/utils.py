@@ -705,7 +705,7 @@ def _fetch_file(url, data_dir=TEMP, uncompress=False, move=False,md5sum=None,
 
     # 2 possibilities:
     # - the file exists in data_dir, nothing to do (we have to account for move parameter here)
-    # - the file does not exists: we download it in temp_dir
+    # - the file does not exist: we download it in temp_dir
 
     # Target file in the data_dir
     target_file = os.path.join(data_dir, file_name)

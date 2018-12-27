@@ -33,6 +33,12 @@ def load_embedding(fname, format="word2vec_bin", normalize=True,
     Additional parameters passed to load function. Mostly useful for 'glove' format where you
     should pass vocab_size and dim.
   """
+
+  print("\nLoad embeddings located here:\n")
+  print(fname)
+  print("\nformat: {}, normalize: {}, lower: {}, clean_words: {}, load_kwargs: {}\n---\n".
+        format(format, normalize, lower, clean_words, load_kwargs))
+
   assert format in ['word2vec_bin', 'word2vec', 'glove', 'dict'], "Unrecognized format"
   if format == "word2vec_bin":
     w = Embedding.from_word2vec(fname, binary=True)
