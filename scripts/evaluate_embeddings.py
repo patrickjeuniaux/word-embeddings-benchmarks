@@ -6,7 +6,7 @@
 
  Usage:
 
- ./evaluate_embeddings <output_dir>
+ ./evaluate_embeddings -o <output_dir>
 """
 from web.evaluate import evaluate_on_all
 from web import embeddings

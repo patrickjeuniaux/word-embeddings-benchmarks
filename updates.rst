@@ -1,9 +1,10 @@
-Updates
-=======
+Major updates
+=============
 
 This is a list of changes made to the original project.
 
 Patrick P. J. M. H. Jeuniaux
+
 University of Pisa
 
 
@@ -33,6 +34,7 @@ RuntimeError: generator raised StopIteration
 
 
 See : Generator raised StopIteration when locateOnScreen
+
 https://stackoverflow.com/questions/51371846/generator-raised-stopiteration-when-locateonscreen/51371879#51371879
 
 
@@ -47,11 +49,11 @@ in def _fetch_helper,
 
 replaced
 
-os.mkdir(temp_dir)
+    os.mkdir(temp_dir)
 
 by
 
-_makedirs(temp_dir)
+    _makedirs(temp_dir)
 
 to avoid FileExistsError: [Errno 17] File exists
 
