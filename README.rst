@@ -81,7 +81,8 @@ You can also install it in development mode with::
 
 Examples
 ========
-See `examples` folder.
+
+See `examples <examples>`_ folder.
 
 License
 =======
