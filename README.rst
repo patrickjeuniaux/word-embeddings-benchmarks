@@ -90,5 +90,5 @@ Code is licensed under MIT, however available embeddings distributed within pack
 Updates
 =======
 
-See `updates.rst`.
+See `updates.rst <updates.rst>`_.
 
