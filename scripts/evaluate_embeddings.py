@@ -28,53 +28,89 @@ logger = logging.getLogger(__name__)
 
 jobs = []
 
-## GloVe
 
-for dim in [50, 100, 200, 300]:
-    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
+# ConceptNet Numberbatch
+# ---
 
-for dim in [25, 50, 100, 200]:
-    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
+# jobs.append(["fetch_conceptnet_numberbatch", {}])
 
+# FastText
+# ---
 
-for corpus in ["common-crawl-42B", "common-crawl-840B"]:
-    jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
-
-## NMT
-
-jobs.append(["fetch_NMT", {"which": "FR"}])
-jobs.append(["fetch_NMT", {"which": "DE"}])
-
-## PDC and HDC
-
-for dim in [50, 100, 300]:
-    jobs.append(["fetch_PDC", {"dim": dim}])
-    jobs.append(["fetch_HDC", {"dim": dim}])
-
-## SG
-
-jobs.append(["fetch_SG_GoogleNews", {}])
-
-## LexVec
-
-jobs.append(["fetch_LexVec", {}])
-
-## ConceptNet Numberbatch
-jobs.append(["fetch_conceptnet_numberbatch", {}])
-
-## FastText
 jobs.append(["fetch_FastText", {}])
 
+# PDC and HDC
+# ---
 
-def run_job(j):
-    fn, kwargs = j
-    outf = path.join(opts.output_dir, fn + "_" + "_".join(str(k) + "=" + str(v) for k, v in iteritems(kwargs))) + ".csv"
+# for dim in [50, 100, 300]:
+
+#     jobs.append(["fetch_PDC", {"dim": dim}])
+
+#     jobs.append(["fetch_HDC", {"dim": dim}])
+
+# GloVe
+# ---
+
+# for dim in [50, 100, 200, 300]:
+
+#     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
+
+# for dim in [25, 50, 100, 200]:
+
+#     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
+
+
+# for corpus in ["common-crawl-42B", "common-crawl-840B"]:
+
+#     jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
+
+# NMT
+# ---
+
+# jobs.append(["fetch_NMT", {"which": "FR"}])
+# jobs.append(["fetch_NMT", {"which": "DE"}])
+
+
+# SG
+# ---
+
+# jobs.append(["fetch_SG_GoogleNews", {}])
+
+# LexVec
+
+# jobs.append(["fetch_LexVec", {}])
+
+
+def run_job(job):
+
+    fetch_function_name, kwargs = job
+
+    embedding_name = fetch_function_name.split("_")[1]
+
+    filename = embedding_name
+
+    if kwargs:
+
+        job_description = "_" + "_".join(str(k) + "=" + str(v)
+                                         for k, v in iteritems(kwargs))
+
+        filename += job_description
+
+    filename += ".csv"
+
+    outf = path.join(opts.output_dir, filename)
+
     logger.info("Processing " + outf)
+
     if not path.exists(outf):
-        w = getattr(embeddings, fn)(**kwargs)
+
+        w = getattr(embeddings, fetch_function_name)(**kwargs)
+
         res = evaluate_on_all(w)
+
         res.to_csv(outf)
 
 
 if __name__ == "__main__":
+
     Pool(opts.n_jobs).map(run_job, jobs)
