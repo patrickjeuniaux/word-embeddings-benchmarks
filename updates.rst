@@ -9,6 +9,22 @@ University of Pisa
 
 
 
+5. Avoid fetching NMT word embeddings
+-------------------------------------
+2018-12-28
+
+NMT embeddings are not longer available thru the provided url.
+
+This link is broken:
+
+https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz
+
+In scripts.evaluate_embeddings
+
+the job of evaluating NMT is removed.
+
+
+
 4. Avoid generator error in Python 3.7
 --------------------------------------
 2018-12-27

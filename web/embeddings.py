@@ -248,7 +248,7 @@ def fetch_morphoRNNLM(which, normalize=True, lower=False, clean_words=False):
 
 def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
   """
-  Fetches word embeddings induced by Neural Translation Machine
+  Fetches word embeddings induced by Neural Machine Translation
 
   Parameters
   ----------
@@ -281,7 +281,10 @@ def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
   print("\nFetch {} embeddings, which: {}, normalize: {}, lower: {}, clean_words: {}\n---\n".
         format("NMT", which, normalize, lower, clean_words))
 
-  dirname = _fetch_file(url="https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz",
+  # unfortunately this link is broken
+  url = "https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz"
+
+  dirname = _fetch_file(url=url,
                         data_dir="embeddings",
                         uncompress=True,
                         verbose=1)

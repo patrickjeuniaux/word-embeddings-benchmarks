@@ -32,7 +32,7 @@ jobs = []
 # ConceptNet Numberbatch
 # ---
 
-# jobs.append(["fetch_conceptnet_numberbatch", {}])
+jobs.append(["fetch_conceptnet_numberbatch", {}])
 
 # FastText
 # ---
@@ -42,43 +42,47 @@ jobs.append(["fetch_FastText", {}])
 # PDC and HDC
 # ---
 
-# for dim in [50, 100, 300]:
+for dim in [50, 100, 300]:
 
-#     jobs.append(["fetch_PDC", {"dim": dim}])
+    jobs.append(["fetch_PDC", {"dim": dim}])
 
-#     jobs.append(["fetch_HDC", {"dim": dim}])
+    jobs.append(["fetch_HDC", {"dim": dim}])
 
 # GloVe
 # ---
 
-# for dim in [50, 100, 200, 300]:
+for dim in [50, 100, 200, 300]:
 
-#     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
+    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
 
-# for dim in [25, 50, 100, 200]:
+for dim in [25, 50, 100, 200]:
 
-#     jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
+    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
 
 
-# for corpus in ["common-crawl-42B", "common-crawl-840B"]:
+for corpus in ["common-crawl-42B", "common-crawl-840B"]:
 
-#     jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
-
-# NMT
-# ---
-
-# jobs.append(["fetch_NMT", {"which": "FR"}])
-# jobs.append(["fetch_NMT", {"which": "DE"}])
-
+    jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
 
 # SG
 # ---
 
-# jobs.append(["fetch_SG_GoogleNews", {}])
+jobs.append(["fetch_SG_GoogleNews", {}])
 
 # LexVec
+# ---
 
-# jobs.append(["fetch_LexVec", {}])
+jobs.append(["fetch_LexVec", {}])
+
+
+# NMT
+# ---
+
+# NMT embeddings are not longer available thru the provided url
+
+# jobs.append(["fetch_NMT", {"which": "FR"}])
+# jobs.append(["fetch_NMT", {"which": "DE"}])
+
 
 
 def run_job(job):
