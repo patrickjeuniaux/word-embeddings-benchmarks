@@ -13,7 +13,7 @@ University of Pisa
 -------------------------------------
 2018-12-28
 
-NMT embeddings are not longer available thru the provided url.
+NMT embeddings are no longer available thru the provided url.
 
 This link is broken:
 
