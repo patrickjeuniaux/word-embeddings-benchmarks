@@ -6,16 +6,24 @@
 
  Usage:
 
- ./evaluate_embeddings -o <output_dir>
+ ./evaluate_all_embeddings -o <output_dir>
 """
-from web.evaluate import evaluate_on_all
-from web import embeddings
+
+# external imports
+# ---
+
 from six import iteritems
 from multiprocessing import Pool
 from os import path
 import logging
 import optparse
 import multiprocessing
+
+# internal imports
+# ---
+from web.evaluate import evaluate_on_all
+from web import embeddings
+
 
 parser = optparse.OptionParser()
 parser.add_option("-j", "--n_jobs", type="int", default=4)

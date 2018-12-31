@@ -3,8 +3,16 @@
 """
  Simple example showing evaluating embedding on similarity datasets
 """
+
+# external imports
+# ---
+
 import logging
 from six import iteritems
+
+# internal imports
+# ---
+
 from web.datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999, fetch_SimVerb3500
 from web.embeddings import fetch_GloVe
 from web.evaluate import evaluate_similarity
