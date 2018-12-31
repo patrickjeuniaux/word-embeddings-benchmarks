@@ -26,12 +26,17 @@ from web import embeddings
 
 
 parser = optparse.OptionParser()
+
 parser.add_option("-j", "--n_jobs", type="int", default=4)
+
 parser.add_option("-o", "--output_dir", type="str", default="")
+
 (opts, args) = parser.parse_args()
 
 # Configure logging
+
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+
 logger = logging.getLogger(__name__)
 
 

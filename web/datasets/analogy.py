@@ -4,15 +4,21 @@
  Functions for fetching analogy datasets
 """
 
+# external imports
+# ---
+
 from collections import defaultdict
 import glob
 import os
 import numpy as np
-
 from sklearn.utils import check_random_state
-
 from sklearn.datasets.base import Bunch
-from .utils import _get_dataset_dir, _fetch_file, _change_list_to_np
+
+# internal imports
+# ---
+from .utils import _get_dataset_dir
+from .utils import _fetch_file
+from .utils import _change_list_to_np
 from ..utils import standardize_string
 
 
