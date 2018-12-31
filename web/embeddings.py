@@ -25,6 +25,9 @@ def load_embedding(fname, format="word2vec_bin", normalize=True,
   normalize: bool, default: True
     If true will normalize all vector to unit length
 
+  lower: bool, default: False
+    If true, will convert string to lowercase
+
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
     Warning: shouldn't be applied to embeddings with non-ascii characters
@@ -72,10 +75,13 @@ def fetch_GloVe(dim=300, corpus="wiki-6B", normalize=True, lower=False, clean_wo
 
   corpus: string, default: "wiki-6B"
     Corpus that GloVe vector were trained on.
-    Available corpuses: "wiki-6B", "common-crawl-42B", "common-crawl-840B", "twitter-27B"
+    Available corpora: "wiki-6B", "common-crawl-42B", "common-crawl-840B", "twitter-27B"
 
   normalize: bool, default: True
     If true will normalize all vector to unit length
+
+  lower: bool, default: False
+    If true, will convert string to lowercase
 
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
@@ -164,6 +170,9 @@ def fetch_HPCA(which, normalize=True, lower=False, clean_words=False):
   normalize: bool, default: True
     If true will normalize all vector to unit length
 
+  lower: bool, default: False
+    If true, will convert string to lowercase
+
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
     Warning: shouldn't be applied to embeddings with non-ascii characters
@@ -210,6 +219,9 @@ def fetch_morphoRNNLM(which, normalize=True, lower=False, clean_words=False):
 
   normalize: bool, default: True
     If true will normalize all vector to unit length
+
+  lower: bool, default: False
+    If true, will convert string to lowercase
 
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
@@ -258,6 +270,9 @@ def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
 
   normalize: bool, default: True
     If true will normalize all vector to unit length
+
+  lower: bool, default: False
+    If true, will convert string to lowercase
 
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
@@ -310,6 +325,9 @@ def fetch_PDC(dim=300, normalize=True, lower=False, clean_words=False):
 
   normalize: bool, default: True
     If true will normalize all vector to unit length
+
+  lower: bool, default: False
+    If true, will convert string to lowercase
 
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
@@ -365,6 +383,9 @@ def fetch_HDC(dim=300, normalize=True, lower=False, clean_words=False):
   normalize: bool, default: True
     If true will normalize all vector to unit length
 
+  lower: bool, default: False
+    If true, will convert string to lowercase
+
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
     Warning: shouldn't be applied to embeddings with non-ascii characters
@@ -416,6 +437,9 @@ def fetch_SG_GoogleNews(normalize=True, lower=False, clean_words=False):
   ----------
   normalize: bool, default: True
     If true will normalize all vector to unit length
+
+  lower: bool, default: False
+    If true, will convert string to lowercase
 
   clean_words: bool, default: True
     If true will only keep alphanumeric characters and "_", "-"
