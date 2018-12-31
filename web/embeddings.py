@@ -43,15 +43,20 @@ def load_embedding(fname, format="word2vec_bin", normalize=True,
         format(format, normalize, lower, clean_words, load_kwargs))
 
   assert format in ['word2vec_bin', 'word2vec', 'glove', 'dict'], "Unrecognized format"
+
   if format == "word2vec_bin":
     w = Embedding.from_word2vec(fname, binary=True)
+
   elif format == "word2vec":
     w = Embedding.from_word2vec(fname, binary=False)
+
   elif format == "glove":
     w = Embedding.from_glove(fname, **load_kwargs)
+
   elif format == "dict":
     d = pickle.load(open(fname, "rb"), encoding='latin1')
     w = Embedding.from_dict(d)
+
   if normalize:
     w.normalize_words(inplace=True)
   if lower or clean_words:

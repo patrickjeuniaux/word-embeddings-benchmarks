@@ -26,63 +26,92 @@ parser.add_option("-o", "--output_dir", type="str", default="")
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 logger = logging.getLogger(__name__)
 
-jobs = []
 
+job_selection = []
+
+job_selection.append('conceptnet')
+# job_selection.append('FastText')
+# job_selection.append('PDC')
+# job_selection.append('HDC')
+# job_selection.append('GloVe')
+# job_selection.append('SG_GoogleNews')
+# job_selection.append('LexVec')
+
+# WARNING
+# NMT embeddings are not longer available thru the provided url
+# job_selection.append('NMT')
+
+jobs = []
 
 # ConceptNet Numberbatch
 # ---
 
-jobs.append(["fetch_conceptnet_numberbatch", {}])
+if 'conceptnet' in job_selection:
+
+    jobs.append(["fetch_conceptnet_numberbatch", {}])
+
 
 # FastText
 # ---
 
-jobs.append(["fetch_FastText", {}])
+if 'FastText' in job_selection:
+
+    jobs.append(["fetch_FastText", {}])
 
 # PDC and HDC
 # ---
 
 for dim in [50, 100, 300]:
 
-    jobs.append(["fetch_PDC", {"dim": dim}])
+    if 'PDC' in job_selection:
 
-    jobs.append(["fetch_HDC", {"dim": dim}])
+        jobs.append(["fetch_PDC", {"dim": dim}])
+
+    if 'HDC' in job_selection:
+
+        jobs.append(["fetch_HDC", {"dim": dim}])
 
 # GloVe
 # ---
 
-for dim in [50, 100, 200, 300]:
+if 'GloVe' in job_selection:
 
-    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
+    for dim in [50, 100, 200, 300]:
 
-for dim in [25, 50, 100, 200]:
+        jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "wiki-6B"}])
 
-    jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
+    for dim in [25, 50, 100, 200]:
 
+        jobs.append(["fetch_GloVe", {"dim": dim, "corpus": "twitter-27B"}])
 
-for corpus in ["common-crawl-42B", "common-crawl-840B"]:
+    for corpus in ["common-crawl-42B", "common-crawl-840B"]:
 
-    jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
+        jobs.append(["fetch_GloVe", {"dim": 300, "corpus": corpus}])
 
 # SG
 # ---
+if 'SG_GoogleNews' in job_selection:
 
-jobs.append(["fetch_SG_GoogleNews", {}])
+    jobs.append(["fetch_SG_GoogleNews", {}])
 
 # LexVec
 # ---
 
-jobs.append(["fetch_LexVec", {}])
+if 'LexVec' in job_selection:
+
+    jobs.append(["fetch_LexVec", {}])
 
 
 # NMT
 # ---
 
-# NMT embeddings are not longer available thru the provided url
+if 'NMT' in job_selection:
 
-# jobs.append(["fetch_NMT", {"which": "FR"}])
-# jobs.append(["fetch_NMT", {"which": "DE"}])
+    # WARNING
+    # NMT embeddings are not longer available thru the provided url
 
+    jobs.append(["fetch_NMT", {"which": "FR"}])
+    jobs.append(["fetch_NMT", {"which": "DE"}])
 
 
 def run_job(job):
