@@ -2,7 +2,13 @@
 Downloading datasets: utility functions
 
 This is a copy of nilearn.datasets.
+
+https://nilearn.github.io/modules/reference.html#module-nilearn.datasets
+
 """
+
+# external imports
+# ---
 
 import errno
 import os
@@ -23,13 +29,19 @@ import glob
 import pandas as pd
 from tqdm import tqdm
 from sklearn.datasets.base import Bunch
+
+# internal imports
+# ---
 from .._utils.compat import _basestring, cPickle, _urllib, md5_hash
 
 
 TEMP = tempfile.gettempdir()
 
 
-def _makedirs(path):  # https://stackoverflow.com/a/600612/223267
+def _makedirs(path):
+    """
+        https://stackoverflow.com/a/600612/223267
+    """
     try:
         os.makedirs(path)
     except OSError as e:
@@ -40,6 +52,9 @@ def _makedirs(path):  # https://stackoverflow.com/a/600612/223267
 
 
 def _get_cluster_assignments(dataset_name, url, sep=" ", skip_header=False):
+    """
+
+    """
     data_dir = _get_dataset_dir("categorization", verbose=0)
     _fetch_file(url=url,
                 data_dir=data_dir,
@@ -60,14 +75,26 @@ def _get_cluster_assignments(dataset_name, url, sep=" ", skip_header=False):
 
 
 def _get_as_pd(url, dataset_name, **read_csv_kwargs):
+    """
+
+    """
     return pd.read_csv(_fetch_file(url, dataset_name, verbose=0), **read_csv_kwargs)
 
 
 def _change_list_to_np(dict):
+    """
+        Convert a dictionary
+        by turning each of its values to a Numpy array
+
+        ???
+    """
     return {k: np.array(dict[k], dtype="object") for k in dict}
 
 
 def _format_time(t):
+    """
+
+    """
     if t > 60:
         return "%4.1fmin" % (t / 60.)
     else:
@@ -75,7 +102,8 @@ def _format_time(t):
 
 
 def _md5_sum_file(path):
-    """ Calculates the MD5 sum of a file.
+    """
+        Calculates the MD5 sum of a file.
     """
     with open(path, 'rb') as f:
         m = hashlib.md5()
@@ -88,7 +116,8 @@ def _md5_sum_file(path):
 
 
 def _read_md5_sum_file(path):
-    """ Reads a MD5 checksum file and returns hashes as a dictionary.
+    """
+        Reads a MD5 checksum file and returns hashes as a dictionary.
     """
     with open(path, "r") as f:
         hashes = {}
@@ -103,8 +132,8 @@ def _read_md5_sum_file(path):
 
 def readlinkabs(link):
     """
-    Return an absolute path for the destination
-    of a symlink
+        Return an absolute path for the destination
+        of a symlink
     """
     path = os.readlink(link)
     if os.path.isabs(path):
@@ -113,23 +142,24 @@ def readlinkabs(link):
 
 
 def _chunk_report_(bytes_so_far, total_size, initial_size, t0):
-    """Show downloading percentage.
+    """
+        Show downloading percentage.
 
-    Parameters
-    ----------
-    bytes_so_far: int
-        Number of downloaded bytes
+        Parameters
+        ----------
+        bytes_so_far: int
+            Number of downloaded bytes
 
-    total_size: int
-        Total size of the file (may be 0/None, depending on download method).
+        total_size: int
+            Total size of the file (may be 0/None, depending on download method).
 
-    t0: int
-        The time in seconds (as returned by time.time()) at which the
-        download was resumed / started.
+        t0: int
+            The time in seconds (as returned by time.time()) at which the
+            download was resumed / started.
 
-    initial_size: int
-        If resuming, indicate the initial size of the file.
-        If not resuming, set to zero.
+        initial_size: int
+            If resuming, indicate the initial size of the file.
+            If not resuming, set to zero.
     """
 
     if not total_size:
@@ -156,35 +186,36 @@ def _chunk_report_(bytes_so_far, total_size, initial_size, t0):
 
 def _chunk_read_(response, local_file, chunk_size=8192, report_hook=None,
                  initial_size=0, total_size=None, verbose=1):
-    """Download a file chunk by chunk and show advancement
+    """
+        Download a file chunk by chunk and show advancement
 
-    Parameters
-    ----------
-    response: _urllib.response.addinfourl
-        Response to the download request in order to get file size
+        Parameters
+        ----------
+        response: _urllib.response.addinfourl
+            Response to the download request in order to get file size
 
-    local_file: file
-        Hard disk file where data should be written
+        local_file: file
+            Hard disk file where data should be written
 
-    chunk_size: int, optional
-        Size of downloaded chunks. Default: 8192
+        chunk_size: int, optional
+            Size of downloaded chunks. Default: 8192
 
-    report_hook: bool
-        Whether or not to show downloading advancement. Default: None
+        report_hook: bool
+            Whether or not to show downloading advancement. Default: None
 
-    initial_size: int, optional
-        If resuming, indicate the initial size of the file
+        initial_size: int, optional
+            If resuming, indicate the initial size of the file
 
-    total_size: int, optional
-        Expected final size of download (None means it is unknown).
+        total_size: int, optional
+            Expected final size of download (None means it is unknown).
 
-    verbose: int, optional
-        verbosity level (0 means no message).
+        verbose: int, optional
+            verbosity level (0 means no message).
 
-    Returns
-    -------
-    data: string
-        The downloaded file.
+        Returns
+        -------
+        data: string
+            The downloaded file.
 
     """
 
@@ -227,39 +258,41 @@ def _chunk_read_(response, local_file, chunk_size=8192, report_hook=None,
 
 def _get_dataset_dir(sub_dir=None, data_dir=None, default_paths=None,
                      verbose=1):
-    """ Create if necessary and returns data directory of given dataset.
-
-    Parameters
-    ----------
-    sub_dir: string
-        Name of sub-dir
-
-    data_dir: string, optional
-        Path of the data directory. Used to force data storage in a specified
-        location. Default: None
-
-    default_paths: list of string, optional
-        Default system paths in which the dataset may already have been
-        installed by a third party software. They will be checked first.
-
-    verbose: int, optional
-        verbosity level (0 means no message).
-
-    Returns
-    -------
-    data_dir: string
-        Path of the given dataset directory.
-
-    Notes
-    -----
-    This function retrieves the datasets directory (or data directory) using
-    the following priority :
-    1. defaults system paths
-    2. the keyword argument data_dir
-    3. the global environment variable WEB_SHARED_DATA
-    4. the user environment variable WEB_DATA
-    5. web_data in the user home folder
     """
+        Create if necessary and returns data directory of given dataset.
+
+        Parameters
+        ----------
+        sub_dir: string
+            Name of sub-dir
+
+        data_dir: string, optional
+            Path of the data directory. Used to force data storage in a specified
+            location. Default: None
+
+        default_paths: list of string, optional
+            Default system paths in which the dataset may already have been
+            installed by a third party software. They will be checked first.
+
+        verbose: int, optional
+            verbosity level (0 means no message).
+
+        Returns
+        -------
+        data_dir: string
+            Path of the given dataset directory.
+
+        Notes
+        -----
+        This function retrieves the datasets directory (or data directory) using
+        the following priority :
+        1. defaults system paths
+        2. the keyword argument data_dir
+        3. the global environment variable WEB_SHARED_DATA
+        4. the user environment variable WEB_DATA
+        5. web_data in the user home folder
+    """
+
     # We build an array of successive paths by priority
     # The boolean indicates if it is a pre_dir: in that case, we won't add the
     # dataset name to the path.
@@ -320,24 +353,26 @@ def _get_dataset_dir(sub_dir=None, data_dir=None, default_paths=None,
 
 
 def _uncompress_file(file_, delete_archive=True, verbose=1):
-    """Uncompress files contained in a data_set.
-
-    Parameters
-    ----------
-    file: string
-        path of file to be uncompressed.
-
-    delete_archive: bool, optional
-        Wheteher or not to delete archive once it is uncompressed.
-        Default: True
-
-    verbose: int, optional
-        verbosity level (0 means no message).
-
-    Notes
-    -----
-    This handles zip, tar, gzip and bzip files only.
     """
+        Uncompress files contained in a data_set.
+
+        Parameters
+        ----------
+        file: string
+            path of file to be uncompressed.
+
+        delete_archive: bool, optional
+            Wheteher or not to delete archive once it is uncompressed.
+            Default: True
+
+        verbose: int, optional
+            verbosity level (0 means no message).
+
+        Notes
+        -----
+        This handles zip, tar, gzip and bzip files only.
+    """
+
     if verbose > 0:
         print('Extracting data from %s...' % file_)
     data_dir = os.path.dirname(file_)
@@ -385,22 +420,24 @@ def _uncompress_file(file_, delete_archive=True, verbose=1):
 
 
 def _filter_column(array, col, criteria):
-    """ Return index array matching criteria
-
-    Parameters
-    ----------
-
-    array: numpy array with columns
-        Array in which data will be filtered
-
-    col: string
-        Name of the column
-
-    criteria: integer (or float), pair of integers, string or list of these
-        if integer, select elements in column matching integer
-        if a tuple, select elements between the limits given by the tuple
-        if a string, select elements that match the string
     """
+        Return index array matching criteria
+
+        Parameters
+        ----------
+
+        array: numpy array with columns
+            Array in which data will be filtered
+
+        col: string
+            Name of the column
+
+        criteria: integer (or float), pair of integers, string or list of these
+            if integer, select elements in column matching integer
+            if a tuple, select elements between the limits given by the tuple
+            if a string, select elements that match the string
+    """
+
     # Raise an error if the column does not exist. This is the only way to
     # test it across all possible types (pandas, recarray...)
     try:
@@ -433,20 +470,21 @@ def _filter_column(array, col, criteria):
 
 
 def _filter_columns(array, filters, combination='and'):
-    """ Return indices of recarray entries that match criteria.
+    """
+        Return indices of recarray entries that match criteria.
 
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    array: numpy array with columns
-        Array in which data will be filtered
+        array: numpy array with columns
+            Array in which data will be filtered
 
-    filters: list of criteria
-        See _filter_column
+        filters: list of criteria
+            See _filter_column
 
-    combination: string, optional
-        String describing the combination operator. Possible values are "and"
-        and "or".
+        combination: string, optional
+            String describing the combination operator. Possible values are "and"
+            and "or".
     """
     if combination == 'and':
         fcomb = np.logical_and
@@ -463,6 +501,9 @@ def _filter_columns(array, filters, combination='and'):
 
 
 def _get_dataset_descr(ds_name):
+    """
+
+    """
     module_path = os.path.dirname(os.path.abspath(__file__))
 
     fname = ds_name
@@ -481,8 +522,10 @@ def _get_dataset_descr(ds_name):
 
 
 def movetree(src, dst):
-    """Move an entire tree to another directory. Any existing file is
-    overwritten"""
+    """
+        Move an entire tree to another directory. Any existing file is
+        overwritten
+    """
     names = os.listdir(src)
 
     # Create destination dir if it does not exist
@@ -512,64 +555,68 @@ def movetree(src, dst):
 # and it might have not been an optimal choice
 def _fetch_file(url, data_dir=TEMP, uncompress=False, move=False, md5sum=None,
                 username=None, password=None, mock=False, handlers=[], resume=True, verbose=0):
-    """Load requested dataset, downloading it if needed or requested.
+    """
+        Load requested dataset, downloading it if needed or requested.
 
-    This function retrieves files from the hard drive or download them from
-    the given urls. Note to developpers: All the files will be first
-    downloaded in a sandbox and, if everything goes well, they will be moved
-    into the folder of the dataset. This prevents corrupting previously
-    downloaded data. In case of a big dataset, do not hesitate to make several
-    calls if needed.
+        This function retrieves files from the hard drive or download them from
+        the given urls. Note to developpers: All the files will be first
+        downloaded in a sandbox and, if everything goes well, they will be moved
+        into the folder of the dataset. This prevents corrupting previously
+        downloaded data. In case of a big dataset, do not hesitate to make several
+        calls if needed.
 
-    Parameters
-    ----------
-    dataset_name: string
-        Unique dataset name
+        Parameters
+        ----------
+        dataset_name: string
+            Unique dataset name
 
-    resume: bool, optional
-        If true, try to resume partially downloaded files
+        resume: bool, optional
+            If true, try to resume partially downloaded files
 
-    uncompress: bool, optional
-        If true, will uncompress zip
+        uncompress: bool, optional
+            If true, will uncompress zip
 
-    move: str, optional
-        If True, will move downloaded file to given relative path.
-        NOTE: common usage is zip_file_id/zip_file.zip together
-        with uncompress set to True
+        move: str, optional
+            If True, will move downloaded file to given relative path.
+            NOTE: common usage is zip_file_id/zip_file.zip together
+            with uncompress set to True
 
-    md5sum: string, optional
-        MD5 sum of the file. Checked if download of the file is required
+        md5sum: string, optional
+            MD5 sum of the file. Checked if download of the file is required
 
-    username: string, optional
-        Username used for basic HTTP authentication
+        username: string, optional
+            Username used for basic HTTP authentication
 
-    password: string, optional
-        Password used for basic HTTP authentication
+        password: string, optional
+            Password used for basic HTTP authentication
 
-    handlers: list of BaseHandler, optional
-        urllib handlers passed to urllib.request.build_opener. Used by
-        advanced users to customize request handling.
+        handlers: list of BaseHandler, optional
+            urllib handlers passed to urllib.request.build_opener. Used by
+            advanced users to customize request handling.
 
-    data_dir: string, optional
-        Path of the data directory. Used to force data storage in a specified
-        location. Default: None
+        data_dir: string, optional
+            Path of the data directory. Used to force data storage in a specified
+            location. Default: None
 
-    resume: bool, optional
-        If true, try resuming download if possible
+        resume: bool, optional
+            If true, try resuming download if possible
 
-    verbose: int, optional
-        verbosity level (0 means no message).
+        verbose: int, optional
+            verbosity level (0 means no message).
 
-    Returns
-    -------
-    files: list of string
-        Absolute paths of downloaded files on disk
+        Returns
+        -------
+        files: list of string
+            Absolute paths of downloaded files on disk
     """
 
     # TODO: move to global scope and rename
     def _fetch_helper(url, data_dir=TEMP, resume=True, overwrite=False,
                       md5sum=None, username=None, password=None, handlers=[],
                       verbose=1):
+        """
+
+        """
         if not os.path.isabs(data_dir):
             data_dir = _get_dataset_dir(data_dir)
 
@@ -790,18 +837,19 @@ def _fetch_file(url, data_dir=TEMP, uncompress=False, move=False, md5sum=None,
 
 
 def _tree(path, pattern=None, dictionary=False):
-    """ Return a directory tree under the form of a dictionaries and list
+    """
+        Return a directory tree under the form of a dictionaries and list
 
-    Parameters:
-    -----------
-    path: string
-        Path browsed
+        Parameters:
+        -----------
+        path: string
+            Path browsed
 
-    pattern: string, optional
-        Pattern used to filter files (see fnmatch)
+        pattern: string, optional
+            Pattern used to filter files (see fnmatch)
 
-    dictionary: boolean, optional
-        If True, the function will return a dict instead of a list
+        dictionary: boolean, optional
+            If True, the function will return a dict instead of a list
     """
     files = []
     dirs = [] if not dictionary else {}

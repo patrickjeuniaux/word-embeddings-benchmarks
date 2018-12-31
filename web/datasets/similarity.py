@@ -13,155 +13,6 @@ from sklearn.datasets.base import Bunch
 from .utils import _get_as_pd, _fetch_file
 
 
-def fetch_MTurk():
-    """
-    Fetch MTurk dataset for testing attributional similarity
-
-    Returns
-    -------
-    data : sklearn.datasets.base.Bunch
-        dictionary-like object. Keys of interest:
-        'X': matrix of 2 words per column,
-        'y': vector with scores,
-
-    References
-    ----------
-    Radinsky, Kira et al., "A Word at a Time: Computing Word Relatedness Using Temporal Semantic Analysis", 2011
-
-    Notes
-    -----
-    Human labeled examples of word semantic relatedness. The data pairs were generated using an algorithm as
-    described in the paper by [K. Radinsky, E. Agichtein, E. Gabrilovich, S. Markovitch.].
-    Each pair of words was evaluated by 10 people on a scale of 1-5.
-
-    Additionally scores were multiplied by factor of 2.
-    """
-
-    print("\nFetch '{}' dataset\n---\n".
-          format("MTurk"))
-
-    data = _get_as_pd('https://www.dropbox.com/s/f1v4ve495mmd9pw/EN-TRUK.txt?dl=1',
-                      'similarity', header=None, sep=" ").values
-    return Bunch(X=data[:, 0:2].astype("object"),
-                 y=2 * data[:, 2].astype(np.float))
-
-
-def fetch_MEN(which="all", form="natural"):
-    """
-    Fetch MEN dataset for testing similarity and relatedness
-
-    Parameters
-    ----------
-    which : "all", "test" or "dev"
-    form : "lem" or "natural"
-
-    Returns
-    -------
-    data : sklearn.datasets.base.Bunch
-        dictionary-like object. Keys of interest:
-        'X': matrix of 2 words per column,
-        'y': vector with scores
-
-    References
-    ----------
-    Published at http://clic.cimec.unitn.it/~elia.bruni/MEN.html.
-
-    Notes
-    -----
-    Scores for MEN are calculated differently than in WS353 or SimLex999.
-    Furthermore scores where rescaled to 0 - 10 scale to match standard scaling.
-
-    The MEN Test Collection contains two sets of English word pairs (one for training and one for testing)
-    together with human-assigned similarity judgments, obtained by crowdsourcing using Amazon Mechanical
-    Turk via the CrowdFlower interface. The collection can be used to train and/or test computer algorithms
-    implementing semantic similarity and relatedness measures.
-    """
-
-    print("\nFetch '{}' dataset, which: {}, form: {}\n---\n".
-          format("MEN", which, form))
-
-    if which == "dev":
-        data = _get_as_pd('https://www.dropbox.com/s/c0hm5dd95xapenf/EN-MEN-LEM-DEV.txt?dl=1',
-                          'similarity', header=None, sep=" ")
-    elif which == "test":
-        data = _get_as_pd('https://www.dropbox.com/s/vdmqgvn65smm2ah/EN-MEN-LEM-TEST.txt?dl=1',
-                          'similarity/EN-MEN-LEM-TEST', header=None, sep=" ")
-    elif which == "all":
-        data = _get_as_pd('https://www.dropbox.com/s/b9rv8s7l32ni274/EN-MEN-LEM.txt?dl=1',
-                          'similarity', header=None, sep=" ")
-    else:
-        raise RuntimeError("Not recognized which parameter")
-
-    if form == "natural":
-        # Remove last two chars from first two columns
-        data = data.apply(lambda x: [y if isinstance(y, float) else y[0:-2] for y in x])
-    elif form != "lem":
-        raise RuntimeError("Not recognized form argument")
-
-    return Bunch(X=data.values[:, 0:2].astype("object"), y=data.values[:, 2:].astype(np.float) / 5.0)
-
-
-def fetch_WS353(which="all"):
-    """
-    Fetch WS353 dataset for testing attributional and
-    relatedness similarity
-
-    Parameters
-    ----------
-    which : 'all': for both relatedness and attributional similarity,
-            'relatedness': for relatedness similarity
-            'similarity': for attributional similarity
-            'set1': as divided by authors
-            'set2': as divided by authors
-
-    References
-    ----------
-    Finkelstein, Gabrilovich, "Placing Search in Context: The Concept Revisited†", 2002
-    Agirre, Eneko et al., "A Study on Similarity and Relatedness Using Distributional and WordNet-based Approaches",
-    2009
-
-    Returns
-    -------
-    data : sklearn.datasets.base.Bunch
-        dictionary-like object. Keys of interest:
-        'X': matrix of 2 words per column,
-        'y': vector with scores,
-        'sd': vector of std of scores if available (for set1 and set2)
-    """
-
-    print("\nFetch '{}' dataset, which: {}\n---\n".
-          format("WS353", which))
-
-    if which == "all":
-        data = _get_as_pd('https://www.dropbox.com/s/eqal5qj97ajaycz/EN-WS353.txt?dl=1',
-                          'similarity', header=0, sep="\t")
-    elif which == "relatedness":
-        data = _get_as_pd('https://www.dropbox.com/s/x94ob9zg0kj67xg/EN-WSR353.txt?dl=1',
-                          'similarity', header=None, sep="\t")
-    elif which == "similarity":
-        data = _get_as_pd('https://www.dropbox.com/s/ohbamierd2kt1kp/EN-WSS353.txt?dl=1',
-                          'similarity', header=None, sep="\t")
-    elif which == "set1":
-        data = _get_as_pd('https://www.dropbox.com/s/opj6uxzh5ov8gha/EN-WS353-SET1.txt?dl=1',
-                          'similarity', header=0, sep="\t")
-    elif which == "set2":
-        data = _get_as_pd('https://www.dropbox.com/s/w03734er70wyt5o/EN-WS353-SET2.txt?dl=1',
-                          'similarity', header=0, sep="\t")
-    else:
-        raise RuntimeError("Not recognized which parameter")
-
-    # We basically select all the columns available
-    X = data.values[:, 0:2]
-    y = data.values[:, 2].astype(np.float)
-
-    # We have also scores
-    if data.values.shape[1] > 3:
-        sd = np.std(data.values[:, 2:15].astype(np.float), axis=1).flatten()
-        return Bunch(X=X.astype("object"), y=y, sd=sd)
-    else:
-        return Bunch(X=X.astype("object"), y=y)
-
-
 def fetch_RG65():
     """
     Fetch Rubenstein and Goodenough dataset for testing attributional and
@@ -192,6 +43,40 @@ def fetch_RG65():
 
     return Bunch(X=data[:, 0:2].astype("object"),
                  y=data[:, 2].astype(np.float) * 10.0 / 4.0)
+
+
+def fetch_MTurk():
+    """
+    Fetch MTurk dataset for testing attributional similarity
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores,
+
+    References
+    ----------
+    Radinsky, Kira et al., "A Word at a Time: Computing Word Relatedness Using Temporal Semantic Analysis", 2011
+
+    Notes
+    -----
+    Human labeled examples of word semantic relatedness. The data pairs were generated using an algorithm as
+    described in the paper by [K. Radinsky, E. Agichtein, E. Gabrilovich, S. Markovitch.].
+    Each pair of words was evaluated by 10 people on a scale of 1-5.
+
+    Additionally scores were multiplied by factor of 2.
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("MTurk"))
+
+    data = _get_as_pd('https://www.dropbox.com/s/f1v4ve495mmd9pw/EN-TRUK.txt?dl=1',
+                      'similarity', header=None, sep=" ").values
+
+    return Bunch(X=data[:, 0:2].astype("object"),
+                 y=2 * data[:, 2].astype(np.float))
 
 
 def fetch_RW():
@@ -226,18 +111,15 @@ def fetch_RW():
 
     data = _get_as_pd('https://www.dropbox.com/s/xhimnr51kcla62k/EN-RW.txt?dl=1',
                       'similarity', header=None, sep="\t").values
+
     return Bunch(X=data[:, 0:2].astype("object"),
                  y=data[:, 2].astype(np.float),
                  sd=np.std(data[:, 3:].astype(np.float)))
 
 
-def fetch_multilingual_SimLex999(which="EN"):
+def fetch_TR9856():
     """
-    Fetch Multilingual SimLex999 dataset for testing attributional similarity
-
-    Parameters
-    -------
-    which : "EN", "RU", "IT" or "DE" for language
+    Fetch TR9856 dataset for testing multi-word term relatedness
 
     Returns
     -------
@@ -245,52 +127,87 @@ def fetch_multilingual_SimLex999(which="EN"):
         dictionary-like object. Keys of interest:
         'X': matrix of 2 words per column,
         'y': vector with scores,
-        'sd': vector of sd of scores,
+        'topic': vector of topics providing context for each pair of terms
 
     References
     ----------
-    Published at http://technion.ac.il/~ira.leviant/MultilingualVSMdata.html.
+    Levy, Ran et al., "TR9856: A multi-word term relatedness benchmark", 2015.
 
     Notes
     -----
-    Scores for EN are different than the original SimLex999 dataset.
-
-    Authors description:
-    Multilingual SimLex999 resource consists of translations of the SimLex999 word similarity data set to
-    three languages: German, Italian and Russian. Each of the translated datasets is scored by
-    13 human judges (crowdworkers) - all fluent speakers of its language. For consistency, we
-    also collected human judgments for the original English corpus according to the same protocol
-    applied to the other languages. This dataset allows to explore the impact of the "judgement language"
-    (the language in which word pairs are presented to the human judges) on the resulted similarity scores
-    and to evaluate vector space models on a truly multilingual setup (i.e. when both the training and the
-    test data are multilingual).
     """
 
-    print("\nFetch '{}' dataset, which: {}\n---\n".
-          format("multilingual SimLex999", which))
+    print("\nFetch '{}' dataset\n---\n".
+          format("TR9856"))
 
-    if which == "EN":
-        data = _get_as_pd('https://www.dropbox.com/s/nczc4ao6koqq7qm/EN-MSIM999.txt?dl=1',
-                          'similarity', header=None, encoding='utf-8', sep=" ")
-    elif which == "DE":
-        data = _get_as_pd('https://www.dropbox.com/s/ucpwrp0ahawsdtf/DE-MSIM999.txt?dl=1',
-                          'similarity', header=None, encoding='utf-8', sep=" ")
-    elif which == "IT":
-        data = _get_as_pd('https://www.dropbox.com/s/siqjagyz8dkjb9q/IT-MSIM999.txt?dl=1',
-                          'similarity', header=None, encoding='utf-8', sep=" ")
-    elif which == "RU":
-        data = _get_as_pd('https://www.dropbox.com/s/3v26edm9a31klko/RU-MSIM999.txt?dl=1',
-                          'similarity', header=None, encoding='utf-8', sep=" ")
-    else:
-        raise RuntimeError("Not recognized which parameter")
+    url = 'https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_TR9856.v2.zip'
+
+    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=0)
+
+    input_path = os.path.join(folder,
+                              'IBM_Debater_(R)_TR9856.v0.2', 'TermRelatednessResults.csv')
+
+    data = pd.read_csv(input_path, encoding="iso-8859-1")
 
     # We basically select all the columns available
-    X = data.values[:, 0:2]
-    scores = data.values[:, 2:].astype(np.float)
-    y = np.mean(scores, axis=1)
-    sd = np.std(scores, axis=1)
 
-    return Bunch(X=X.astype("object"), y=y, sd=sd)
+    X = data[['term1', 'term2']].values
+
+    y = data['score'].values
+
+    topic = data['topic'].values
+
+    return Bunch(X=X.astype("object"), y=y, topic=topic)
+
+
+def fetch_SimVerb3500():
+    """
+    Fetch SimVerb-3500 dataset for testing verbs similarity
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores
+
+    References
+    ----------
+    Gerz, D., Vulić, I., Hill, F., Reichart, R., & Korhonen, A. (2016). SimVerb-3500: A Large-Scale Evaluation Set of Verb Similarity. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (pp. 2173–2182). Stroudsburg, PA. Retrieved from http://arxiv.org/abs/1608.00869
+
+    Notes
+    -----
+     SimVerb-3500 (...) provides human ratings for the similarity of 3,500 verb pairs.
+    """
+
+    """
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores
+    -------
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("SimVerb-3500"))
+
+    url = 'http://people.ds.cam.ac.uk/dsg40/paper/simverb/simverb-3500-data.zip'
+
+    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=1)
+
+    input_path = os.path.join(folder, 'data', 'SimVerb-3500.txt')
+
+    df = pd.read_csv(input_path, header=None, encoding='utf-8', sep="\t")
+
+    data = df.values
+
+    X = data[:, 0:2].astype("object")
+
+    y = data[:, 3].astype(np.float)
+
+    return Bunch(X=X, y=y)
 
 
 def fetch_SimLex999():
@@ -339,9 +256,13 @@ def fetch_SimLex999():
     return Bunch(X=X.astype("object"), y=y, sd=sd, conc=conc, POS=POS, assoc=assoc)
 
 
-def fetch_TR9856():
+def fetch_multilingual_SimLex999(which="EN"):
     """
-    Fetch TR9856 dataset for testing multi-word term relatedness
+    Fetch Multilingual SimLex999 dataset for testing attributional similarity
+
+    Parameters
+    -------
+    which : "EN", "RU", "IT" or "DE" for language
 
     Returns
     -------
@@ -349,40 +270,149 @@ def fetch_TR9856():
         dictionary-like object. Keys of interest:
         'X': matrix of 2 words per column,
         'y': vector with scores,
-        'topic': vector of topics providing context for each pair of terms
+        'sd': vector of sd of scores,
 
     References
     ----------
-    Levy, Ran et al., "TR9856: A multi-word term relatedness benchmark", 2015.
+    Published at http://technion.ac.il/~ira.leviant/MultilingualVSMdata.html.
 
     Notes
     -----
+    Scores for EN are different than the original SimLex999 dataset.
+
+    Authors description:
+    Multilingual SimLex999 resource consists of translations of the SimLex999 word similarity data set to
+    three languages: German, Italian and Russian. Each of the translated datasets is scored by
+    13 human judges (crowdworkers) - all fluent speakers of its language. For consistency, we
+    also collected human judgments for the original English corpus according to the same protocol
+    applied to the other languages. This dataset allows to explore the impact of the "judgement language"
+    (the language in which word pairs are presented to the human judges) on the resulted similarity scores
+    and to evaluate vector space models on a truly multilingual setup (i.e. when both the training and the
+    test data are multilingual).
     """
 
-    print("\nFetch '{}' dataset\n---\n".
-          format("TR9856"))
+    print("\nFetch '{}' dataset, which: {}\n---\n".
+          format("multilingual SimLex999", which))
 
-    url = 'https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_TR9856.v2.zip'
+    if which == "EN":
 
-    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=0)
+        data = _get_as_pd('https://www.dropbox.com/s/nczc4ao6koqq7qm/EN-MSIM999.txt?dl=1',
+                          'similarity', header=None, encoding='utf-8', sep=" ")
+    elif which == "DE":
 
-    input_path = os.path.join(folder,
-                              'IBM_Debater_(R)_TR9856.v0.2', 'TermRelatednessResults.csv')
+        data = _get_as_pd('https://www.dropbox.com/s/ucpwrp0ahawsdtf/DE-MSIM999.txt?dl=1',
+                          'similarity', header=None, encoding='utf-8', sep=" ")
+    elif which == "IT":
 
-    data = pd.read_csv(input_path, encoding="iso-8859-1")
+        data = _get_as_pd('https://www.dropbox.com/s/siqjagyz8dkjb9q/IT-MSIM999.txt?dl=1',
+                          'similarity', header=None, encoding='utf-8', sep=" ")
+    elif which == "RU":
+
+        data = _get_as_pd('https://www.dropbox.com/s/3v26edm9a31klko/RU-MSIM999.txt?dl=1',
+                          'similarity', header=None, encoding='utf-8', sep=" ")
+    else:
+
+        raise RuntimeError("Not recognized which parameter")
 
     # We basically select all the columns available
-    X = data[['term1', 'term2']].values
-    y = data['score'].values
-    topic = data['topic'].values
 
-    return Bunch(X=X.astype("object"), y=y, topic=topic)
+    X = data.values[:, 0:2]
+
+    scores = data.values[:, 2:].astype(np.float)
+
+    y = np.mean(scores, axis=1)
+
+    sd = np.std(scores, axis=1)
+
+    return Bunch(X=X.astype("object"), y=y, sd=sd)
 
 
-def fetch_SimVerb3500():
-
+def fetch_WS353(which="all"):
     """
-    Fetch SimVerb-3500 dataset for testing verbs similarity
+    Fetch WS353 dataset for testing attributional and
+    relatedness similarity
+
+    Parameters
+    ----------
+    which : 'all': for both relatedness and attributional similarity,
+            'relatedness': for relatedness similarity
+            'similarity': for attributional similarity
+            'set1': as divided by authors
+            'set2': as divided by authors
+
+    References
+    ----------
+    Finkelstein, Gabrilovich, "Placing Search in Context: The Concept Revisited†", 2002
+    Agirre, Eneko et al., "A Study on Similarity and Relatedness Using Distributional and WordNet-based Approaches",
+    2009
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': matrix of 2 words per column,
+        'y': vector with scores,
+        'sd': vector of std of scores if available (for set1 and set2)
+    """
+
+    print("\nFetch '{}' dataset, which: {}\n---\n".
+          format("WS353", which))
+
+    if which == "all":
+
+        data = _get_as_pd('https://www.dropbox.com/s/eqal5qj97ajaycz/EN-WS353.txt?dl=1',
+                          'similarity', header=0, sep="\t")
+
+    elif which == "relatedness":
+
+        data = _get_as_pd('https://www.dropbox.com/s/x94ob9zg0kj67xg/EN-WSR353.txt?dl=1',
+                          'similarity', header=None, sep="\t")
+
+    elif which == "similarity":
+
+        data = _get_as_pd('https://www.dropbox.com/s/ohbamierd2kt1kp/EN-WSS353.txt?dl=1',
+                          'similarity', header=None, sep="\t")
+
+    elif which == "set1":
+
+        data = _get_as_pd('https://www.dropbox.com/s/opj6uxzh5ov8gha/EN-WS353-SET1.txt?dl=1',
+                          'similarity', header=0, sep="\t")
+
+    elif which == "set2":
+
+        data = _get_as_pd('https://www.dropbox.com/s/w03734er70wyt5o/EN-WS353-SET2.txt?dl=1',
+                          'similarity', header=0, sep="\t")
+
+    else:
+        raise RuntimeError("Not recognized which parameter")
+
+    # We basically select all the columns available
+
+    X = data.values[:, 0:2]
+
+    y = data.values[:, 2].astype(np.float)
+
+    # We have also scores
+
+    if data.values.shape[1] > 3:
+
+        sd = np.std(data.values[:, 2:15].astype(np.float), axis=1).flatten()
+
+        return Bunch(X=X.astype("object"), y=y, sd=sd)
+
+    else:
+
+        return Bunch(X=X.astype("object"), y=y)
+
+
+def fetch_MEN(which="all", form="natural"):
+    """
+    Fetch MEN dataset for testing similarity and relatedness
+
+    Parameters
+    ----------
+    which : "all", "test" or "dev"
+    form : "lem" or "natural"
 
     Returns
     -------
@@ -393,39 +423,46 @@ def fetch_SimVerb3500():
 
     References
     ----------
-    Gerz, D., Vulić, I., Hill, F., Reichart, R., & Korhonen, A. (2016). SimVerb-3500: A Large-Scale Evaluation Set of Verb Similarity. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (pp. 2173–2182). Stroudsburg, PA. Retrieved from http://arxiv.org/abs/1608.00869
+    Published at http://clic.cimec.unitn.it/~elia.bruni/MEN.html.
 
     Notes
     -----
-     SimVerb-3500 (...) provides human ratings for the similarity of 3,500 verb pairs.
+    Scores for MEN are calculated differently than in WS353 or SimLex999.
+    Furthermore scores where rescaled to 0 - 10 scale to match standard scaling.
+
+    The MEN Test Collection contains two sets of English word pairs (one for training and one for testing)
+    together with human-assigned similarity judgments, obtained by crowdsourcing using Amazon Mechanical
+    Turk via the CrowdFlower interface. The collection can be used to train and/or test computer algorithms
+    implementing semantic similarity and relatedness measures.
     """
 
+    print("\nFetch '{}' dataset, which: {}, form: {}\n---\n".
+          format("MEN", which, form))
 
-    """
-    Returns
-    -------
-    data : sklearn.datasets.base.Bunch
-        dictionary-like object. Keys of interest:
-        'X': matrix of 2 words per column,
-        'y': vector with scores
-    -------
-    """
+    if which == "dev":
 
-    print("\nFetch '{}' dataset\n---\n".
-          format("SimVerb-3500"))
+        data = _get_as_pd('https://www.dropbox.com/s/c0hm5dd95xapenf/EN-MEN-LEM-DEV.txt?dl=1',
+                          'similarity', header=None, sep=" ")
+    elif which == "test":
 
-    url = 'http://people.ds.cam.ac.uk/dsg40/paper/simverb/simverb-3500-data.zip'
+        data = _get_as_pd('https://www.dropbox.com/s/vdmqgvn65smm2ah/EN-MEN-LEM-TEST.txt?dl=1',
+                          'similarity/EN-MEN-LEM-TEST', header=None, sep=" ")
+    elif which == "all":
 
-    folder = _fetch_file(url, 'similarity', uncompress=True, verbose=1)
+        data = _get_as_pd('https://www.dropbox.com/s/b9rv8s7l32ni274/EN-MEN-LEM.txt?dl=1',
+                          'similarity', header=None, sep=" ")
+    else:
 
-    input_path = os.path.join(folder, 'data', 'SimVerb-3500.txt')
+        raise RuntimeError("Not recognized which parameter")
 
-    df = pd.read_csv(input_path, header=None, encoding='utf-8', sep="\t")
+    if form == "natural":
 
-    data = df.values
+        # Remove last two characters from first two columns
 
-    X = data[:, 0:2].astype("object")
+        data = data.apply(lambda x: [y if isinstance(y, float) else y[0:-2] for y in x])
 
-    y = data[:, 3].astype(np.float)
+    elif form != "lem":
 
-    return Bunch(X=X, y=y)
+        raise RuntimeError("Not recognized form argument")
+
+    return Bunch(X=data.values[:, 0:2].astype("object"), y=data.values[:, 2:].astype(np.float) / 5.0)

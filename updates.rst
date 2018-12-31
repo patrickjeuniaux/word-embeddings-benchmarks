@@ -8,6 +8,20 @@ Patrick P. J. M. H. Jeuniaux
 University of Pisa
 
 
+6. Count the number of items
+----------------------------
+2018-12-31
+
+Add `web.datasets.items <web/datasets/items.py>`_
+
+to count the number of items in the datasets.
+
+The use of this module is illustrated in
+
+`scripts.count_items <scripts/count_items.py>`_
+
+
+
 
 5. Avoid fetching NMT word embeddings
 -------------------------------------
