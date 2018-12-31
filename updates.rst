@@ -13,23 +13,19 @@ University of Pisa
 -------------------------------------
 2018-12-28
 
-NMT embeddings are no longer available thru the provided url.
+In `scripts.evaluate_embeddings <scripts/evaluate_embeddings.py>`_
 
-This link is broken:
+the job of evaluating NMT is commented out
 
-https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz
+because NMT embeddings are no longer available thru the provided url
 
-In scripts.evaluate_embeddings
-
-the job of evaluating NMT is removed.
-
-
+(this link is broken: https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz).
 
 4. Avoid generator error in Python 3.7
 --------------------------------------
 2018-12-27
 
-In web.utils,
+In `web.utils <web/utils.py>`_
 
 in def batched,
 
@@ -48,7 +44,6 @@ to void
 
 RuntimeError: generator raised StopIteration
 
-
 See : Generator raised StopIteration when locateOnScreen
 
 https://stackoverflow.com/questions/51371846/generator-raised-stopiteration-when-locateonscreen/51371879#51371879
@@ -59,7 +54,7 @@ https://stackoverflow.com/questions/51371846/generator-raised-stopiteration-when
 ---------------------------------
 2018-12-27
 
-In web.datasets.utils,
+In `web.datasets.utils <web/datasets/utils.py>`_
 
 in def _fetch_helper,
 
@@ -81,7 +76,7 @@ a conflict in folder creation resulting from multiprocessing.
 --------------------------------
 2018-12-27
 
-In web.datasets.similarity,
+In `web.datasets.similarity <web/datasets/similarity.py>`_
 
 added
 
@@ -93,11 +88,13 @@ to fetch the SimVerb3500 dataset.
 ----------------------
 2018-12-27
 
-In several places,
+In several places in the code such as
+
+`web.embeddings <web/embeddings.py>`_
 
 added
 
-some print functions
+print functions
 
 to increase the readibility of the program execution
 
