@@ -2,17 +2,40 @@
 """
  Evaluation functions
 """
+
+# external imports
+# ---
+
 import logging
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from .datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999, fetch_MTurk, fetch_RG65, fetch_RW, fetch_TR9856
-from .datasets.categorization import fetch_AP, fetch_battig, fetch_BLESS, fetch_ESSLI_1a, fetch_ESSLI_2b, \
-    fetch_ESSLI_2c
-from web.analogy import *
 from six import iteritems
+
+# internal imports
+# ---
+
+from .datasets.similarity import fetch_MEN
+from .datasets.similarity import fetch_WS353
+from .datasets.similarity import fetch_SimLex999
+from .datasets.similarity import fetch_MTurk
+from .datasets.similarity import fetch_RG65
+from .datasets.similarity import fetch_RW
+from .datasets.similarity import fetch_TR9856
+
+from .datasets.categorization import fetch_AP
+from .datasets.categorization import fetch_battig
+from .datasets.categorization import fetch_BLESS
+from .datasets.categorization import fetch_ESSLI_1a
+from .datasets.categorization import fetch_ESSLI_2b
+from .datasets.categorization import fetch_ESSLI_2c
+
+from web.analogy import *
+
+
 from web.embedding import Embedding
 
 logger = logging.getLogger(__name__)
+
 
 def calculate_purity(y_true, y_pred):
     """
@@ -114,7 +137,6 @@ def evaluate_categorization(w, X, y, method="all", seed=None):
     return best_purity
 
 
-
 def evaluate_on_semeval_2012_2(w):
     """
     Simple method to score embedding using SimpleAnalogySolver
@@ -145,7 +167,7 @@ def evaluate_on_semeval_2012_2(w):
 
         questions = data.X[c]
         question_left, question_right = np.vstack(w.get(word, mean_vector) for word in questions[:, 0]), \
-                                        np.vstack(w.get(word, mean_vector) for word in questions[:, 1])
+            np.vstack(w.get(word, mean_vector) for word in questions[:, 1])
 
         scores = np.dot(prot_left - prot_right, (question_left - question_right).T)
 
@@ -258,8 +280,7 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
         X_cat = data.X[data.category == cat]
         X_cat = X_cat[0:max_pairs]
 
-        logger.info("Processing {} with {} pairs, {} questions".format(cat, X_cat.shape[0]
-                                                                       , X_cat.shape[0] * (X_cat.shape[0] - 1)))
+        logger.info("Processing {} with {} pairs, {} questions".format(cat, X_cat.shape[0], X_cat.shape[0] * (X_cat.shape[0] - 1)))
 
         # For each category construct question-answer pairs
         size = X_cat.shape[0] * (X_cat.shape[0] - 1)
@@ -331,11 +352,10 @@ def evaluate_similarity(w, X, y):
     if missing_words > 0:
         logger.warning("Missing {} words. Will replace them with mean vector".format(missing_words))
 
-
     mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
     A = np.vstack(w.get(word, mean_vector) for word in X[:, 0])
     B = np.vstack(w.get(word, mean_vector) for word in X[:, 1])
-    scores = np.array([v1.dot(v2.T)/(np.linalg.norm(v1)*np.linalg.norm(v2)) for v1, v2 in zip(A, B)])
+    scores = np.array([v1.dot(v2.T) / (np.linalg.norm(v1) * np.linalg.norm(v2)) for v1, v2 in zip(A, B)])
     return scipy.stats.spearmanr(scores, y).correlation
 
 
