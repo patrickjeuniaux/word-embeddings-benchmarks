@@ -49,7 +49,7 @@ def count_analogy():
     assert count_semeval_2012_2("all") == 3218
     assert count_wordrep() == 237409102
     assert count_SAT() == 374
-    count_BATS() # 98000 != 99200 (PROBLEM)
+    count_BATS()  # 98000 != 99200 (PROBLEM)
 
 
 def count_categorization():
@@ -62,9 +62,9 @@ def count_categorization():
     count_categorization_items("BLESS")  # 200 != 26554 (PROBLEM)
     count_categorization_items("battig")  # 5231 != 83 (PROBLEM)
 
-    count_categorization_items("ESSLI_1a")  # 44
-    count_categorization_items("ESSLI_2b")  # 40
-    count_categorization_items("ESSLI_2c")  # 45
+    n1a = count_categorization_items("ESSLI_1a")  # 44
+    n2b = count_categorization_items("ESSLI_2b")  # 40
+    n2c = count_categorization_items("ESSLI_2c")  # 45
     # 44 + 40 + 45 = 129 != 134 (PROBLEM)
 
 
