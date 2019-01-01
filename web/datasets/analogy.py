@@ -621,7 +621,8 @@ def fetch_SAT():
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
         'X': the questions
-        'y': the answers (where the first one is the correct one)
+        'y': the answers (between 4 and 5 alternatives
+        - the first one is the good answer)
 
     examples
     --------
