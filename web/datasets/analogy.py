@@ -502,9 +502,44 @@ def fetch_wordrep(subsample=None, rng=None):
 
     # This dataset is too big to calculate and store all word analogy quadruples
 
+    """
+    word pairs
+    ---
+    first five data points as an example:
+
+    internal    internally
+    grateful    gratefully
+    bright  brightly
+    helpless    helplessly
+    oral    orally
+    """
     word_pairs = []
 
+    """
+    categories
+    ---
+    first five data points as an example:
+
+    adjective-to-adverb
+    adjective-to-adverb
+    adjective-to-adverb
+    adjective-to-adverb
+    adjective-to-adverb
+    """
+
     category = []
+
+    """
+    high level categories
+    ---
+    first five data points as an example:
+
+    wikipedia-dict
+    wikipedia-dict
+    wikipedia-dict
+    wikipedia-dict
+    wikipedia-dict
+    """
 
     category_high_level = []
 

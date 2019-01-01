@@ -7,6 +7,7 @@
 # external imports
 # ---
 import numpy as np
+from math import factorial
 
 # internal imports
 # ---
@@ -150,5 +151,94 @@ def count_mikolov(corpus_name):
     n = y.shape[0]
 
     print("number of items = ", n)
+
+    return(n)
+
+
+def number_permutations(k, n):
+    """
+    Calculate the number of permutation of k elements
+    chosen in a set of n elements
+    """
+    return int(factorial(n) / factorial(n - k))
+
+
+def count_wordrep(subsample=None, rng=None):
+    """
+        Return the number of items in wordrep
+        and display a sample of the data
+        for checking purposes
+    """
+
+    data = analogy.fetch_wordrep(subsample, rng)
+
+    X = data.X
+
+    categories = data.category
+
+    categories_high_level = data.category_high_level
+
+    wordnet_categories = data.wordnet_categories
+
+    wikipedia_categories = data.wikipedia_categories
+
+    all_categories = wordnet_categories | wikipedia_categories
+
+    # display a sample
+    # ---
+
+    limit = 5
+
+    print(X[:limit])
+    print(categories[:limit])
+    print(categories_high_level[:limit])
+
+    print("---")
+    print("")
+    print("WordNet categories:")
+    print("---")
+    print(wordnet_categories)
+    print("")
+    print("Wikipedia categories:")
+    print("---")
+    print(wikipedia_categories)
+
+    # items counting
+    # ---
+
+    n = 0
+
+    p1 = X.shape[0]
+
+    p2 = 0
+
+    print("")
+    print("Statistics")
+    print("---")
+    print("")
+
+    for category in all_categories:
+
+        subX = X[categories == category]
+
+        p = len(subX)
+
+        np = number_permutations(2, p)
+
+        print(category, " : ", p, " pairs, ", np, " permutations ")
+
+        n += np
+
+        p2 += p
+
+    print("---")
+
+    if p2 != p1:
+
+        print ("Problem: p1 = ", p1, " != p2 = ", p2)
+
+    print("number of words pairs = ", p1)
+
+    print("number of items (i.e., number of permutations) = ", n)
 
     return(n)
