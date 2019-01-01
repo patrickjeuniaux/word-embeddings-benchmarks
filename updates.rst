@@ -10,7 +10,7 @@ University of Pisa
 
 6. Count the number of items
 ----------------------------
-2018-12-31
+2018-12-31 --- 2019-01-01
 
 Add `web.datasets.items <web/datasets/items.py>`_
 
@@ -20,7 +20,6 @@ The use of this module is illustrated in
 
 `scripts.count_items <scripts/count_items.py>`_
 
-Note: unfinished
 
 
 5. Avoid fetching NMT word embeddings

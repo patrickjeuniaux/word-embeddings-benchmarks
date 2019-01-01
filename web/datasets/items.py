@@ -14,6 +14,7 @@ from math import factorial
 
 from . import similarity
 from . import analogy
+from . import categorization
 
 
 def count_similarity_items(corpus_name, **kwargs):
@@ -182,8 +183,6 @@ def count_wordrep(subsample=None, rng=None):
 
     wikipedia_categories = data.wikipedia_categories
 
-    all_categories = wordnet_categories | wikipedia_categories
-
     # display a sample
     # ---
 
@@ -217,7 +216,7 @@ def count_wordrep(subsample=None, rng=None):
     print("---")
     print("")
 
-    for category in all_categories:
+    for category in wordnet_categories | wikipedia_categories:
 
         subX = X[categories == category]
 
@@ -240,5 +239,44 @@ def count_wordrep(subsample=None, rng=None):
     print("number of words pairs = ", p1)
 
     print("number of items (i.e., number of permutations) = ", n)
+
+    return(n)
+
+
+def count_categorization_items(corpus_name, **kwargs):
+    """
+        Count the number of items in the categorization dataset
+        and display a sample of the data for checking purposes
+    """
+
+    # dynamically set the fetch function name
+    # ---
+    fetch_function_name = "fetch_" + corpus_name
+
+    # retrieve the dataset
+    # ---
+    data = getattr(categorization, fetch_function_name)(**kwargs)
+
+    X = data.X
+
+    y = data.y
+
+    # display a short sample of the data
+    # ---
+
+    limit = 5
+
+    for i in range(limit):
+
+        print(i + 1, X[i], y[i])
+
+    print("---")
+
+    # items counting
+    # ---
+
+    n = data.X.shape[0]
+
+    print("number of items = ", n)
 
     return(n)

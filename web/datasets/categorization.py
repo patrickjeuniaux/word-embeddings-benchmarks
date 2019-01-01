@@ -16,7 +16,15 @@ def fetch_AP():
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'clusters': dict of arrays of words representing
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
+
+    examples:
+    ---------
+
+    X : ['anger', 'desire', 'fear', 'happiness', 'joy']
+    y : ['feeling', 'feeling', 'feeling', 'feeling', 'feeling']
+
 
     References
     ----------
@@ -69,8 +77,15 @@ def fetch_BLESS():
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words
-        'y': cluster assignment
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
+
+    examples:
+    ---------
+
+    X : ['axe', 'chisel', 'corkscrew', 'fork', 'hammer']
+    y : ['tool', 'tool', 'tool', 'tool', 'tool']
+
 
     References
     ----------
@@ -97,12 +112,19 @@ def fetch_battig():
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words
-        'y': cluster assignment
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
         'freq': frequency of response
         'frequency': Kucera-Francis word frequency
         'rank': rank of frequence within response
         'rfreq': rated frequency
+
+    examples:
+    ---------
+
+    X : ['mile', 'foot', 'inch', 'yard', 'meter']
+    y : ['unit_of_distance', 'unit_of_distance', 'unit_of_distance', 'unit_of_distance', 'unit_of_distance']
+
 
     References
     ----------
@@ -133,36 +155,33 @@ def fetch_battig():
                  freq=data.X[:, 1], frequency=data.X[:, 2], rank=data.X[:, 3], rfreq=data.X[:, 4])
 
 
-def fetch_ESSLI_2c():
+def fetch_ESSLI_1a():
     """
-    Fetch ESSLI 2c task categorization dataset
+    Fetch ESSLI 1a task categorization dataset.
 
     Returns
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words
-        'y': cluster assignment
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
 
     References
     ----------
-    Originally published at http://wordspace.collocations.de/doku.php/data:esslli2008:verb_categorization
+    Originally published at http://wordspace.collocations.de/doku.php/data:esslli2008:concrete_nouns_categorization.
 
     Notes
     -----
-    The goal of the sub-task is to group verbs into semantic categories. The data set consists of 45 verbs,
-    belonging to 9 semantic classes. The classification scheme is inspired by P. Vinson & G. Vigliocco (2007),
-    “Semantic Feature Production Norms for a Large Set of Objects and Events”, Behavior Research Methods,
-    which in turn closely follows the classification proposed in Levin (1993). The data set consists of 44 concrete
-    nouns, belonging to 6 semantic categories (four animates and two inanimates). The nouns are included in the
-    feature norms described in McRae et al. (2005)
+    The goal of the sub-task is to group concrete nouns into semantic categories.
+    The data set consists of 44 concrete nouns, belonging to 6 semantic categories (four animates and two inanimates).
+    The nouns are included in the feature norms described in McRae et al. (2005)
     """
 
     print("\nFetch '{}' dataset\n---\n".
-          format("ESSLI 2c"))
+          format("ESSLI 1a"))
 
-    return _get_cluster_assignments(dataset_name="EN-ESSLI-2c",
-                                    url="https://www.dropbox.com/sh/d3mcyl3b5mawfhm/AAABygW1rguhI4L0XSw_I68ta?dl=1")
+    return _get_cluster_assignments(dataset_name="EN-ESSLI-1a",
+                                    url="https://www.dropbox.com/sh/h362565r1sk5wii/AADjcdYy3nRo-MjuFUSvb-0ya?dl=1")
 
 
 def fetch_ESSLI_2b():
@@ -176,8 +195,8 @@ def fetch_ESSLI_2b():
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words
-        'y': cluster assignment
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
 
     References
     ----------
@@ -198,30 +217,33 @@ def fetch_ESSLI_2b():
                                     url="https://www.dropbox.com/sh/7gdv52gy9vb4mf2/AACExLgHdbvbBrRZBP6CcdDaa?dl=1")
 
 
-def fetch_ESSLI_1a():
+def fetch_ESSLI_2c():
     """
-    Fetch ESSLI 1a task categorization dataset.
+    Fetch ESSLI 2c task categorization dataset
 
     Returns
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words
-        'y': cluster assignment
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
 
     References
     ----------
-    Originally published at http://wordspace.collocations.de/doku.php/data:esslli2008:concrete_nouns_categorization.
+    Originally published at http://wordspace.collocations.de/doku.php/data:esslli2008:verb_categorization
 
     Notes
     -----
-    The goal of the sub-task is to group concrete nouns into semantic categories.
-    The data set consists of 44 concrete nouns, belonging to 6 semantic categories (four animates and two inanimates).
-    The nouns are included in the feature norms described in McRae et al. (2005)
+    The goal of the sub-task is to group verbs into semantic categories. The data set consists of 45 verbs,
+    belonging to 9 semantic classes. The classification scheme is inspired by P. Vinson & G. Vigliocco (2007),
+    “Semantic Feature Production Norms for a Large Set of Objects and Events”, Behavior Research Methods,
+    which in turn closely follows the classification proposed in Levin (1993). The data set consists of 44 concrete
+    nouns, belonging to 6 semantic categories (four animates and two inanimates). The nouns are included in the
+    feature norms described in McRae et al. (2005)
     """
 
     print("\nFetch '{}' dataset\n---\n".
-          format("ESSLI 1a"))
+          format("ESSLI 2c"))
 
-    return _get_cluster_assignments(dataset_name="EN-ESSLI-1a",
-                                    url="https://www.dropbox.com/sh/h362565r1sk5wii/AADjcdYy3nRo-MjuFUSvb-0ya?dl=1")
+    return _get_cluster_assignments(dataset_name="EN-ESSLI-2c",
+                                    url="https://www.dropbox.com/sh/d3mcyl3b5mawfhm/AAABygW1rguhI4L0XSw_I68ta?dl=1")
