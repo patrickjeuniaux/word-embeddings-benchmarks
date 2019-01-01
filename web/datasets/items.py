@@ -11,21 +11,32 @@ import numpy as np
 # internal imports
 # ---
 
-from .similarity import *
+from . import similarity
 from .analogy import *
 
 
-def count_similarity_items(data):
+def count_similarity_items(corpus_name, **kwargs):
     """
         Count the number of items in the similarity dataset
         and display a sample of the data for checking purposes
     """
+
+    # dynamically set the fetch function name
+    # ---
+    fetch_function_name = "fetch_" + corpus_name
+
+    # retrieve the dataset
+    # ---
+    data = getattr(similarity, fetch_function_name)(**kwargs)
 
     X = data.X
 
     y = data.y
 
     n = data.X.shape[0]
+
+    # display a short sample of the data
+    # ---
 
     limit = 5
 
@@ -36,114 +47,6 @@ def count_similarity_items(data):
     print("---")
 
     print("number of items = ", n)
-
-    return(n)
-
-
-def count_RG65():
-    """
-        Return the number of items in RG65
-    """
-
-    data = fetch_RG65()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_MTurk():
-    """
-        Return the number of items in MTurk
-    """
-
-    data = fetch_MTurk()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_RW():
-    """
-        Return the number of items in RW
-    """
-
-    data = fetch_RW()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_TR9856():
-    """
-        Return the number of items in TR9856
-    """
-
-    data = fetch_TR9856()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_SimVerb3500():
-    """
-        Return the number of items in SimVerb3500
-    """
-
-    data = fetch_SimVerb3500()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_SimLex999():
-    """
-        Return the number of items in SimLex999
-    """
-
-    data = fetch_SimLex999()
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_multilingual_SimLex999(which="EN"):
-    """
-        Return the number of items in multilingual_SimLex999
-    """
-
-    data = fetch_multilingual_SimLex999(which)
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_WS353(which="all"):
-    """
-        Return the number of items in WS353
-    """
-
-    data = fetch_WS353(which)
-
-    n = count_similarity_items(data)
-
-    return(n)
-
-
-def count_MEN(which="all"):
-    """
-        Return the number of items in MEN
-    """
-
-    data = fetch_MEN(which)
-
-    n = count_similarity_items(data)
 
     return(n)
 
