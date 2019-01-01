@@ -115,7 +115,6 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     """
     categories_descriptions = {}
 
-
     # Every question is formed as similarity to analogy category that is
     # posed as a list of 3 prototype word pairs
 
@@ -134,7 +133,6 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
              ['bowler' 'head']]
     """
     prototypes = {}
-
 
     """
     questions
@@ -158,8 +156,6 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     """
     questions = defaultdict(list)
 
-
-
     """
     scores : dict of dict from category codes to a list of scores
     ---
@@ -177,7 +173,6 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     platinium_scores = {}
 
     scores = {"golden": golden_scores, "platinium": platinium_scores}
-
 
     for f in files:
 
@@ -275,11 +270,60 @@ def fetch_msr_analogy():
 
         L = f.read().splitlines()
 
-    # Typical 4 words analogy questions
+    """
+    Typical 4 words analogy questions
+    ---
+    first five data points as an example:
+
+    good better rough JJ_JJR rougher
+    better good rougher JJR_JJ rough
+    good best rough JJ_JJS roughest
+    best good roughest JJS_JJ rough
+    best better roughest JJS_JJR rougher
+
+    """
+
+    """
+    questions:
+    ---
+    first five data points as an example:
+
+        good better rough
+        better good rougher
+        good best rough
+        best good roughest
+        best better roughest
+    """
 
     questions = []
 
+    """
+    answers:
+    ---
+    first five data points as an example:
+
+        rougher
+        rough
+        roughest
+        rough
+        rougher
+
+    """
+
     answers = []
+
+    """
+    category:
+    ---
+    first five data points as an example:
+
+        JJ_JJR
+        JJR_JJ
+        JJ_JJS
+        JJS_JJ
+        JJS_JJR
+
+    """
 
     category = []
 
@@ -296,6 +340,19 @@ def fetch_msr_analogy():
     verb = set([c for c in set(category) if c.startswith("VB")])
 
     noun = set([c for c in set(category) if c.startswith("NN")])
+
+    """
+    category_high_level:
+    ---
+    first five data points as an example:
+
+        adjective
+        adjective
+        adjective
+        adjective
+        adjective
+
+    """
 
     category_high_level = []
 

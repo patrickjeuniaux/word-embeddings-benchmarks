@@ -12,7 +12,7 @@ import numpy as np
 # ---
 
 from . import similarity
-from .analogy import *
+from . import analogy
 
 
 def count_similarity_items(corpus_name, **kwargs):
@@ -58,7 +58,7 @@ def count_semeval_2012_2(which="all"):
         for checking purposes
     """
 
-    data = fetch_semeval_2012_2(which)
+    data = analogy.fetch_semeval_2012_2(which)
 
     X_prot = data.X_prot
 
@@ -70,7 +70,7 @@ def count_semeval_2012_2(which="all"):
 
     categories_descriptions = data.categories_descriptions
 
-    # excerpt
+    # display a sample
     # ---
     categories = ('3_f', '8_f', '9_i')
 
@@ -98,6 +98,42 @@ def count_semeval_2012_2(which="all"):
         nb_questions = X[category].shape[0]
 
         n += nb_questions
+
+    print("---")
+
+    print("number of items = ", n)
+
+    return(n)
+
+
+def count_msr_analogy():
+    """
+        Return the number of items in msr_analogy
+        and display a sample of the data
+        for checking purposes
+    """
+
+    data = analogy.fetch_msr_analogy()
+
+    X = data.X
+
+    y = data.y
+
+    categories = data.category
+
+    categories_high_level = data.category_high_level
+
+    # display a sample
+    # ---
+
+    limit = 5
+
+    print(X[:limit, :limit])
+    print(y[:limit])
+    print(categories[:limit])
+    print(categories_high_level[:limit])
+
+    n = y.shape[0]
 
     print("---")
 
