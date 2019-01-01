@@ -19,10 +19,12 @@ from sklearn.datasets.base import Bunch
 from .utils import _get_dataset_dir
 from .utils import _fetch_file
 from .utils import _change_list_to_np
+from .utils import _get_as_pd
 from ..utils import standardize_string
 
-
 # TODO: rewrite to a more standarized version
+
+
 def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     """
     Fetch dataset used for SEMEVAL 2012 task 2 competition
@@ -45,8 +47,8 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
         'categories_descriptions': dictionary keyed on category. Each entry is a human readable description of
         category.
 
-    References
-    ----------
+    Reference
+    ---------
     DA Jurgens et al.,
     "Measuring degrees of relational similarity. In *SEM 2012: The First Joint Conference on Lexical
     and Computational Semantics", 2012
@@ -247,8 +249,8 @@ def fetch_msr_analogy():
         'category': name of category
         'category_high_level': name of high level category (noun/adjective/verb)
 
-    References
-    ----------
+    Reference
+    ---------
     Originally published at http://research.microsoft.com/en-us/projects/rnn/.
 
     Notes
@@ -393,8 +395,8 @@ def fetch_google_analogy():
         'category': name of category
         'category_high_level': name of high level category (semantic/syntactic)
 
-    References
-    ----------
+    Reference
+    ---------
     Mikolov, Tomas and Sutskever, Ilya and Chen, Kai and Corrado, Greg S and Dean, Jeff,
     "Distributed representations of words and phrases and their compositionality", 2013
 
@@ -474,8 +476,8 @@ def fetch_wordrep(subsample=None, rng=None):
         'category': name of category
         'category_high_level': name of high level category (semantic/syntactic)
 
-    References
-    ----------
+    Reference
+    ---------
     Gao, Bin and Bian, Jiang and Liu, Tie-Yan,
     "Wordrep: A benchmark for research on learning word representations", 2014
 

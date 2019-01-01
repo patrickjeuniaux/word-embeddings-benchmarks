@@ -15,10 +15,10 @@ Count the number of items in the datasets
 from web.datasets.items import *
 
 
-if __name__ == "__main__":
+def count_similarity():
+    """
 
-    # similarity
-    # ---
+    """
 
     count_similarity_items("RG65")  # 65
     count_similarity_items("MTurk")  # 287
@@ -38,15 +38,22 @@ if __name__ == "__main__":
 
     count_similarity_items("MEN", which="all")  # 3000
 
-    # analogy
-    # ---
+
+def count_analogy():
+    """
+
+    """
+
     count_mikolov("msr_analogy")  # 8000
     count_mikolov("google_analogy")  # 19544
     count_semeval_2012_2("all")  # 3218
     count_wordrep()  # 237409102
 
-    # categorization
-    # ---
+
+def count_categorization():
+    """
+
+    """
 
     count_categorization_items("AP")  # 402
 
@@ -58,4 +65,17 @@ if __name__ == "__main__":
     count_categorization_items("ESSLI_2c")  # 45
     # 44 + 40 + 45 = 129 != 134 (PROBLEM)
 
-    pass
+
+if __name__ == "__main__":
+
+    # similarity
+    # ---
+    count_similarity()
+
+    # analogy
+    # ---
+    count_analogy()
+
+    # categorization
+    # ---
+    count_categorization()

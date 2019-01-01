@@ -4,13 +4,20 @@
  Functions for fetching similarity datasets
 """
 
+# external imports
+# ---
+
 import os
 
 import numpy as np
 import pandas as pd
 from sklearn.datasets.base import Bunch
 
-from .utils import _get_as_pd, _fetch_file
+# internal imports
+# ---
+
+from .utils import _get_as_pd
+from .utils import _fetch_file
 
 
 def fetch_RG65():
@@ -26,8 +33,8 @@ def fetch_RG65():
         'y': vector with scores,
         'sd': vector of std of scores if available (for set1 and set2)
 
-    References
-    ----------
+    Reference
+    ---------
     Rubenstein, Goodenough, "Contextual correlates of synonymy", 1965
 
     Notes
@@ -56,8 +63,8 @@ def fetch_MTurk():
         'X': matrix of 2 words per column,
         'y': vector with scores,
 
-    References
-    ----------
+    Reference
+    ---------
     Radinsky, Kira et al., "A Word at a Time: Computing Word Relatedness Using Temporal Semantic Analysis", 2011
 
     Notes
@@ -91,8 +98,8 @@ def fetch_RW():
         'y': vector with scores,
         'sd': vector of std of scores
 
-    References
-    ----------
+    Reference
+    ---------
     Published at http://www-nlp.stanford.edu/~lmthang/morphoNLM/.
 
     Notes
@@ -129,8 +136,8 @@ def fetch_TR9856():
         'y': vector with scores,
         'topic': vector of topics providing context for each pair of terms
 
-    References
-    ----------
+    Reference
+    ---------
     Levy, Ran et al., "TR9856: A multi-word term relatedness benchmark", 2015.
 
     Notes
@@ -171,8 +178,8 @@ def fetch_SimVerb3500():
         'X': matrix of 2 words per column,
         'y': vector with scores
 
-    References
-    ----------
+    Reference
+    ---------
     Gerz, D., Vulić, I., Hill, F., Reichart, R., & Korhonen, A. (2016). SimVerb-3500: A Large-Scale Evaluation Set of Verb Similarity. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (pp. 2173–2182). Stroudsburg, PA. Retrieved from http://arxiv.org/abs/1608.00869
 
     Notes
@@ -225,8 +232,8 @@ def fetch_SimLex999():
         'POS': vector with POS tag
         'assoc': matrix with columns denoting free association: Assoc(USF) and SimAssoc333
 
-    References
-    ----------
+    Reference
+    ---------
     Hill, Felix et al., "Simlex-999: Evaluating semantic models with (genuine) similarity estimation", 2014
 
     Notes
@@ -272,8 +279,8 @@ def fetch_multilingual_SimLex999(which="EN"):
         'y': vector with scores,
         'sd': vector of sd of scores,
 
-    References
-    ----------
+    Reference
+    ---------
     Published at http://technion.ac.il/~ira.leviant/MultilingualVSMdata.html.
 
     Notes
@@ -333,15 +340,15 @@ def fetch_WS353(which="all"):
     relatedness similarity
 
     Parameters
-    ----------
+    ---------
     which : 'all': for both relatedness and attributional similarity,
             'relatedness': for relatedness similarity
             'similarity': for attributional similarity
             'set1': as divided by authors
             'set2': as divided by authors
 
-    References
-    ----------
+    Reference
+    ---------
     Finkelstein, Gabrilovich, "Placing Search in Context: The Concept Revisited†", 2002
     Agirre, Eneko et al., "A Study on Similarity and Relatedness Using Distributional and WordNet-based Approaches",
     2009
@@ -410,7 +417,7 @@ def fetch_MEN(which="all", form="natural"):
     Fetch MEN dataset for testing similarity and relatedness
 
     Parameters
-    ----------
+    ---------
     which : "all", "test" or "dev"
     form : "lem" or "natural"
 
@@ -421,8 +428,8 @@ def fetch_MEN(which="all", form="natural"):
         'X': matrix of 2 words per column,
         'y': vector with scores
 
-    References
-    ----------
+    Reference
+    ---------
     Published at http://clic.cimec.unitn.it/~elia.bruni/MEN.html.
 
     Notes
