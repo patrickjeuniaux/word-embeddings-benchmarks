@@ -51,7 +51,7 @@ job_selection.append('conceptnet')
 # job_selection.append('LexVec')
 
 # WARNING
-# NMT embeddings are not longer available thru the provided url
+# NMT embeddings are no longer available through the provided url
 # job_selection.append('NMT')
 
 jobs = []
@@ -121,7 +121,7 @@ if 'LexVec' in job_selection:
 if 'NMT' in job_selection:
 
     # WARNING
-    # NMT embeddings are not longer available thru the provided url
+    # NMT embeddings are no longer available through the provided url
 
     jobs.append(["fetch_NMT", {"which": "FR"}])
     jobs.append(["fetch_NMT", {"which": "DE"}])

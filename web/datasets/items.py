@@ -157,7 +157,7 @@ def count_mikolov(corpus_name):
 
 def number_permutations(k, n):
     """
-    Calculate the number of permutation of k elements
+    Calculate the number of permutations of k elements
     chosen in a set of n elements
     """
     return int(factorial(n) / factorial(n - k))
