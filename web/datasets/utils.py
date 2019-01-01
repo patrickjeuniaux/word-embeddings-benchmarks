@@ -56,21 +56,31 @@ def _get_cluster_assignments(dataset_name, url, sep=" ", skip_header=False):
 
     """
     data_dir = _get_dataset_dir("categorization", verbose=0)
+
     _fetch_file(url=url,
                 data_dir=data_dir,
                 uncompress=True,
                 move="{0}/{0}.txt".format(dataset_name),
                 verbose=0)
+
     files = glob.glob(os.path.join(data_dir, dataset_name + "/*.txt"))
+
     X = []
+
     y = []
+
     names = []
+
     for cluster_id, file_name in enumerate(files):
+
         with open(file_name) as f:
+
             lines = f.read().splitlines()[(int(skip_header)):]
 
             X += [l.split(sep) for l in lines]
+
             y += [os.path.basename(file_name).split(".")[0]] * len(lines)
+
     return Bunch(X=np.array(X, dtype="object"), y=np.array(y).astype("object"))
 
 
