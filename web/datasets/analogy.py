@@ -652,6 +652,7 @@ def fetch_SAT():
     print("\nFetch '{}' dataset\n---\n".
           format("SAT"))
 
+    # there
     url = 'file:' + os.path.expanduser('~/Downloads/sat2.txt')
 
     input_path = _fetch_file(url, 'analogy')
@@ -665,3 +666,111 @@ def fetch_SAT():
     y = data[:, 2:].astype("object")
 
     return Bunch(X=X, y=y)
+
+
+def fetch_BATS():
+    """
+    Fetch BATS dataset for testing analogies
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': words pairs
+
+
+    examples
+    --------
+
+    X :
+
+
+    Reference
+    ---------
+    Gladkova, A., Drozd, A., & Matsuoka, S. (2016). Analogy-Based Detection of Morphological and Semantic Relations with Word Embeddings: What Works and What Doesn’t. In Proceedings of the NAACL-HLT SRW (pp. 47–54). San Diego, California, June 12-17, 2016: ACL. https://doi.org/10.18653/v1/N16-2002
+
+    Additional information
+    ----------------------
+
+    The Bigger Analogy Test Set (BATS)
+    http://vecto.space/projects/BATS/
+
+    Notes
+    -----
+
+    /
+
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("BATS"))
+
+    url = 'file:' + os.path.expanduser('~/Downloads/BATS_3.0.zip')
+
+    input_folder = _fetch_file(url=url,
+                               data_dir="analogy",
+                               uncompress=True,
+                               verbose=1)
+
+    input_folder = os.path.join(input_folder, "BATS_3.0")
+
+    high_level_categories = ['Inflectional_morphology',
+                             'Derivational_morphology',
+                             'Encyclopedic_semantics',
+                             'Lexicographic_semantics']
+
+    categories_high_level = []
+    categories = []
+    # questions = []
+    # answers = []
+    words_pairs = []
+
+    for i, category_high_level in enumerate(high_level_categories, 1):
+
+        sub_folder = str(i) + "_" + category_high_level
+
+        folder = os.path.join(input_folder, sub_folder)
+
+        for filename in os.listdir(folder):
+
+            category = filename[5:-5]
+
+            input_file = os.path.join(folder, filename)
+
+            with open(input_file, 'r') as file:
+
+                for line in file:
+
+                    line = line.strip()
+
+                    if line:
+
+                        # question, answer = line.split("\t")
+
+                        # questions.append(question)
+
+                        # answers.append(answer)
+
+                        words_pair = line.split("\t")
+
+                        words_pairs.append(words_pair)
+
+                        categories.append(category)
+
+                        categories_high_level.append(category_high_level)
+
+    # b = Bunch(X=np.hstack(questions).astype("object"),
+
+    #              y=np.hstack(answers).astype("object"),
+
+    #              categories=np.hstack(categories).astype("object"),
+
+    #              categories_high_level=np.hstack(categories_high_level).astype("object"))
+
+    b = Bunch(X=np.array(words_pairs).astype("object"),
+
+              category=np.hstack(categories).astype("object"),
+
+              category_high_level=np.hstack(categories_high_level).astype("object"))
+
+    return b

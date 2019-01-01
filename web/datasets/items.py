@@ -222,11 +222,11 @@ def count_wordrep(subsample=None, rng=None):
 
         p = len(subX)
 
-        np = number_permutations(2, p)
+        nb_per = number_permutations(2, p)
 
-        print(category, " : ", p, " pairs, ", np, " permutations ")
+        print(category, " : ", p, " pairs, ", nb_per, " permutations ")
 
-        n += np
+        n += nb_per
 
         p2 += p
 
@@ -307,5 +307,72 @@ def count_SAT():
     n = data.y.shape[0]
 
     print("number of items = ", n)
+
+    return(n)
+
+
+def count_BATS():
+    """
+        Return the number of items in BATS
+        and display a sample of the data
+        for checking purposes
+    """
+
+    import numpy as np
+
+    data = analogy.fetch_BATS()
+
+    X = data.X
+
+    categories = data.category
+
+    categories_high_level = data.category_high_level
+
+    # display a sample
+    # ---
+
+    limit = 5
+
+    print(X[:limit])
+    print(categories[:limit])
+    print(categories_high_level[:limit])
+
+    # items counting
+    # ---
+
+    n = 0
+
+    p1 = X.shape[0]
+
+    p2 = 0
+
+    print("")
+    print("Statistics")
+    print("---")
+    print("")
+
+    for category in np.unique(categories):
+
+        subX = X[categories == category]
+
+        p = len(subX)
+
+        np = number_permutations(2, p)
+
+        print(category, " : ", p, " pairs, ", np, " permutations ")
+
+        n += np
+
+        p2 += p
+
+    print("---")
+
+    if p2 != p1:
+
+        print ("Problem: p1 = ", p1, " != p2 = ", p2)
+
+    print("number of words pairs = ", p1)
+
+    print("number of items (i.e., number of permutations) = ", n)
 
     return(n)

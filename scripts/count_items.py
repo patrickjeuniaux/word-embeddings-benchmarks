@@ -20,23 +20,23 @@ def count_similarity():
 
     """
 
-    count_similarity_items("RG65")  # 65
-    count_similarity_items("MTurk")  # 287
-    count_similarity_items("RW")  # 2034
-    count_similarity_items("TR9856")  # 9856
-    count_similarity_items("SimVerb3500")  # 3500
-    count_similarity_items("SimLex999")  # 999
+    assert count_similarity_items("RG65") == 65
+    assert count_similarity_items("MTurk") == 287
+    assert count_similarity_items("RW") == 2034
+    assert count_similarity_items("TR9856") == 9856
+    assert count_similarity_items("SimVerb3500") == 3500
+    assert count_similarity_items("SimLex999") == 999
 
-    count_similarity_items("multilingual_SimLex999", which="EN")  # 999
-    count_similarity_items("multilingual_SimLex999", which="DE")  # 999
-    count_similarity_items("multilingual_SimLex999", which="IT")  # 999
-    count_similarity_items("multilingual_SimLex999", which="RU")  # 999
+    assert count_similarity_items("multilingual_SimLex999", which="EN") == 999
+    assert count_similarity_items("multilingual_SimLex999", which="DE") == 999
+    assert count_similarity_items("multilingual_SimLex999", which="IT") == 999
+    assert count_similarity_items("multilingual_SimLex999", which="RU") == 999
 
-    count_similarity_items("WS353", which="all")  # 353
-    count_similarity_items("WS353", which="relatedness")  # 252
-    count_similarity_items("WS353", which="similarity")  # 203
+    assert count_similarity_items("WS353", which="all") == 353
+    assert count_similarity_items("WS353", which="relatedness") == 252
+    assert count_similarity_items("WS353", which="similarity") == 203
 
-    count_similarity_items("MEN", which="all")  # 3000
+    assert count_similarity_items("MEN", which="all") == 3000
 
 
 def count_analogy():
@@ -44,11 +44,12 @@ def count_analogy():
 
     """
 
-    count_mikolov("msr_analogy")  # 8000
-    count_mikolov("google_analogy")  # 19544
-    count_semeval_2012_2("all")  # 3218
-    count_wordrep()  # 237409102
-    count_SAT()  # 374
+    assert count_mikolov("msr_analogy") == 8000
+    assert count_mikolov("google_analogy") == 19544
+    assert count_semeval_2012_2("all") == 3218
+    assert count_wordrep() == 237409102
+    assert count_SAT() == 374
+    count_BATS() # 98000 != 99200 (PROBLEM)
 
 
 def count_categorization():
@@ -56,7 +57,7 @@ def count_categorization():
 
     """
 
-    count_categorization_items("AP")  # 402
+    assert count_categorization_items("AP") == 402
 
     count_categorization_items("BLESS")  # 200 != 26554 (PROBLEM)
     count_categorization_items("battig")  # 5231 != 83 (PROBLEM)
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 
     # analogy
     # ---
-    count_analogy()
+    # count_analogy()
 
     # categorization
     # ---

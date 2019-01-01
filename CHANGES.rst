@@ -7,6 +7,27 @@ Patrick P. J. M. H. Jeuniaux
 
 University of Pisa
 
+8. Add functions for a new dataset : BATS
+-----------------------------------------
+2019-01-01
+
+In `web.datasets.analogy <web/datasets/analogy.py>`_
+
+added
+
+    def fetch_BATS
+
+to fetch the BATS dataset
+
+(note: it does not download from the Internet
+but from the local machine --- TODO: find an official online version)
+
+In `web.datasets.items <web/datasets/items.py>`_
+
+added
+
+    def count_BATS
+
 
 7. Add functions for a new dataset : SAT
 ----------------------------------------
