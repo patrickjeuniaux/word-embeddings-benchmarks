@@ -48,7 +48,7 @@ def count_analogy():
     count_mikolov("google_analogy")  # 19544
     count_semeval_2012_2("all")  # 3218
     count_wordrep()  # 237409102
-
+    count_SAT() # 374
 
 def count_categorization():
     """
@@ -70,12 +70,12 @@ if __name__ == "__main__":
 
     # similarity
     # ---
-    count_similarity()
+    # count_similarity()
 
     # analogy
     # ---
-    count_analogy()
+    # count_analogy()
 
     # categorization
     # ---
-    count_categorization()
+    # count_categorization()

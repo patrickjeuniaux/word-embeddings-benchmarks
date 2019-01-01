@@ -280,3 +280,32 @@ def count_categorization_items(corpus_name, **kwargs):
     print("number of items = ", n)
 
     return(n)
+
+
+def count_SAT():
+
+    data = analogy.fetch_SAT()
+
+    X = data.X
+
+    y = data.y
+
+    # display a short sample of the data
+    # ---
+
+    limit = 5
+
+    for i in range(limit):
+
+        print(i + 1, X[i], y[i, :])
+
+    print("---")
+
+    # items counting
+    # ---
+
+    n = data.y.shape[0]
+
+    print("number of items = ", n)
+
+    return(n)

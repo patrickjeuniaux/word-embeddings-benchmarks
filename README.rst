@@ -88,8 +88,8 @@ License
 =======
 Code is licensed under MIT, however available embeddings distributed within package might be under different license. If you are unsure please reach to authors (references are included in docstrings)
 
-Updates
+Changes
 =======
 
-See `updates.rst <updates.rst>`_.
+See `CHANGES.rst <CHANGES.rst>`_.
 

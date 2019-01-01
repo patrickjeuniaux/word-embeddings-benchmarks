@@ -11,6 +11,7 @@ from collections import defaultdict
 import glob
 import os
 import numpy as np
+import pandas as pd
 from sklearn.utils import check_random_state
 from sklearn.datasets.base import Bunch
 
@@ -609,3 +610,57 @@ def fetch_wordrep(subsample=None, rng=None):
                  category=np.array(category),
                  wikipedia_categories=wordnet_categories,
                  wordnet_categories=wikipedia_categories)
+
+
+def fetch_SAT():
+    """
+    Fetch SAT dataset for testing analogies
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': the questions
+        'y': the answers (where the first one is the correct one)
+
+    examples
+    --------
+
+    X : lull-v_trust-n
+    y : ['cajole-v_compliance-n' 'balk-v_fortitude-n' 'betray-v_loyalty-n'
+        'hinder-v_destination-n' 'soothe-v_passion-n']
+
+
+    Reference
+    ---------
+    Turney, P. D., Littman, M. L., Bigham, J., & Shnayder, V. (2003). Combining independent modules to solve multiple-choice synonym and analogy problems. In Proceedings of the International Conference on Recent Advances in Natural Language Processing (RANLP-03).
+
+    Additional information
+    ----------------------
+
+    SAT Analogy Questions (State of the art)
+    https://aclweb.org/aclwiki/SAT_Analogy_Questions_(State_of_the_art)
+
+    Notes
+    -----
+
+    /
+
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("SAT"))
+
+    url = 'file:' + os.path.expanduser('~/Downloads/sat2.txt')
+
+    input_path = _fetch_file(url, 'analogy')
+
+    df = pd.read_csv(input_path, header=0, encoding='utf-8', sep="\t")
+
+    data = df.values
+
+    X = data[:, 1].astype("object")
+
+    y = data[:, 2:].astype("object")
+
+    return Bunch(X=X, y=y)
