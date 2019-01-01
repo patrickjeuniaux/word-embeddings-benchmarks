@@ -40,5 +40,6 @@ if __name__ == "__main__":
 
     # analogy
     # ---
-    count_msr_analogy()
+    count_mikolov("msr_analogy")
+    count_mikolov("google_analogy")
     # count_semeval_2012_2("all")

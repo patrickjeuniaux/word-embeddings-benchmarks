@@ -106,14 +106,20 @@ def count_semeval_2012_2(which="all"):
     return(n)
 
 
-def count_msr_analogy():
+def count_mikolov(corpus_name):
     """
-        Return the number of items in msr_analogy
+        Return the number of items in msr_analogy or google_analogy
         and display a sample of the data
         for checking purposes
     """
 
-    data = analogy.fetch_msr_analogy()
+    # dynamically set the fetch function name
+    # ---
+    fetch_function_name = "fetch_" + corpus_name
+
+    # retrieve the dataset
+    # ---
+    data = getattr(analogy, fetch_function_name)()
 
     X = data.X
 
