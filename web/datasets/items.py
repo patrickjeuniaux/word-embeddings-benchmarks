@@ -15,7 +15,6 @@ from .similarity import *
 from .analogy import *
 
 
-
 def count_similarity_items(data):
     """
         Count the number of items in the similarity dataset
@@ -39,8 +38,6 @@ def count_similarity_items(data):
     print("number of items = ", n)
 
     return(n)
-
-
 
 
 def count_RG65():
@@ -185,7 +182,7 @@ def count_semeval_2012_2(which="all"):
         print(categories_names[category])
         print(categories_descriptions[category])
         print(X_prot[category])
-        print(X[category][:limit,:])
+        print(X[category][:limit, :])
         print(y[category][:limit])
 
     # items counting
@@ -195,10 +192,7 @@ def count_semeval_2012_2(which="all"):
 
     for category in categories_names:
 
-        nb_prototypes = X_prot[category].shape[0]
         nb_questions = X[category].shape[0]
-
-        n += nb_prototypes
 
         n += nb_questions
 
@@ -207,13 +201,3 @@ def count_semeval_2012_2(which="all"):
     print("number of items = ", n)
 
     return(n)
-
-
-
-
-
-
-
-
-
-
