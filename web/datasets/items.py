@@ -23,7 +23,7 @@ def count_similarity_items(corpus_name, **kwargs):
         and display a sample of the data for checking purposes
     """
 
-    # dynamically set the fetch function name
+    # set the fetch function name
     # ---
     fetch_function_name = "fetch_" + corpus_name
 
@@ -118,7 +118,7 @@ def count_mikolov(corpus_name):
         for checking purposes
     """
 
-    # dynamically set the fetch function name
+    # set the fetch function name
     # ---
     fetch_function_name = "fetch_" + corpus_name
 
@@ -249,7 +249,7 @@ def count_categorization_items(corpus_name, **kwargs):
         and display a sample of the data for checking purposes
     """
 
-    # dynamically set the fetch function name
+    # set the fetch function name
     # ---
     fetch_function_name = "fetch_" + corpus_name
 
