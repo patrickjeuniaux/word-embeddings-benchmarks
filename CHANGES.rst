@@ -3,7 +3,7 @@ Main updates
 
 This is a list of changes made to the original project.
 
-Patrick P. J. M. H. Jeuniaux
+Patrick Jeuniaux
 
 University of Pisa
 

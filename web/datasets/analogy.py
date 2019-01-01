@@ -682,7 +682,22 @@ def fetch_BATS():
     examples
     --------
 
-    X :
+    X : [['angry' 'angrier']
+        ['cheap' 'cheaper']
+        ['clever' 'cleverer']
+        ['coarse' 'coarser']
+        ['costly' 'costlier']]
+
+    category:
+
+    {'adj - comparative' 'adj - comparative' 'adj - comparative'
+     'adj - comparative' 'adj - comparative'}
+
+    category_high_level:
+
+    ['Inflectional_morphology' 'Inflectional_morphology'
+     'Inflectional_morphology' 'Inflectional_morphology'
+     'Inflectional_morphology']
 
 
     Reference
