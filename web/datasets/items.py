@@ -33,8 +33,6 @@ def count_similarity_items(corpus_name, **kwargs):
 
     y = data.y
 
-    n = data.X.shape[0]
-
     # display a short sample of the data
     # ---
 
@@ -45,6 +43,11 @@ def count_similarity_items(corpus_name, **kwargs):
         print(i + 1, X[i, 0], X[i, 1], y[i])
 
     print("---")
+
+    # items counting
+    # ---
+
+    n = data.X.shape[0]
 
     print("number of items = ", n)
 
@@ -139,9 +142,12 @@ def count_mikolov(corpus_name):
     print(categories[:limit])
     print(categories_high_level[:limit])
 
-    n = y.shape[0]
-
     print("---")
+
+    # items counting
+    # ---
+
+    n = y.shape[0]
 
     print("number of items = ", n)
 
