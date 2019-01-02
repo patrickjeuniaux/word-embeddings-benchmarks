@@ -57,7 +57,7 @@ def count_analogy():
     assert count_semeval_2012_2("all") == 3218
     assert count_wordrep() == 237409102
     assert count_Xy_items("analogy", "SAT") == 374
-    count_BATS()  # 98000 != 99200 (PROBLEM)
+    assert count_BATS() == 98000
 
 
 def count_categorization():
@@ -67,6 +67,27 @@ def count_categorization():
 
     assert count_Xy_items("categorization", "AP") == 402
 
+    assert count_Xy_items("categorization", "BLESS") == 200
+    assert count_Xy_items("categorization", "battig") == 5231
+
+    assert count_Xy_items("categorization", "ESSLI_1a") == 44
+    assert count_Xy_items("categorization", "ESSLI_2b") == 40
+    assert count_Xy_items("categorization", "ESSLI_2c") == 45
+
+
+if __name__ == "__main__":
+
+    # count_synonymy()
+    # count_similarity()
+    # count_analogy()
+    # count_categorization()
+
+    # analogy
+    # ---
+    count_BATS()  # 98000 != 99200 (PROBLEM)
+
+    # categorization
+    # ---
     count_Xy_items("categorization", "BLESS")  # 200 != 26554 (PROBLEM)
     count_Xy_items("categorization", "battig")  # 5231 != 83 (PROBLEM)
 
@@ -74,13 +95,5 @@ def count_categorization():
     n2b = count_Xy_items("categorization", "ESSLI_2b")  # 40
     n2c = count_Xy_items("categorization", "ESSLI_2c")  # 45
     # 44 + 40 + 45 = 129 != 134 (PROBLEM)
-
-
-if __name__ == "__main__":
-
-    count_synonymy()
-    count_similarity()
-    count_analogy()
-    count_categorization()
 
     pass
