@@ -8,28 +8,35 @@
 # ---
 import numpy as np
 from math import factorial
+import importlib
 
 # internal imports
 # ---
 
-from . import similarity
+# from . import similarity
 from . import analogy
-from . import categorization
+# from . import categorization
 
 
-def count_similarity_items(corpus_name, **kwargs):
+def count_Xy_items(module_name, dataset_name, **kwargs):
     """
-        Count the number of items in the similarity dataset
+        Count the number of items in a dataset with X and y variables
+        by specifying its module name (similarity, synonymy, categorization...)
         and display a sample of the data for checking purposes
     """
 
     # set the fetch function name
     # ---
-    fetch_function_name = "fetch_" + corpus_name
+    fetch_function_name = "fetch_" + dataset_name
+
+    # load module
+    # ---
+
+    module = importlib.import_module("web.datasets." + module_name)
 
     # retrieve the dataset
     # ---
-    data = getattr(similarity, fetch_function_name)(**kwargs)
+    data = getattr(module, fetch_function_name)(**kwargs)
 
     X = data.X
 
@@ -42,7 +49,7 @@ def count_similarity_items(corpus_name, **kwargs):
 
     for i in range(limit):
 
-        print(i + 1, X[i, 0], X[i, 1], y[i])
+        print(i + 1, X[i], y[i])
 
     print("---")
 
@@ -243,74 +250,6 @@ def count_wordrep(subsample=None, rng=None):
     return(n)
 
 
-def count_categorization_items(corpus_name, **kwargs):
-    """
-        Count the number of items in the categorization dataset
-        and display a sample of the data for checking purposes
-    """
-
-    # set the fetch function name
-    # ---
-    fetch_function_name = "fetch_" + corpus_name
-
-    # retrieve the dataset
-    # ---
-    data = getattr(categorization, fetch_function_name)(**kwargs)
-
-    X = data.X
-
-    y = data.y
-
-    # display a short sample of the data
-    # ---
-
-    limit = 5
-
-    for i in range(limit):
-
-        print(i + 1, X[i], y[i])
-
-    print("---")
-
-    # items counting
-    # ---
-
-    n = data.X.shape[0]
-
-    print("number of items = ", n)
-
-    return(n)
-
-
-def count_SAT():
-
-    data = analogy.fetch_SAT()
-
-    X = data.X
-
-    y = data.y
-
-    # display a short sample of the data
-    # ---
-
-    limit = 5
-
-    for i in range(limit):
-
-        print(i + 1, X[i], y[i, :])
-
-    print("---")
-
-    # items counting
-    # ---
-
-    n = data.y.shape[0]
-
-    print("number of items = ", n)
-
-    return(n)
-
-
 def count_BATS():
     """
         Return the number of items in BATS
@@ -355,15 +294,15 @@ def count_BATS():
 
         subX = X[categories == category]
 
-        p = len(subX)
+        nb_pair = len(subX)
 
-        np = number_permutations(2, p)
+        nb_permu = number_permutations(2, nb_pair)
 
-        print(category, " : ", p, " pairs, ", np, " permutations ")
+        print(category, " : ", nb_pair, " pairs, ", nb_permu, " permutations ")
 
-        n += np
+        n += nb_permu
 
-        p2 += p
+        p2 += nb_pair
 
     print("---")
 

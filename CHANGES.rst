@@ -7,6 +7,25 @@ Patrick Jeuniaux
 
 University of Pisa
 
+
+9. Add functions for two new datasets: ESL, TOEFL
+-------------------------------------------------
+2019-01-02
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_
+
+added
+
+    def fetch_ESL
+    def fetch_TOEFL
+
+In `web.datasets.items <web/datasets/items.py>`_
+
+several counting functions have been factorized into
+
+    def count_Xy_items
+
+
 8. Add functions for a new dataset : BATS
 -----------------------------------------
 2019-01-01
@@ -44,11 +63,6 @@ to fetch the SAT dataset
 (note: it does not download from the Internet
 but from the local machine --- TODO: find an official online version)
 
-In `web.datasets.items <web/datasets/items.py>`_
-
-added
-
-    def count_SAT
 
 6. Count the number of items
 ----------------------------
