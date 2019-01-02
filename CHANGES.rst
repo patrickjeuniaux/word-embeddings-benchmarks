@@ -15,7 +15,7 @@ Add fetch functions for new datasets
 - 2019-01-01 : SAT
 - 2019-01-01 : BATS
 - 2019-01-02 : ESL
-- 2019-01-03 : TOEFL
+- 2019-01-02 : TOEFL
 
 
 In `web.datasets.similarity <web/datasets/similarity.py>`_
