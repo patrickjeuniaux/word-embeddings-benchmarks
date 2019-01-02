@@ -8,9 +8,54 @@ Patrick Jeuniaux
 University of Pisa
 
 
+Add fetch functions for new datasets
+------------------------------------
 
-6. Count the number of items
-----------------------------
+- 2018-12-27 : SimVerb3500
+- 2019-01-01 : SAT
+- 2019-01-01 : BATS
+- 2019-01-02 : ESL
+- 2019-01-03 : TOEFL
+
+
+In `web.datasets.similarity <web/datasets/similarity.py>`_
+
+added
+
+    def fetch_SimVerb3500
+
+
+In `web.datasets.analogy <web/datasets/analogy.py>`_
+
+added
+
+    def fetch_SAT
+
+    def fetch_BATS
+
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_
+
+added
+
+    def fetch_ESL
+
+    def fetch_TOEFL
+
+
+Note:
+
+except for SimVerb3500, the datasets are not downloaded
+
+from the Internet but from the local machine.
+
+TODO:
+
+find official online versions of the datasets
+
+
+Count the number of items
+-------------------------
 2018-12-31 --- 2019-01-02
 
 Add `web.datasets.items <web/datasets/items.py>`_
@@ -23,8 +68,8 @@ The use of this module is illustrated in
 
 
 
-5. Avoid fetching NMT word embeddings
--------------------------------------
+Avoid fetching NMT word embeddings
+----------------------------------
 2018-12-28
 
 In `scripts.evaluate_embeddings <scripts/evaluate_embeddings.py>`_
@@ -35,8 +80,8 @@ because NMT embeddings are no longer available thru the provided url
 
 (this link is broken: https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz).
 
-4. Avoid generator error in Python 3.7
---------------------------------------
+Avoid generator error in Python 3.7
+-----------------------------------
 2018-12-27
 
 In `web.utils <web/utils.py>`_
@@ -64,8 +109,8 @@ https://stackoverflow.com/questions/51371846/generator-raised-stopiteration-when
 
 
 
-3. Avoid folder creation conflict
----------------------------------
+Avoid folder creation conflict
+------------------------------
 2018-12-27
 
 In `web.datasets.utils <web/datasets/utils.py>`_
@@ -86,52 +131,9 @@ a conflict in folder creation resulting from multiprocessing.
 
 
 
-2. Add fetch functions for new datasets
----------------------------------------
 
-- 2018-12-27 : SimVerb3500
-- 2019-01-01 : SAT
-- 2019-01-01 : BATS
-- 2019-01-02 : ESL
-- 2019-01-03 : TOEFL
-
-
-In `web.datasets.similarity <web/datasets/similarity.py>`_
-
-added
-
-    def fetch_SimVerb3500
-
-
-In `web.datasets.analogy <web/datasets/analogy.py>`_
-
-added
-
-    def fetch_SAT
-    def fetch_BATS
-
-
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_
-
-added
-
-    def fetch_ESL
-    def fetch_TOEFL
-
-
-Note:
-
-except for SimVerb3500, the datasets are not downloaded
-
-from the Internet but from the local machine.
-
-TODO:
-
-find official online versions of the datasets
-
-
-1. Improve readability
-----------------------
+Improve readability
+-------------------
 2018-12-27
 
 In several places in the code such as
