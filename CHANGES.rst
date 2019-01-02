@@ -8,68 +8,10 @@ Patrick Jeuniaux
 University of Pisa
 
 
-9. Add functions for two new datasets: ESL, TOEFL
--------------------------------------------------
-2019-01-02
-
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_
-
-added
-
-    def fetch_ESL
-    def fetch_TOEFL
-
-(note: it does not download from the Internet
-but from the local machine --- TODO: find an official online version)
-
-In `web.datasets.items <web/datasets/items.py>`_
-
-several counting functions have been factorized into
-
-    def count_Xy_items
-
-
-8. Add functions for a new dataset : BATS
------------------------------------------
-2019-01-01
-
-In `web.datasets.analogy <web/datasets/analogy.py>`_
-
-added
-
-    def fetch_BATS
-
-to fetch the BATS dataset
-
-(note: it does not download from the Internet
-but from the local machine --- TODO: find an official online version)
-
-In `web.datasets.items <web/datasets/items.py>`_
-
-added
-
-    def count_BATS
-
-
-7. Add functions for a new dataset : SAT
-----------------------------------------
-2019-01-01
-
-In `web.datasets.analogy <web/datasets/analogy.py>`_
-
-added
-
-    def fetch_SAT
-
-to fetch the SAT dataset
-
-(note: it does not download from the Internet
-but from the local machine --- TODO: find an official online version)
-
 
 6. Count the number of items
 ----------------------------
-2018-12-31 --- 2019-01-01
+2018-12-31 --- 2019-01-02
 
 Add `web.datasets.items <web/datasets/items.py>`_
 
@@ -144,9 +86,15 @@ a conflict in folder creation resulting from multiprocessing.
 
 
 
-2. Add new dataset : SimVerb3500
---------------------------------
-2018-12-27
+2. Add fetch functions for new datasets
+---------------------------------------
+
+- 2018-12-27 : SimVerb3500
+- 2019-01-01 : SAT
+- 2019-01-01 : BATS
+- 2019-01-02 : ESL
+- 2019-01-03 : TOEFL
+
 
 In `web.datasets.similarity <web/datasets/similarity.py>`_
 
@@ -154,7 +102,33 @@ added
 
     def fetch_SimVerb3500
 
-to fetch the SimVerb3500 dataset.
+
+In `web.datasets.analogy <web/datasets/analogy.py>`_
+
+added
+
+    def fetch_SAT
+    def fetch_BATS
+
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_
+
+added
+
+    def fetch_ESL
+    def fetch_TOEFL
+
+
+Note:
+
+except for SimVerb3500, the datasets are not downloaded
+
+from the Internet but from the local machine.
+
+TODO:
+
+find official online versions of the datasets
+
 
 1. Improve readability
 ----------------------
