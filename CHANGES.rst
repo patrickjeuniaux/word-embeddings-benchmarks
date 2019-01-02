@@ -140,9 +140,7 @@ In several places in the code such as
 
 `web.embeddings <web/embeddings.py>`_
 
-added
-
 print functions
 
-to increase the readibility of the program execution
+have been added to increase the readibility of the program execution
 
