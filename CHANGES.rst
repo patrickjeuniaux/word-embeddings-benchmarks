@@ -19,6 +19,9 @@ added
     def fetch_ESL
     def fetch_TOEFL
 
+(note: it does not download from the Internet
+but from the local machine --- TODO: find an official online version)
+
 In `web.datasets.items <web/datasets/items.py>`_
 
 several counting functions have been factorized into
