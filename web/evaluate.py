@@ -25,9 +25,9 @@ from .datasets.similarity import fetch_TR9856
 from .datasets.categorization import fetch_AP
 from .datasets.categorization import fetch_battig
 from .datasets.categorization import fetch_BLESS
-from .datasets.categorization import fetch_ESSLI_1a
-from .datasets.categorization import fetch_ESSLI_2b
-from .datasets.categorization import fetch_ESSLI_2c
+from .datasets.categorization import fetch_ESSLLI_1a
+from .datasets.categorization import fetch_ESSLLI_2b
+from .datasets.categorization import fetch_ESSLLI_2c
 
 from web.analogy_solver import *
 
@@ -108,9 +108,9 @@ def evaluate_on_all(w):
         "AP": fetch_AP(),
         "BLESS": fetch_BLESS(),
         "Battig": fetch_battig(),
-        "ESSLI_2c": fetch_ESSLI_2c(),
-        "ESSLI_2b": fetch_ESSLI_2b(),
-        "ESSLI_1a": fetch_ESSLI_1a()
+        "ESSLLI_2c": fetch_ESSLLI_2c(),
+        "ESSLLI_2b": fetch_ESSLLI_2b(),
+        "ESSLLI_1a": fetch_ESSLLI_1a()
     }
 
     categorization_results = {}

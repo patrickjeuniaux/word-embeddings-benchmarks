@@ -155,9 +155,9 @@ def fetch_battig():
                  freq=data.X[:, 1], frequency=data.X[:, 2], rank=data.X[:, 3], rfreq=data.X[:, 4])
 
 
-def fetch_ESSLI_1a():
+def fetch_ESSLLI_1a():
     """
-    Fetch ESSLI 1a task categorization dataset.
+    Fetch ESSLLI 1a task categorization dataset.
 
     Returns
     -------
@@ -178,15 +178,15 @@ def fetch_ESSLI_1a():
     """
 
     print("\nFetch '{}' dataset\n---\n".
-          format("ESSLI 1a"))
+          format("ESSLLI 1a"))
 
-    return _get_cluster_assignments(dataset_name="EN-ESSLI-1a",
+    return _get_cluster_assignments(dataset_name="EN-ESSLLI-1a",
                                     url="https://www.dropbox.com/sh/h362565r1sk5wii/AADjcdYy3nRo-MjuFUSvb-0ya?dl=1")
 
 
-def fetch_ESSLI_2b():
+def fetch_ESSLLI_2b():
     """
-    Fetch ESSLI 2c task categorization dataset
+    Fetch ESSLLI 2c task categorization dataset
 
     Parameters
     -------
@@ -211,15 +211,15 @@ def fetch_ESSLI_2b():
     """
 
     print("\nFetch '{}' dataset\n---\n".
-          format("ESSLI 2b"))
+          format("ESSLLI 2b"))
 
-    return _get_cluster_assignments(dataset_name="EN-ESSLI-2b",
+    return _get_cluster_assignments(dataset_name="EN-ESSLLI-2b",
                                     url="https://www.dropbox.com/sh/7gdv52gy9vb4mf2/AACExLgHdbvbBrRZBP6CcdDaa?dl=1")
 
 
-def fetch_ESSLI_2c():
+def fetch_ESSLLI_2c():
     """
-    Fetch ESSLI 2c task categorization dataset
+    Fetch ESSLLI 2c task categorization dataset
 
     Returns
     -------
@@ -243,7 +243,7 @@ def fetch_ESSLI_2c():
     """
 
     print("\nFetch '{}' dataset\n---\n".
-          format("ESSLI 2c"))
+          format("ESSLLI 2c"))
 
-    return _get_cluster_assignments(dataset_name="EN-ESSLI-2c",
+    return _get_cluster_assignments(dataset_name="EN-ESSLLI-2c",
                                     url="https://www.dropbox.com/sh/d3mcyl3b5mawfhm/AAABygW1rguhI4L0XSw_I68ta?dl=1")
