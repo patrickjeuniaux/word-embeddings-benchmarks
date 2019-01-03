@@ -38,7 +38,7 @@ Included datasets:
 * AP
 * BLESS
 * Battig
-* ESSLI (2b, 2a, 1c)
+* ESSLLI (2b, 2a, 1c)
 * WS353
 * MTurk
 * RG65
