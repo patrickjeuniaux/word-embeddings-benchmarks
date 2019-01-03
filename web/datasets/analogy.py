@@ -640,6 +640,7 @@ def fetch_SAT():
     ----------------------
 
     SAT Analogy Questions (State of the art)
+
     https://aclweb.org/aclwiki/SAT_Analogy_Questions_(State_of_the_art)
 
     Notes
@@ -652,7 +653,6 @@ def fetch_SAT():
     print("\nFetch '{}' dataset\n---\n".
           format("SAT"))
 
-    # there
     url = 'file:' + os.path.expanduser('~/Downloads/sat2.txt')
 
     input_path = _fetch_file(url, 'analogy')

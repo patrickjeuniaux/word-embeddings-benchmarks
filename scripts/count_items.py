@@ -81,6 +81,7 @@ def count_categorization():
     assert count_Xy_items("categorization", "AP") == 402
 
     assert count_Xy_items("categorization", "battig") == 5231
+    assert count_Xy_items("categorization", "battig2010") == 82
 
     assert count_Xy_items("categorization", "ESSLLI_1a") == 44
     assert count_Xy_items("categorization", "ESSLLI_2b") == 40
@@ -89,7 +90,9 @@ def count_categorization():
 
 if __name__ == "__main__":
 
-    if True:
+    count_Xy_items("categorization", "battig2010")
+
+    if False:
         count_synonymy()
         count_similarity()
         count_analogy()

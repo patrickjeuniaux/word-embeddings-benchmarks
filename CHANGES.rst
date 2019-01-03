@@ -16,7 +16,7 @@ Add fetch functions for new datasets
 - 2019-01-01 : BATS
 - 2019-01-02 : ESL
 - 2019-01-02 : TOEFL
-
+- 2018-01-03 : BATTIG2010
 
 In `web.datasets.similarity <web/datasets/similarity.py>`_
 
@@ -32,6 +32,12 @@ added
     def fetch_SAT
 
     def fetch_BATS
+
+In `web.datasets.categorization <web/datasets/categorization.py>`_
+
+added
+
+    def fetch_battig2010
 
 
 In `web.datasets.synonymy <web/datasets/synonymy.py>`_

@@ -4,8 +4,17 @@
  Functions for fetching categorization datasets
 """
 
+# external imports
+# ---
 from sklearn.datasets.base import Bunch
+import os
+import pandas as pd
+
+# internal imports
+# ---
+
 from .utils import _get_cluster_assignments
+from .utils import _fetch_file
 
 
 def fetch_AP():
@@ -153,6 +162,59 @@ def fetch_battig():
                                     sep=",", skip_header=True)
     return Bunch(X=data.X[:, 0], y=data.y,
                  freq=data.X[:, 1], frequency=data.X[:, 2], rank=data.X[:, 3], rfreq=data.X[:, 4])
+
+
+def fetch_battig2010():
+    """
+    Fetch the 2010 Battig dataset
+
+    Returns
+    -------
+    data : sklearn.datasets.base.Bunch
+        dictionary-like object. Keys of interest:
+        'X': words to categorize
+        'y': cluster (i.e., category) assignment
+
+    examples:
+    ---------
+
+    X : aeroplane-n, apple-n, bean-n, bear-n, bicycle-n, birch-n
+    y : vehicle, fruit, vegetable, land_mammal. vehicle, tree
+
+
+    References
+    ----------
+    Baroni, M., Murphy, B., Barbu, E., & Poesio, M. (2010). Strudel: A corpus-based semantic model based on properties and types. Cognitive Science, 34(2), 222–254. https://doi.org/10.1111/j.1551-6709.2009.01068.x
+
+    Notes
+    -----
+    The authorsd constructed a test set of 10 common concrete categories extracted from the norms of Van Overschelde, Rawson, and Dunlosky (2004). For each superordinate category, they selected up to 10 concepts, as ordered by typicality rating according to the norms, and that were also attested in our concept list and in the McRae norms. The resulting test set contains 82 concepts.
+
+    This is the same dataset that is used in Baroni et al. "Don’t count, predict! A systematic comparison of
+    context-counting vs. context-predicting semantic vectors"
+    """
+
+    print("\nFetch '{}' dataset\n---\n".
+          format("battig2010"))
+
+    url = 'file:' + os.path.expanduser('~/Downloads/battig_strudel.txt')
+
+    input_path = _fetch_file(url, 'categorization')
+
+    df = pd.read_csv(input_path, header=None, encoding='utf-8', sep="\t")
+
+    data = df.values
+
+    X = data[:, 0].astype("object")
+
+    y = data[:, 1].astype("object")
+
+    bunch = Bunch(X=X, y=y)
+
+    # bunch = _get_cluster_assignments(dataset_name="battig2010",
+    #                                 url=url)
+
+    return bunch
 
 
 def fetch_ESSLLI_1a():
