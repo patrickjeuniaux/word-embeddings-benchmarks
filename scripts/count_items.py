@@ -90,27 +90,9 @@ def count_categorization():
 
 if __name__ == "__main__":
 
-    count_Xy_items("categorization", "battig2010")
-
-    if False:
-        count_synonymy()
-        count_similarity()
-        count_analogy()
-        count_categorization()
-
-    if False:
-        # analogy
-        # ---
-        count_BATS()  # 98000 != 99200 (PROBLEM)
-
-        # categorization
-        # ---
-        count_Xy_items("categorization", "BLESS")  # 200 != 26554 (PROBLEM)
-        count_Xy_items("categorization", "battig")  # 5231 != 83 (PROBLEM)
-
-        n1a = count_Xy_items("categorization", "ESSLLI_1a")  # 44
-        n2b = count_Xy_items("categorization", "ESSLLI_2b")  # 40
-        n2c = count_Xy_items("categorization", "ESSLLI_2c")  # 45
-        # 44 + 40 + 45 = 129 != 134 (PROBLEM)
+    count_synonymy()
+    count_similarity()
+    count_analogy()
+    count_categorization()
 
     pass

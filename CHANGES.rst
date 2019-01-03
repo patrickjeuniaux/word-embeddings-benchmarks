@@ -62,7 +62,7 @@ find official online versions of the datasets
 
 Count the number of items
 -------------------------
-2018-12-31 --- 2019-01-02
+2018-12-31 --- 2019-01-03
 
 Add `web.datasets.items <web/datasets/items.py>`_
 
