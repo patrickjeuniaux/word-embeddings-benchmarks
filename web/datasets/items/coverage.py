@@ -10,6 +10,7 @@ import numpy as np
 from math import factorial
 import importlib
 import os
+import six
 
 # internal imports
 # ---
@@ -17,6 +18,7 @@ import os
 import web.datasets.synonymy
 import web.datasets.similarity
 import web.datasets.analogy
+import web.datasets.categorization
 
 from utils import number_permutations
 
@@ -268,6 +270,97 @@ def coverage_synonymy(dataset_name, vocabulary):
     return coverage_result(nb_items, nb_items_covered)
 
 
+def coverage_categorization(dataset_name, vocabulary):
+    """
+
+    """
+
+    # set the fetch function name
+    # ---
+    fetch_function_name = "fetch_" + dataset_name
+
+    # retrieve the dataset
+    # ---
+    data = getattr(web.datasets.categorization, fetch_function_name)()
+
+    # the question
+    X = data.X
+
+    nb_items = data.X.shape[0]
+
+    nb_items_covered = 0
+
+    for i in range(nb_items):
+
+        word = X[i][0]
+
+        if word in vocabulary:
+
+            nb_items_covered += 1
+
+    return coverage_result(nb_items, nb_items_covered)
+
+
+def coverage_SAT(vocabulary):
+    """
+
+    """
+
+    # retrieve the dataset
+    # ---
+    data = web.datasets.analogy.fetch_SAT()
+
+    # the question
+    X = data.X
+
+    # the answers
+    y = data.y
+
+    nb_items = data.X.shape[0]
+
+    nb_items_covered = 0
+
+    def pair_in_vocab(pair, vocabulary):
+
+        # if not a string (ex: if NaN)
+        if not isinstance(pair, six.string_types):
+
+            # https://pythonhosted.org/six/#constants
+
+            return False
+
+        word1, word2 = pair.split("_")
+
+        return word1 in vocabulary and word2 in vocabulary
+
+    for i in range(nb_items):
+
+        question = X[i]
+
+        answers = y[i]
+
+        good_answer = answers[0]
+        bad_answers = answers[1:]
+
+        # print(i + 1, X[i], y[i])
+
+        bad_answers_covered = 0
+
+        for bad_answer in bad_answers:
+
+            if pair_in_vocab(bad_answer, vocabulary):
+
+                bad_answers_covered += 1
+
+        if pair_in_vocab(question, vocabulary) and \
+                pair_in_vocab(good_answer, vocabulary) and \
+                bad_answers_covered > 0:
+
+            nb_items_covered += 1
+
+    return coverage_result(nb_items, nb_items_covered)
+
+
 def coverage_result(nb_items, nb_items_covered):
     """
 
@@ -344,12 +437,12 @@ def calculate_coverage(vocabulary):
     # coverage_mikolov("msr_analogy", vocabulary)
     # coverage_mikolov("google_analogy", vocabulary)
     # coverage_wordrep(vocabulary)
-    coverage_BATS(vocabulary)
+    # coverage_BATS(vocabulary)
     # coverage_semeval_2012_2(vocabulary, "all")
 
     # coverage_SAT(vocabulary)
 
-    # coverage_categorization(BLESS", vocabulary)
+    # coverage_categorization("BLESS", vocabulary)
 
     # coverage_categorization("AP", vocabulary)
 

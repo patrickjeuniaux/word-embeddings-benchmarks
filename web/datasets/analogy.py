@@ -653,7 +653,7 @@ def fetch_SAT():
     print("\nFetch '{}' dataset\n---\n".
           format("SAT"))
 
-    url = 'file:' + os.path.expanduser('~/Downloads/sat2.txt')
+    url = 'file:' + os.path.expanduser('~/Downloads/sat.txt')
 
     input_path = _fetch_file(url, 'analogy')
 
