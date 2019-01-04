@@ -60,17 +60,28 @@ TODO:
 find official online versions of the datasets
 
 
-Count the number of items
--------------------------
-2018-12-31 --- 2019-01-03
+Calculate datasets statistics
+-----------------------------
+2018-12-31 --- 2019-01-04
 
-Add `web.datasets.items <web/datasets/items.py>`_
+
+Add `web.datasets.items.counter <web/datasets/items/counter.py>`_
 
 to count the number of items in the datasets.
 
 The use of this module is illustrated in
 
 `scripts.count_items <scripts/count_items.py>`_
+
+
+Add `web.datasets.items.coverage <web/datasets/items/coverage.py>`_
+
+to determine the number of items in the datasets that are covered by a vocabulary.
+
+The use of this module is illustrated in
+
+`scripts.items_coverage <scripts/items_coverage.py>`_
+
 
 
 
