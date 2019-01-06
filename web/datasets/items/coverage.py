@@ -531,7 +531,7 @@ def calculate_coverage(vocabulary, output_path):
             results = coverage_similarity(dataset, vocabulary)
             save_results(dataset, results, file)
 
-        for which in ("similarity", "relatedness"):
+        for which in ("all", "similarity", "relatedness"):
 
             results = coverage_similarity("WS353", vocabulary, which=which)
             dataset = "WS353-" + which
