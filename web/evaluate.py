@@ -263,7 +263,9 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
 def evaluate_on_semeval_2012_2(w):
     """
-    Simple method to score embedding using SimpleAnalogySolver
+    Simple method to score embedding
+    Note: it is NOT using SimpleAnalogySolver
+    but another method
 
     Parameters
     ----------

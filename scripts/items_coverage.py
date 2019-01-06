@@ -22,11 +22,24 @@ from web.datasets.items.coverage import *
 
 if __name__ == "__main__":
 
-    path = os.path.expanduser(os.path.join(
+    # IO
+    # ---
+
+    vocabulary_path = os.path.expanduser(os.path.join(
         "~", "Documents", "data", "DSM_eval", "5_vocabulary", "vocabulary.txt"))
 
-    vocabulary = load_vocabulary(path)
+    results_folder = os.path.expanduser(os.path.join(
+        "~", "Documents", "data", "DSM_eval", "4_coverage"))
 
-    calculate_coverage(vocabulary)
+    attend_output_folder(results_folder)
 
-    print("--- THE END ---")
+    results_path = os.path.join(results_folder, "items_coverage.txt")
+
+    # load vocabulary
+    # ---
+    vocabulary = load_vocabulary(vocabulary_path)
+
+    # calculate coverage
+    # ---
+
+    calculate_coverage(vocabulary, results_path)

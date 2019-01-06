@@ -62,7 +62,7 @@ find official online versions of the datasets
 
 Calculate datasets statistics
 -----------------------------
-2018-12-31 --- 2019-01-04
+2018-12-31 --- 2019-01-06
 
 
 Add `web.datasets.items.counter <web/datasets/items/counter.py>`_

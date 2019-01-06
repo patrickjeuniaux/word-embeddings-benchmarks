@@ -20,7 +20,48 @@ import web.datasets.similarity
 import web.datasets.analogy
 import web.datasets.categorization
 
-from utils import number_permutations
+
+from web.datasets.items.utils import number_permutations
+from web.datasets.items.utils import attend_output_folder
+
+
+def coverage_semeval_2012_2(vocabulary, which="all"):
+    """
+
+    """
+
+    data = web.datasets.analogy.fetch_semeval_2012_2(which)
+
+    # X_prot = data.X_prot
+
+    X = data.X
+
+    # y = data.y
+
+    categories_names = data.categories_names
+
+    # categories_descriptions = data.categories_descriptions
+
+    # items counting
+    # ---
+
+    total_nb_pairs = 0
+
+    total_nb_pairs_covered = 0
+
+    for category in categories_names:
+
+        for word1, word2 in X[category]:
+
+            # print(word1, word2)
+
+            total_nb_pairs += 1
+
+            if word1 in vocabulary and word2 in vocabulary:
+
+                total_nb_pairs_covered += 1
+
+    return coverage_result(total_nb_pairs, total_nb_pairs_covered)
 
 
 def coverage_BATS(vocabulary):
@@ -412,55 +453,133 @@ def load_vocabulary(input_path):
     return(vocabulary)
 
 
-def calculate_coverage(vocabulary):
+def test_coverage(vocabulary):
     """
 
     """
 
-    print("Calculate coverage")
+    print("Test - coverage calculation")
     print("---")
 
-    # coverage_synonymy("TOEFL", vocabulary)
-    # coverage_synonymy("ESL", vocabulary)
+    coverage_synonymy("TOEFL", vocabulary)
+    coverage_synonymy("ESL", vocabulary)
 
-    # coverage_similarity("RG65", vocabulary)
-    # coverage_similarity("RW", vocabulary)
-    # coverage_similarity("SimLex999", vocabulary)
-    # coverage_similarity("SimVerb3500", vocabulary)
-    # coverage_similarity("WS353", vocabulary, which="all")
-    # coverage_similarity("WS353", vocabulary, which="similarity")
-    # coverage_similarity("WS353", vocabulary, which="relatedness")
+    coverage_similarity("RG65", vocabulary)
+    coverage_similarity("RW", vocabulary)
+    coverage_similarity("SimLex999", vocabulary)
+    coverage_similarity("SimVerb3500", vocabulary)
+    coverage_similarity("WS353", vocabulary, which="all")
+    coverage_similarity("WS353", vocabulary, which="similarity")
+    coverage_similarity("WS353", vocabulary, which="relatedness")
 
-    # coverage_similarity("MTurk", vocabulary)
-    # coverage_similarity("MEN", vocabulary, which="all")
+    coverage_similarity("MTurk", vocabulary)
+    coverage_similarity("MEN", vocabulary, which="all")
 
-    # coverage_mikolov("msr_analogy", vocabulary)
-    # coverage_mikolov("google_analogy", vocabulary)
-    # coverage_wordrep(vocabulary)
-    # coverage_BATS(vocabulary)
-    # coverage_semeval_2012_2(vocabulary, "all")
+    coverage_mikolov("msr_analogy", vocabulary)
+    coverage_mikolov("google_analogy", vocabulary)
+    coverage_wordrep(vocabulary)
+    coverage_BATS(vocabulary)
+    coverage_semeval_2012_2(vocabulary, "all")
 
-    # coverage_SAT(vocabulary)
+    coverage_SAT(vocabulary)
 
-    # coverage_categorization("BLESS", vocabulary)
+    coverage_categorization("BLESS", vocabulary)
 
-    # coverage_categorization("AP", vocabulary)
+    coverage_categorization("AP", vocabulary)
 
-    # coverage_categorization("battig", vocabulary)
-    # coverage_categorization("battig2010", vocabulary)
+    coverage_categorization("battig", vocabulary)
+    coverage_categorization("battig2010", vocabulary)
 
-    # coverage_categorization("ESSLLI_1a", vocabulary)
-    # coverage_categorization("ESSLLI_2b", vocabulary)
-    # coverage_categorization("ESSLLI_2c", vocabulary)
+    coverage_categorization("ESSLLI_1a", vocabulary)
+    coverage_categorization("ESSLLI_2b", vocabulary)
+    coverage_categorization("ESSLLI_2c", vocabulary)
+
+
+def calculate_coverage(vocabulary, output_path):
+    """
+
+    """
+
+    print("Calculate and save coverage")
+    print("---")
+
+    def save_results(dataset, results, file):
+        """
+
+        """
+
+        nb_items, nb_items_covered = results
+
+        percentage_coverage = nb_items_covered / nb_items
+
+        line = "\n" + "\t".join((dataset, str(nb_items), str(nb_items_covered), str(percentage_coverage)))
+
+        file.write(line)
+
+    with open(output_path, 'w') as file:
+
+        headers = "\t".join(("dataset", "number_of_items", "number_of_items_covered", "percentage_coverage"))
+        file.write(headers)
+
+        for dataset in ("TOEFL", "ESL"):
+
+            results = coverage_synonymy(dataset, vocabulary)
+            save_results(dataset, results, file)
+
+        for dataset in ("RG65", "RW", "SimLex999", "SimVerb3500", "MTurk", "MEN"):
+
+            results = coverage_similarity(dataset, vocabulary)
+            save_results(dataset, results, file)
+
+        for which in ("similarity", "relatedness"):
+
+            results = coverage_similarity("WS353", vocabulary, which=which)
+            dataset = "WS353-" + which
+            save_results(dataset, results, file)
+
+        for dataset in ("msr_analogy", "google_analogy"):
+
+            results = coverage_mikolov(dataset, vocabulary)
+            save_results(dataset, results, file)
+
+        results = coverage_wordrep(vocabulary)
+        save_results("wordrep", results, file)
+
+        results = coverage_BATS(vocabulary)
+        save_results("BATS", results, file)
+
+        results = coverage_semeval_2012_2(vocabulary)
+        save_results("semeval_2012_2", results, file)
+
+        results = coverage_SAT(vocabulary)
+        save_results("SAT", results, file)
+
+        for dataset in ("BLESS", "AP", "battig", "battig2010", "ESSLLI_1a", "ESSLLI_2b", "ESSLLI_2c"):
+
+            results = coverage_categorization(dataset, vocabulary)
+
+            save_results(dataset, results, file)
+
+        print("")
+        print("Save output :")
+        print("---")
+        print(output_path)
 
 
 if __name__ == "__main__":
 
-    path = os.path.expanduser(os.path.join(
+    # IO
+    # ---
+
+    vocabulary_path = os.path.expanduser(os.path.join(
         "~", "Documents", "data", "DSM_eval", "5_vocabulary", "vocabulary.txt"))
 
-    vocabulary = load_vocabulary(path)
+    # load vocabulary
+    # ---
+    vocabulary = load_vocabulary(vocabulary_path)
 
-    calculate_coverage(vocabulary)
+    # calculate coverage
+    # ---
+    test_coverage(vocabulary)
 
     print("--- THE END ---")
