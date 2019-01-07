@@ -85,6 +85,8 @@ def coverage_BATS(vocabulary):
 
     for category in np.unique(categories):
 
+        print(category)
+
         pairs = X[categories == category]
 
         nb_pairs = len(pairs)
@@ -93,6 +95,8 @@ def coverage_BATS(vocabulary):
 
         # convert numpy array to list of lists
         pairs = pairs.tolist()
+
+        print(pairs)
 
         # we want to keep only the pairs covered
 
@@ -465,7 +469,7 @@ def test_coverage(vocabulary):
     # coverage_synonymy("ESL", vocabulary)
 
     # coverage_similarity("RG65", vocabulary)
-    coverage_similarity("RW", vocabulary)
+    # coverage_similarity("RW", vocabulary)
     # coverage_similarity("SimLex999", vocabulary)
     # coverage_similarity("SimVerb3500", vocabulary)
     # coverage_similarity("WS353", vocabulary, which="all")
@@ -478,7 +482,7 @@ def test_coverage(vocabulary):
     # coverage_mikolov("msr_analogy", vocabulary)
     # coverage_mikolov("google_analogy", vocabulary)
     # coverage_wordrep(vocabulary)
-    # coverage_BATS(vocabulary)
+    coverage_BATS(vocabulary)
     # coverage_semeval_2012_2(vocabulary, "all")
 
     # coverage_SAT(vocabulary)

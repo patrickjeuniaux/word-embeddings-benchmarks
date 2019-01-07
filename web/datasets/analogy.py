@@ -755,9 +755,7 @@ def fetch_BATS():
 
         for filename in os.listdir(folder):
 
-            category = filename[5:-5]
-
-            category = standardize_string(category)
+            category = filename[5:-5].lower()
 
             input_file = os.path.join(folder, filename)
 
@@ -775,9 +773,7 @@ def fetch_BATS():
 
                         # answers.append(answer)
 
-                        line = standardize_string(line)
-
-                        words_pair = line.split("\t")
+                        words_pair = line.lower().split("\t")
 
                         words_pairs.append(words_pair)
 

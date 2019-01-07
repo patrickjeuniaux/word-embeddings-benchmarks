@@ -394,7 +394,7 @@ def count_all():
 
     # count_Xy_items("similarity", "RG65")
 
-    count_Xy_items("similarity", "RW")
+    # count_Xy_items("similarity", "RW")
 
     # count_Xy_items("similarity", "SimLex999")
     # count_Xy_items("similarity", "multilingual_SimLex999", which="EN")
@@ -411,7 +411,7 @@ def count_all():
     # count_mikolov("msr_analogy")
     # count_mikolov("google_analogy")
     # count_wordrep()
-    # count_BATS()
+    count_BATS()
     # count_semeval_2012_2("all")
     # count_Xy_items("analogy", "SAT")
 
