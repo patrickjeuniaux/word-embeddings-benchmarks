@@ -21,6 +21,7 @@ from .datasets.similarity import fetch_MTurk
 from .datasets.similarity import fetch_RG65
 from .datasets.similarity import fetch_RW
 from .datasets.similarity import fetch_TR9856
+from .datasets.similarity import fetch_SimVerb3500
 
 from .datasets.categorization import fetch_AP
 from .datasets.categorization import fetch_battig
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 def evaluate_on_all(w):
     """
-    Evaluate Embedding on all fast-running benchmarks
+    Evaluate Embedding w on all fast-running benchmarks
 
     Parameters
     ----------
@@ -69,6 +70,7 @@ def evaluate_on_all(w):
         "RG65": fetch_RG65(),
         "MTurk": fetch_MTurk(),
         "TR9856": fetch_TR9856(),
+        "SimVerb3500": fetch_SimVerb3500(),
     }
 
     similarity_results = {}

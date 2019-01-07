@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- Simple example showing evaluating embedding on similarity datasets
+ Simple example illustrating the evaluation of an embedding on similarity datasets
 """
 
 # external imports
@@ -13,7 +13,7 @@ from six import iteritems
 # internal imports
 # ---
 
-from web.datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999, fetch_SimVerb3500
+from web.datasets.similarity import fetch_MEN, fetch_WS353, fetch_SimLex999
 from web.embeddings import fetch_GloVe
 from web.evaluate import evaluate_similarity
 # import sys
@@ -39,7 +39,6 @@ tasks = {
     "MEN": fetch_MEN(),
     "WS353": fetch_WS353(),
     "SimLex999": fetch_SimLex999(),
-    "SimVerb3500": fetch_SimVerb3500(),
 }
 
 # sys.exit()

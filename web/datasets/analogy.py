@@ -486,7 +486,7 @@ def fetch_wordrep(subsample=None, rng=None):
     Notes
     -----
     This dataset is too big to calculate and store all word analogy quadruples, this is
-    why it returns word paris
+    why it returns word pairs
 
     """
 
@@ -676,8 +676,6 @@ def fetch_BATS():
     -------
     data : sklearn.datasets.base.Bunch
         dictionary-like object. Keys of interest:
-        'X': words pairs
-
 
     examples
     --------
@@ -698,6 +696,15 @@ def fetch_BATS():
     ['Inflectional_morphology' 'Inflectional_morphology'
      'Inflectional_morphology' 'Inflectional_morphology'
      'Inflectional_morphology']
+
+    WARNING:
+
+    some columns in X contain multiple words separated by a /
+
+    Here is an example from 'antonyms - gradable'
+
+    able    unable/incapable/incompetent/unequal
+    abundant    scarce/rare/tight/meager/meagre/meagerly/stingy/scrimpy/insufficient/deficient
 
 
     Reference
@@ -750,6 +757,8 @@ def fetch_BATS():
 
             category = filename[5:-5]
 
+            category = standardize_string(category)
+
             input_file = os.path.join(folder, filename)
 
             with open(input_file, 'r') as file:
@@ -765,6 +774,8 @@ def fetch_BATS():
                         # questions.append(question)
 
                         # answers.append(answer)
+
+                        line = standardize_string(line)
 
                         words_pair = line.split("\t")
 

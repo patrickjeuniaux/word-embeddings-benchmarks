@@ -26,15 +26,18 @@ import os
 # internal imports
 # ---
 
-from web.embeddings import fetch_GloVe, load_embedding
+from web.embeddings import fetch_GloVe
+from web.embeddings import load_embedding
 from web.datasets.utils import _get_dataset_dir
 from web.evaluate import evaluate_on_all
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+
 logger = logging.getLogger(__name__)
 
 parser = OptionParser()
+
 parser.add_option("-f", "--file", dest="filename",
                   help="Path to the file with embedding. If relative will load from data directory.",
                   default=None)
