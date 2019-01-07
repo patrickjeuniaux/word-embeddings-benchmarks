@@ -14,22 +14,27 @@ from six import iteritems
 # internal imports
 # ---
 
-from .datasets.similarity import fetch_MEN
-from .datasets.similarity import fetch_WS353
-from .datasets.similarity import fetch_SimLex999
-from .datasets.similarity import fetch_MTurk
-from .datasets.similarity import fetch_RG65
-from .datasets.similarity import fetch_RW
-from .datasets.similarity import fetch_TR9856
-from .datasets.similarity import fetch_SimVerb3500
+from web.datasets.similarity import fetch_MEN
+from web.datasets.similarity import fetch_WS353
+from web.datasets.similarity import fetch_SimLex999
+from web.datasets.similarity import fetch_MTurk
+from web.datasets.similarity import fetch_RG65
+from web.datasets.similarity import fetch_RW
+from web.datasets.similarity import fetch_TR9856
+from web.datasets.similarity import fetch_SimVerb3500
 
-from .datasets.categorization import fetch_AP
-from .datasets.categorization import fetch_battig
-from .datasets.categorization import fetch_BLESS
-from .datasets.categorization import fetch_ESSLLI_1a
-from .datasets.categorization import fetch_ESSLLI_2b
-from .datasets.categorization import fetch_ESSLLI_2c
+from web.datasets.categorization import fetch_AP
+from web.datasets.categorization import fetch_battig
+from web.datasets.categorization import fetch_battig2010
+from web.datasets.categorization import fetch_BLESS
+from web.datasets.categorization import fetch_ESSLLI_1a
+from web.datasets.categorization import fetch_ESSLLI_2b
+from web.datasets.categorization import fetch_ESSLLI_2c
 
+# import of analogy datasets fetchers
+# and many other things (ex: itertools.product)
+# are accomplished within analogy_solver
+# ---
 from web.analogy_solver import *
 
 
@@ -191,6 +196,126 @@ def evaluate_similarity(w, X, y):
     return scipy.stats.spearmanr(scores, y).correlation
 
 
+def calculate_purity(y_true, y_pred):
+    """
+    Calculate purity for given true and predicted cluster labels.
+
+    Parameters
+    ----------
+    y_true: array, shape: (n_samples, 1)
+      True cluster labels
+
+    y_pred: array, shape: (n_samples, 1)
+      Cluster assingment.
+
+    Returns
+    -------
+    purity: float
+      Calculated purity.
+    """
+    assert len(y_true) == len(y_pred)
+
+    true_clusters = np.zeros(shape=(len(set(y_true)), len(y_true)))
+
+    pred_clusters = np.zeros_like(true_clusters)
+
+    for id, cl in enumerate(set(y_true)):
+
+        true_clusters[id] = (y_true == cl).astype("int")
+
+    for id, cl in enumerate(set(y_pred)):
+
+        pred_clusters[id] = (y_pred == cl).astype("int")
+
+    M = pred_clusters.dot(true_clusters.T)
+
+    return 1. / len(y_true) * np.sum(np.max(M, axis=1))
+
+
+def evaluate_categorization(w, X, y, method="all", seed=None):
+    """
+    Evaluate embeddings on categorization task.
+
+    Parameters
+    ----------
+    w: Embedding or dict
+      Embedding to test.
+
+    X: vector, shape: (n_samples, )
+      Vector of words.
+
+    y: vector, shape: (n_samples, )
+      Vector of cluster assignments.
+
+    method: string, default: "all"
+      What method to use. Possible values are "agglomerative", "kmeans", "all.
+      If "agglomerative" is passed, method will fit AgglomerativeClustering (with very crude
+      hyperparameter tuning to avoid overfitting).
+      If "kmeans" is passed, method will fit KMeans.
+      In both cases number of clusters is preset to the correct value.
+
+    seed: int, default: None
+      Seed passed to KMeans.
+
+    Returns
+    -------
+    purity: float
+      Purity of the best obtained clustering.
+
+    Notes
+    -----
+    KMedoids method was excluded as empirically didn't improve over KMeans (for categorization
+    tasks available in the package).
+    """
+
+    if isinstance(w, dict):
+
+        w = Embedding.from_dict(w)
+
+    assert method in ["all", "kmeans", "agglomerative"], "Uncrecognized method"
+
+    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+
+    words = np.vstack(w.get(word, mean_vector) for word in X.flatten())
+
+    ids = np.random.RandomState(seed).choice(range(len(X)), len(X), replace=False)
+
+    # Evaluate clustering on several hyperparameters of AgglomerativeClustering and
+    # KMeans
+    best_purity = 0
+
+    if method == "all" or method == "agglomerative":
+
+        best_purity = calculate_purity(y[ids], AgglomerativeClustering(n_clusters=len(set(y)),
+                                                                       affinity="euclidean",
+                                                                       linkage="ward").fit_predict(words[ids]))
+
+        logger.debug("Purity={:.3f} using affinity={} linkage={}".format(best_purity, 'euclidean', 'ward'))
+
+        for affinity in ["cosine", "euclidean"]:
+
+            for linkage in ["average", "complete"]:
+
+                purity = calculate_purity(y[ids], AgglomerativeClustering(n_clusters=len(set(y)),
+                                                                          affinity=affinity,
+                                                                          linkage=linkage).fit_predict(words[ids]))
+
+                logger.debug("Purity={:.3f} using affinity={} linkage={}".format(purity, affinity, linkage))
+
+                best_purity = max(best_purity, purity)
+
+    if method == "all" or method == "kmeans":
+
+        purity = calculate_purity(y[ids], KMeans(random_state=seed, n_init=10, n_clusters=len(set(y))).
+                                  fit_predict(words[ids]))
+
+        logger.debug("Purity={:.3f} using KMeans".format(purity))
+
+        best_purity = max(purity, best_purity)
+
+    return best_purity
+
+
 def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=100):
     """
     Simple method to score embedding using SimpleAnalogySolver
@@ -295,6 +420,7 @@ def evaluate_on_semeval_2012_2(w):
     for c in categories:
 
         # Get mean of left and right vector
+        # ---
 
         prototypes = data.X_prot[c]
 
@@ -313,6 +439,7 @@ def evaluate_on_semeval_2012_2(w):
 
         # NaN happens when there are only 0s, which might happen for very rare words or
         # very insufficient word vocabulary
+        # ---
 
         cor = scipy.stats.spearmanr(scores, data.y[c]).correlation
 
@@ -365,28 +492,39 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
 
     count = {}
 
-    for cat in categories:
+    for category in categories:
 
-        X_cat = data.X[data.category == cat]
+        X_cat = data.X[data.category == category]
 
+        # further limit the number of pairs to consider
+        # ---
         X_cat = X_cat[0:max_pairs]
 
+        nb_pairs = X_cat.shape[0]
+
+        nb_questions = nb_pairs * (nb_pairs - 1)
+
         logger.info("Processing {} with {} pairs, {} questions".
-                    format(cat, X_cat.shape[0], X_cat.shape[0] * (X_cat.shape[0] - 1)))
+                    format(category, nb_pairs, nb_questions))
 
         # For each category construct question-answer pairs
+        # ---
 
-        size = X_cat.shape[0] * (X_cat.shape[0] - 1)
+        X = np.zeros(shape=(nb_questions, 3), dtype="object")
 
-        X = np.zeros(shape=(size, 3), dtype="object")
-
-        y = np.zeros(shape=(size,), dtype="object")
+        y = np.zeros(shape=(nb_questions,), dtype="object")
 
         id = 0
+
+        # to find all permutations
+        # iterate through the Cartesian product
+        # ---
 
         for left, right in product(X_cat, X_cat):
 
             if not np.array_equal(left, right):
+
+                # we exclude the cases when left = right
 
                 X[id, 0:2] = left
 
@@ -397,18 +535,20 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
                 id += 1
 
         # Run solver
+        # ---
 
         solver = SimpleAnalogySolver(w=w, **solver_kwargs)
 
         y_pred = solver.predict(X)
 
-        correct[cat] = float(np.sum(y_pred == y))
+        correct[category] = float(np.sum(y_pred == y))
 
-        count[cat] = size
+        count[category] = nb_questions
 
-        accuracy[cat] = float(np.sum(y_pred == y)) / size
+        accuracy[category] = float(np.sum(y_pred == y)) / nb_questions
 
     # Add summary results
+    # ---
 
     correct['wikipedia'] = sum(correct[c] for c in categories if c in data.wikipedia_categories)
 
@@ -433,121 +573,147 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
                       pd.Series(count, name="count")], axis=1)
 
 
-def evaluate_categorization(w, X, y, method="all", seed=None):
+def evaluate_on_BATS(w, solver_kwargs={}):
     """
-    Evaluate embeddings on categorization task.
+    Evaluate on the BATS dataset
 
     Parameters
     ----------
-    w: Embedding or dict
-      Embedding to test.
+    w : Embedding or dict
+      Embedding or dict instance.
 
-    X: vector, shape: (n_samples, )
-      Vector of words.
+    solver_kwargs: dict, default: {}
+      Arguments passed to SimpleAnalogySolver. It is suggested to limit number of words
+      in the dictionary.
 
-    y: vector, shape: (n_samples, )
-      Vector of cluster assignments.
+    References
+    ----------
+    Gladkova, A., Drozd, A., & Matsuoka, S. (2016). Analogy-Based Detection of Morphological and Semantic Relations with Word Embeddings: What Works and What Doesn’t. In Proceedings of the NAACL-HLT SRW (pp. 47–54). San Diego, California, June 12-17, 2016: ACL. https://doi.org/10.18653/v1/N16-2002
 
-    method: string, default: "all"
-      What method to use. Possible values are "agglomerative", "kmeans", "all.
-      If "agglomerative" is passed, method will fit AgglomerativeClustering (with very crude
-      hyperparameter tuning to avoid overfitting).
-      If "kmeans" is passed, method will fit KMeans.
-      In both cases number of clusters is preset to the correct value.
-
-    seed: int, default: None
-      Seed passed to KMeans.
-
-    Returns
-    -------
-    purity: float
-      Purity of the best obtained clustering.
-
-    Notes
-    -----
-    KMedoids method was excluded as empirically didn't improve over KMeans (for categorization
-    tasks available in the package).
     """
-
     if isinstance(w, dict):
 
         w = Embedding.from_dict(w)
 
-    assert method in ["all", "kmeans", "agglomerative"], "Uncrecognized method"
+    data = fetch_BATS()
 
-    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    categories = set(data.category)
 
-    words = np.vstack(w.get(word, mean_vector) for word in X.flatten())
+    # just used two categories --- for testing purposes
+    # categories = list(categories)[0:2]
 
-    ids = np.random.RandomState(seed).choice(range(len(X)), len(X), replace=False)
+    accuracy = {}
 
-    # Evaluate clustering on several hyperparameters of AgglomerativeClustering and
-    # KMeans
-    best_purity = 0
+    correct = {}
 
-    if method == "all" or method == "agglomerative":
+    count = {}
 
-        best_purity = calculate_purity(y[ids], AgglomerativeClustering(n_clusters=len(set(y)),
-                                                                       affinity="euclidean",
-                                                                       linkage="ward").fit_predict(words[ids]))
+    for category in categories:
 
-        logger.debug("Purity={:.3f} using affinity={} linkage={}".format(best_purity, 'euclidean', 'ward'))
+        pairs = data.X[data.category == category]
 
-        for affinity in ["cosine", "euclidean"]:
+        # convert numpy array to list of lists
+        # ---
+        pairs = pairs.tolist()
 
-            for linkage in ["average", "complete"]:
+        # we want to keep only the pairs covered
+        # ---
 
-                purity = calculate_purity(y[ids], AgglomerativeClustering(n_clusters=len(set(y)),
-                                                                          affinity=affinity,
-                                                                          linkage=linkage).fit_predict(words[ids]))
+        # filter 1
+        # ---
+        pairs = [(target_word, candidate) for target_word, candidate in pairs if target_word in w]
 
-                logger.debug("Purity={:.3f} using affinity={} linkage={}".format(purity, affinity, linkage))
+        # filter 2
+        # ---
+        final_pairs = []
 
-                best_purity = max(best_purity, purity)
+        for target_word, candidate in pairs:
 
-    if method == "all" or method == "kmeans":
+            found_word = False
 
-        purity = calculate_purity(y[ids], KMeans(random_state=seed, n_init=10, n_clusters=len(set(y))).
-                                  fit_predict(words[ids]))
+            if "/" not in candidate:
 
-        logger.debug("Purity={:.3f} using KMeans".format(purity))
+                if candidate in w:
 
-        best_purity = max(purity, best_purity)
+                    found_word = True
 
-    return best_purity
+            else:
 
+                words = candidate.split("/")
 
-def calculate_purity(y_true, y_pred):
-    """
-    Calculate purity for given true and predicted cluster labels.
+                for word in words:
 
-    Parameters
-    ----------
-    y_true: array, shape: (n_samples, 1)
-      True cluster labels
+                    if word in w:
 
-    y_pred: array, shape: (n_samples, 1)
-      Cluster assingment.
+                        # keep as a candidate the first word
+                        # found in the vocabulary
 
-    Returns
-    -------
-    purity: float
-      Calculated purity.
-    """
-    assert len(y_true) == len(y_pred)
+                        found_word = True
 
-    true_clusters = np.zeros(shape=(len(set(y_true)), len(y_true)))
+                        candidate = word
 
-    pred_clusters = np.zeros_like(true_clusters)
+                        break
 
-    for id, cl in enumerate(set(y_true)):
+            if found_word:
 
-        true_clusters[id] = (y_true == cl).astype("int")
+                word_pair = (target_word, candidate)
 
-    for id, cl in enumerate(set(y_pred)):
+                final_pairs.append(word_pair)
 
-        pred_clusters[id] = (y_pred == cl).astype("int")
+        nb_pairs = len(final_pairs)
 
-    M = pred_clusters.dot(true_clusters.T)
+        if nb_pairs == 0:
 
-    return 1. / len(y_true) * np.sum(np.max(M, axis=1))
+            continue
+
+        nb_questions = nb_pairs * (nb_pairs - 1)
+
+        logger.info("Processing {} with {} pairs, {} questions".
+                    format(category, nb_pairs, nb_questions))
+
+        # For each category construct question-answer pairs
+        # ---
+
+        X = np.zeros(shape=(nb_questions, 3), dtype="object")
+
+        y = np.zeros(shape=(nb_questions,), dtype="object")
+
+        id = 0
+
+        # to find all permutations
+        # iterate through the Cartesian product
+        # ---
+
+        for left, right in product(final_pairs, final_pairs):
+
+            if not np.array_equal(left, right):
+
+                # we exclude the cases when left = right
+
+                X[id, 0:2] = left
+
+                X[id, 2] = right[0]
+
+                y[id] = right[1]
+
+                id += 1
+
+        # Run solver
+        # ---
+
+        solver = SimpleAnalogySolver(w=w, **solver_kwargs)
+
+        y_pred = solver.predict(X)
+
+        correct[category] = float(np.sum(y_pred == y))
+
+        count[category] = nb_questions
+
+        accuracy[category] = float(np.sum(y_pred == y)) / nb_questions
+
+    # Add summary results
+    # ---
+
+    return pd.concat([pd.Series(accuracy, name="accuracy"),
+                      pd.Series(correct, name="correct"),
+                      pd.Series(count, name="count")], axis=1)

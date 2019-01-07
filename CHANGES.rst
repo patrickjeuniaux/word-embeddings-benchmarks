@@ -8,56 +8,104 @@ Patrick Jeuniaux
 University of Pisa
 
 
-Add fetch functions for new datasets
-------------------------------------
-
-- 2018-12-27 : SimVerb3500
-- 2019-01-01 : SAT
-- 2019-01-01 : BATS
-- 2019-01-02 : ESL
-- 2019-01-02 : TOEFL
-- 2018-01-03 : BATTIG2010
-
-In `web.datasets.similarity <web/datasets/similarity.py>`_
-
-added
-
-    def fetch_SimVerb3500
 
 
-In `web.datasets.analogy <web/datasets/analogy.py>`_
+New analogy dataset 'BATS'
+--------------------------
+2019-01-01 --- 2019-01-07
 
-added
-
-    def fetch_SAT
+In `web.datasets.analogy <web/datasets/analogy.py>`_, added
 
     def fetch_BATS
 
-In `web.datasets.categorization <web/datasets/categorization.py>`_
+This function loads the dataset from a local copy (not provided).
 
-added
+In `web.evaluate <web/evaluate.py>`_, added
+
+    def evaluate_on_BATS
+
+This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+
+
+
+New categorization dataset 'BATTIG2010'
+---------------------------------------
+2019-01-03 --- XX
+
+In `web.datasets.categorization <web/datasets/categorization.py>`_, added
 
     def fetch_battig2010
 
+This function loads the dataset from a local copy (not provided).
 
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_
+This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
 
-added
 
-    def fetch_ESL
+
+
+
+
+New similarity dataset 'SimVerb3500'
+------------------------------------
+2018-12-27 --- 2019-01-07
+
+In `web.datasets.similarity <web/datasets/similarity.py>`_, added
+
+    def fetch_SimVerb3500
+
+This function downloads the dataset from the Internet.
+
+In `web.evaluate <web/evaluate.py>`_
+
+    def evaluate_on_all
+
+added `fetch_SimVerb3500()`
+
+This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+
+
+
+New synonymy dataset 'TOEFL'
+----------------------------
+2019-01-02 --- XX
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
 
     def fetch_TOEFL
 
+This function loads the dataset from a local copy (not provided).
 
-Note:
 
-except for SimVerb3500, the datasets are not downloaded
 
-from the Internet but from the local machine.
 
-TODO:
 
-find official online versions of the datasets
+New synonymy dataset 'ESL'
+--------------------------
+2019-01-02 --- XX
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
+
+    def fetch_ESL
+
+This function loads the dataset from a local copy (not provided).
+
+
+
+
+
+
+
+New analogy dataset 'SAT'
+-------------------------
+2019-01-01 --- XX
+
+In `web.datasets.analogy <web/datasets/analogy.py>`_, added
+
+    def fetch_SAT
+
+This function loads the dataset from a local copy (not provided).
+
+
 
 
 Calculate datasets statistics
@@ -96,6 +144,9 @@ the job of evaluating NMT is commented out
 because NMT embeddings are no longer available thru the provided url
 
 (this link is broken: https://www.cl.cam.ac.uk/~fh295/TEmbz.tar.gz).
+
+
+
 
 Avoid generator error in Python 3.7
 -----------------------------------

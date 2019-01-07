@@ -85,7 +85,7 @@ def coverage_BATS(vocabulary):
 
     for category in np.unique(categories):
 
-        print(category)
+        # print(category)
 
         pairs = X[categories == category]
 
@@ -94,11 +94,13 @@ def coverage_BATS(vocabulary):
         nb_items = number_permutations(2, nb_pairs)
 
         # convert numpy array to list of lists
+        # ---
         pairs = pairs.tolist()
 
-        print(pairs)
+        # print(pairs)
 
         # we want to keep only the pairs covered
+        # ---
 
         # filter 1
         # ---
@@ -111,13 +113,13 @@ def coverage_BATS(vocabulary):
 
         for candidate in candidates:
 
-            nb_words_covered = 0
+            found_word = False
 
             if "/" not in candidate:
 
                 if candidate in vocabulary:
 
-                    nb_words_covered += 1
+                    found_word = True
 
             else:
 
@@ -127,9 +129,11 @@ def coverage_BATS(vocabulary):
 
                     if word in vocabulary:
 
-                        nb_words_covered += 1
+                        found_word = True
 
-            if nb_words_covered > 0:
+                        break
+
+            if found_word:
 
                 final_candidates.append(candidate)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- Test WordRep
+ Test BATS
 """
 
 # external imports
@@ -13,8 +13,8 @@ import logging
 # ---
 
 from web.embeddings import fetch_GloVe
-from web.datasets.analogy import fetch_wordrep
-from web.evaluate import evaluate_on_WordRep
+from web.datasets.analogy import fetch_BATS
+from web.evaluate import evaluate_on_BATS
 
 from web.analogy_solver import *
 
@@ -34,18 +34,14 @@ print("---")
 words_embedding = fetch_GloVe(corpus="wiki-6B", dim=50)
 
 
-# evaluation on WordRep
-# ---
-# limit to 50 pairs (-> 50*49 = 2450 permutations to test)
+# evaluation on BATS
 # ---
 
-max_pairs = 50
-
-print("\nLaunch evaluation on WordRep")
-print("Warning: it will take a long time even for small values of 'max_pairs'")
+print("\nLaunch evaluation on BATS")
+print("Warning: it will take a few minutes")
 print("---")
-print("max_pairs=", max_pairs)
 
-df = evaluate_on_WordRep(words_embedding, max_pairs=max_pairs)
+
+df = evaluate_on_BATS(words_embedding)
 
 print(df)

@@ -26,10 +26,10 @@ print("---")
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
 print("\n1. Load embeddings")
-print("Warning: it might take few minutes")
+print("Warning: it might take a few minutes")
 print("---")
 
-# Fetch GloVe embedding (warning: it might take few minutes)
+# Fetch GloVe embedding
 w_glove = fetch_GloVe(corpus="wiki-6B", dim=300)
 
 print("\n2. Define tasks")

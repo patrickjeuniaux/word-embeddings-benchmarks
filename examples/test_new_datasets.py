@@ -17,11 +17,11 @@ from web.embeddings import fetch_GloVe
 
 from web.evaluate import evaluate_similarity
 from web.evaluate import evaluate_categorization
+from web.evaluate import evaluate_on_BATS
 
 from web.datasets.similarity import fetch_SimVerb3500
-from web.datasets.analogy import fetch_BATS
 from web.datasets.categorization import fetch_battig2010
-
+# from web.datasets.analogy import fetch_BATS
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
@@ -32,7 +32,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=loggin
 datasets = []
 # datasets.append("SimVerb3500")
 # datasets.append("battig2010")
-# datasets.append("battig2010")
+datasets.append("BATS")
 
 
 # Word embeddings
@@ -41,10 +41,10 @@ datasets = []
 if datasets != []:
 
     print("\nLoad embeddings")
-    print("Warning: it might take few minutes")
+    print("Warning: it might take a few minutes")
     print("---")
 
-    # Fetch GloVe embedding (warning: it might take few minutes)
+    # Fetch GloVe embedding
     w_glove = fetch_GloVe(corpus="wiki-6B", dim=50)
     # w_glove = fetch_GloVe(corpus="wiki-6B", dim=300)
 
@@ -99,38 +99,18 @@ if "battig2010" in datasets:
 
     print("\nCluster purity = ", purity)
 
-
 # BATS
 # ---
 
+if "BATS" in datasets:
 
-print("\nBATS")
-print("---")
+    print("\nLaunch evaluation on BATS")
+    print("Warning: it will take a few minutes")
+    print("---")
 
-data = fetch_BATS()
+    df = evaluate_on_BATS(w_glove)
 
-categories = ('UK_city - county', 'adj - comparative', 'antonyms - gradable')
-
-
-print("\nSample of the data:")
-print("---")
-
-for category in categories:
-
-    print("")
-    print(category)
-    X = data.X[data.category == category]
-
-    for i in range(5):
-
-        print(i + 1, X[i])
-
-print("\nEvaluation of categorization:")
-print("---")
-
-# purity = evaluate_categorization(w_glove, data.X, data.y)
-
-# print("\nCluster purity = ", purity)
+    print(df)
 
 
 print("\n--- THE END ---")
