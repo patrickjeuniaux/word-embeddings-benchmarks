@@ -30,7 +30,7 @@ This dataset is tested in `examples.test_new_datasets <examples/test_new_dataset
 
 New categorization dataset 'BATTIG2010'
 ---------------------------------------
-2019-01-03 --- XX
+2019-01-03 --- 2019-01-07
 
 In `web.datasets.categorization <web/datasets/categorization.py>`_, added
 
