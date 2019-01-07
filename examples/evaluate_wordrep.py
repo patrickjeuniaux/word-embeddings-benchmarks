@@ -39,6 +39,13 @@ words_embedding = fetch_GloVe(corpus="wiki-6B", dim=50)
 # limit to 50 pairs (-> 50*49 = 2450 permutations to test)
 # ---
 
-df = evaluate_on_WordRep(words_embedding, max_pairs=50)
+max_pairs = 50
+
+print("\nLaunch evaluation on WordRep")
+print("Warning: it will take a long time even for small values of 'max_pairs'")
+print("---")
+print("max_pairs=", max_pairs)
+
+df = evaluate_on_WordRep(words_embedding, max_pairs=max_pairs)
 
 print(df)
