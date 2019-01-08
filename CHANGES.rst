@@ -17,6 +17,7 @@ New synonymy datasets 'TOEFL' and 'ESL'
 In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
 
     def fetch_TOEFL
+
     def fetch_ESL
 
 This function loads the datasets from a local copy (not provided).
@@ -24,6 +25,7 @@ This function loads the datasets from a local copy (not provided).
 In `web.evaluate <web/evaluate.py>`_, added
 
     def answer_synonymy_question
+
     def evaluate_on_synonyms
 
 This datasets are tested in `examples.test_datasets <examples/test_datasets.py>`_.
@@ -39,6 +41,7 @@ New analogy dataset 'SAT'
 In `web.datasets.analogy <web/datasets/analogy.py>`_, added
 
     def answer_SAT_analogy_question
+
     def fetch_SAT
 
 This function loads the dataset from a local copy (not provided).
