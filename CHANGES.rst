@@ -10,31 +10,23 @@ University of Pisa
 
 
 
-New synonymy dataset 'TOEFL'
-----------------------------
-2019-01-02 --- XX
+New synonymy datasets 'TOEFL' and 'ESL'
+---------------------------------------
+2019-01-02 --- 2019-01-08
 
 In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
 
     def fetch_TOEFL
-
-This function loads the dataset from a local copy (not provided).
-
-
-
-
-
-New synonymy dataset 'ESL'
---------------------------
-2019-01-02 --- XX
-
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
-
     def fetch_ESL
 
-This function loads the dataset from a local copy (not provided).
+This function loads the datasets from a local copy (not provided).
 
+In `web.evaluate <web/evaluate.py>`_, added
 
+    def answer_synonymy_question
+    def evaluate_on_synonyms
+
+This datasets are tested in `examples.test_datasets <examples/test_datasets.py>`_.
 
 
 
@@ -46,6 +38,7 @@ New analogy dataset 'SAT'
 
 In `web.datasets.analogy <web/datasets/analogy.py>`_, added
 
+    def answer_SAT_analogy_question
     def fetch_SAT
 
 This function loads the dataset from a local copy (not provided).
@@ -54,7 +47,7 @@ In `web.evaluate <web/evaluate.py>`_, added
 
     def evaluate_on_SAT
 
-This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+This dataset is tested in `examples.test_datasets <examples/test_datasets.py>`_.
 
 
 
@@ -73,7 +66,7 @@ In `web.evaluate <web/evaluate.py>`_, added
 
     def evaluate_on_BATS
 
-This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+This dataset is tested in `examples.test_datasets <examples/test_datasets.py>`_.
 
 
 
@@ -87,7 +80,7 @@ In `web.datasets.categorization <web/datasets/categorization.py>`_, added
 
 This function loads the dataset from a local copy (not provided).
 
-This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+This dataset is tested in `examples.test_datasets <examples/test_datasets.py>`_.
 
 
 

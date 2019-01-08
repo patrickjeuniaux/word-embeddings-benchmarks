@@ -16,6 +16,8 @@ import numpy as np
 # internal imports
 # ---
 
+import web.datasets.synonymy
+
 from web.datasets.similarity import fetch_MEN
 from web.datasets.similarity import fetch_WS353
 from web.datasets.similarity import fetch_SimLex999
@@ -38,7 +40,6 @@ from web.datasets.categorization import fetch_ESSLLI_2c
 # are accomplished within analogy_solver
 # ---
 from web.analogy_solver import *
-
 
 from web.embedding import Embedding
 
@@ -748,12 +749,12 @@ def cosine_similarity(vector1, vector2):
     return result
 
 
-def answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver):
+def answer_SAT_analogy_question(question, answers, w, solver):
     '''
 
     '''
 
-    nb_rows = len(bad_answers) + 1
+    nb_rows = len(answers)
 
     # init
     # ---
@@ -767,17 +768,13 @@ def answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver):
 
     # filling
     # ---
-    X[0, 0] = question[0]
-    X[0, 1] = question[1]
-    X[0, 2] = good_answer[0]
-    y[0] = good_answer[1]
 
-    for i, bad_answer in enumerate(bad_answers, 1):
+    for i, answer in enumerate(answers):
 
         X[i, 0] = question[0]
         X[i, 1] = question[1]
-        X[i, 2] = bad_answer[0]
-        y[i] = bad_answer[1]
+        X[i, 2] = answer[0]
+        y[i] = answer[1]
 
     # for i in range(nb_rows):
 
@@ -820,15 +817,15 @@ def answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver):
 
             # print("The candidate word is not in the vocabulary. This item is ignored.")
 
-            cosine = None
+            pass
 
         # print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
 
-    i = selected_answer
+    # i = selected_answer
 
     # print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
 
-    return i
+    return selected_answer
 
 
 def evaluate_on_SAT(w, solver_kwargs={}):
@@ -866,21 +863,19 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
         question = data.X[i].split("_")
 
-        good_answer = data.y[i, 0].split("_")
-
-        bad_answers = data.y[i, 1:]
+        answers = data.y[i, :]
 
         '''
             We split while testing for string to avoid attempting to split
             nan values, which occurs when there are 4 alternatives instead of 5.
         '''
 
-        bad_answers = [bad_answer.split("_") for bad_answer in bad_answers
-                       if isinstance(bad_answer, six.string_types)]
+        answers = [answer.split("_") for answer in answers
+                   if isinstance(answer, six.string_types)]
 
-        # print(question, good_answer, bad_answers)
+        # print(question, answers)
 
-        i = answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver)
+        i = answer_SAT_analogy_question(question, answers, w, solver)
 
         # print(i)
 
@@ -900,6 +895,105 @@ def evaluate_on_SAT(w, solver_kwargs={}):
     return results
 
 
+def answer_synonymy_question(question, answers, w):
+    '''
+
+    '''
+
+    if question in w:
+
+        question_vector = w[question]
+
+    else:
+        # if we do not have a vector for the question
+        # we cannot answer it
+        return None
+
+    selected_answer = None
+
+    selected_cosine = None
+
+    nb_answers = len(answers)
+
+    for i in range(nb_answers):
+
+        answer = answers[i]
+
+        if answer in w:
+
+            answer_vector = w[answer]
+
+            cosine = cosine_similarity(question_vector, answer_vector)
+
+            if selected_answer is None or cosine >= selected_cosine:
+
+                selected_answer = i
+                selected_cosine = cosine
+
+    return selected_answer
+
+
+def evaluate_on_synonyms(w, dataset_name):
+    '''
+
+    '''
+
+    if isinstance(w, dict):
+
+        w = Embedding.from_dict(w)
+
+    # set the fetch function name
+    # ---
+    fetch_function_name = "fetch_" + dataset_name
+
+    # retrieve the dataset
+    # ---
+    data = getattr(web.datasets.synonymy, fetch_function_name)()
+
+    # the question
+    X = data.X
+
+    # the answers
+    y = data.y
+
+    nb_items = data.X.shape[0]
+
+    nb_items_correct = 0
+
+    for i in range(nb_items):
+
+        question = X[i]
+
+        answers = y[i]
+
+        # print(question, answers)
+
+        i = answer_synonymy_question(question, answers, w)
+
+        # print(i)
+
+        if i == 0:
+            # this is the good answer
+            nb_items_correct += 1
+
+    accuracy = nb_items_correct / nb_items
+
+    results = pd.concat([pd.Series(accuracy, name="accuracy"),
+                         pd.Series(nb_items_correct, name="correct"),
+                         pd.Series(nb_items, name="count")], axis=1)
+
+    return results
+
+
 if __name__ == "__main__":
+
+    from web.embeddings import fetch_GloVe
+
+    w = fetch_GloVe(corpus="wiki-6B", dim=50)
+    # w = None
+
+    results = evaluate_on_synonyms(w, "ESL")
+
+    print(results)
 
     print("--- THE END ---")

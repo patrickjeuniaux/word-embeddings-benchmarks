@@ -560,7 +560,7 @@ def test_coverage(vocabulary):
     # coverage_BATS(vocabulary)
     # coverage_semeval_2012_2(vocabulary, "all")
 
-    coverage_SAT(vocabulary)
+    # coverage_SAT(vocabulary)
 
     # coverage_categorization("BLESS", vocabulary)
 
