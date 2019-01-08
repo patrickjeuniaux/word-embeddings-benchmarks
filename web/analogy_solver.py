@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 # internal imports
 # ---
 
-from .datasets.analogy import *
-from .utils import batched
+from web.datasets.analogy import *
+from web.utils import batched
 from web.embedding import Embedding
 
 
@@ -162,3 +162,103 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
             output.append([words[id] for id in D.argmax(axis=0)])
 
         return np.array([item for sublist in output for item in sublist])
+
+
+if __name__ == "__main__":
+
+    import numpy as np
+    from web.embeddings import fetch_GloVe
+    from web.evaluate import cosine_similarity
+
+    print("\nTest of 'SimpleAnalogySolver'")
+    print("---")
+
+    print("\nCreation of the data:")
+
+    question = ('ostrich', 'bird')
+    good_answer = ('lion', 'cat')
+    bad_answers = [('goose', 'flock'), ('ewe', 'sheep'), ('cub', 'bear'), ('primate', 'monkey')]
+
+    nb_rows = len(bad_answers) + 1
+
+    # init
+    # ---
+    X = np.zeros(shape=(nb_rows, 3), dtype="object")
+
+    y = np.zeros(shape=(nb_rows,), dtype="object")
+
+    for i in range(nb_rows):
+
+        print("triple", i + 1, ":", X[i, ], "candidate:", y[i])
+
+    # filling
+    # ---
+    X[0, 0] = question[0]
+    X[0, 1] = question[1]
+    X[0, 2] = good_answer[0]
+    y[0] = good_answer[1]
+
+    for i, bad_answer in enumerate(bad_answers, 1):
+
+        X[i, 0] = question[0]
+        X[i, 1] = question[1]
+        X[i, 2] = bad_answer[0]
+        y[i] = bad_answer[1]
+
+    for i in range(nb_rows):
+
+        print("triple", i + 1, ":", X[i, ], "candidate:", y[i])
+
+    print("\nLoad embeddings")
+    print("Warning: it might take a few minutes")
+    print("---")
+
+    w = fetch_GloVe(corpus="wiki-6B", dim=300)
+
+    print("\nPredictions via 'SimpleAnalogySolver':")
+
+    # solver = SimpleAnalogySolver(w=w, **solver_kwargs)
+    solver = SimpleAnalogySolver(w=w)
+
+    y_pred = solver.predict(X)
+
+    selected_answer = None
+    selected_cosine = None
+
+    for i in range(nb_rows):
+
+        # prediction
+
+        predicted_word = y_pred[i]
+
+        predicted_vector = w[predicted_word]
+
+        # candidate
+
+        candidate_word = y[i]
+
+        if candidate_word in w:
+
+            candidate_vector = w[candidate_word]
+
+            cosine = cosine_similarity(predicted_vector, candidate_vector)
+
+            if selected_answer is None or cosine >= selected_cosine:
+
+                selected_answer = i
+                selected_cosine = cosine
+
+        else:
+
+            print("The candidate word is not in the vocabulary. This item is ignored.")
+
+            cosine = None
+
+        print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
+
+    i = selected_answer
+
+    print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
+
+    print("")
+    print("---THE END---")

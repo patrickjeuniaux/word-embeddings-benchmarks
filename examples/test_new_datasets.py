@@ -18,6 +18,7 @@ from web.embeddings import fetch_GloVe
 from web.evaluate import evaluate_similarity
 from web.evaluate import evaluate_categorization
 from web.evaluate import evaluate_on_BATS
+from web.evaluate import evaluate_on_SAT
 
 from web.datasets.similarity import fetch_SimVerb3500
 from web.datasets.categorization import fetch_battig2010
@@ -32,7 +33,8 @@ logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=loggin
 datasets = []
 # datasets.append("SimVerb3500")
 # datasets.append("battig2010")
-datasets.append("BATS")
+# datasets.append("BATS")
+datasets.append("SAT")
 
 
 # Word embeddings
@@ -104,7 +106,7 @@ if "battig2010" in datasets:
 
 if "BATS" in datasets:
 
-    print("\nLaunch evaluation on BATS")
+    print("\nBATS")
     print("Warning: it will take a few minutes")
     print("---")
 
@@ -112,5 +114,17 @@ if "BATS" in datasets:
 
     print(df)
 
+
+# SAT
+# ---
+
+if "SAT" in datasets:
+
+    print("\nLaunch evaluation on SAT")
+    print("---")
+
+    df = evaluate_on_SAT(w_glove)
+
+    print(df)
 
 print("\n--- THE END ---")

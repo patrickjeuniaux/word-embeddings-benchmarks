@@ -10,6 +10,55 @@ University of Pisa
 
 
 
+New synonymy dataset 'TOEFL'
+----------------------------
+2019-01-02 --- XX
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
+
+    def fetch_TOEFL
+
+This function loads the dataset from a local copy (not provided).
+
+
+
+
+
+New synonymy dataset 'ESL'
+--------------------------
+2019-01-02 --- XX
+
+In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
+
+    def fetch_ESL
+
+This function loads the dataset from a local copy (not provided).
+
+
+
+
+
+
+
+New analogy dataset 'SAT'
+-------------------------
+2019-01-01 --- 2019-01-08
+
+In `web.datasets.analogy <web/datasets/analogy.py>`_, added
+
+    def fetch_SAT
+
+This function loads the dataset from a local copy (not provided).
+
+In `web.evaluate <web/evaluate.py>`_, added
+
+    def evaluate_on_SAT
+
+This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
+
+
+
+
 New analogy dataset 'BATS'
 --------------------------
 2019-01-01 --- 2019-01-07
@@ -62,49 +111,6 @@ In `web.evaluate <web/evaluate.py>`_
 added `fetch_SimVerb3500()`
 
 This dataset is tested in `examples.test_new_datasets <examples/test_new_datasets.py>`_.
-
-
-
-New synonymy dataset 'TOEFL'
-----------------------------
-2019-01-02 --- XX
-
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
-
-    def fetch_TOEFL
-
-This function loads the dataset from a local copy (not provided).
-
-
-
-
-
-New synonymy dataset 'ESL'
---------------------------
-2019-01-02 --- XX
-
-In `web.datasets.synonymy <web/datasets/synonymy.py>`_, added
-
-    def fetch_ESL
-
-This function loads the dataset from a local copy (not provided).
-
-
-
-
-
-
-
-New analogy dataset 'SAT'
--------------------------
-2019-01-01 --- XX
-
-In `web.datasets.analogy <web/datasets/analogy.py>`_, added
-
-    def fetch_SAT
-
-This function loads the dataset from a local copy (not provided).
-
 
 
 

@@ -461,48 +461,6 @@ def load_vocabulary(input_path):
     return(vocabulary)
 
 
-def test_coverage(vocabulary):
-    """
-
-    """
-
-    print("Test - coverage calculation")
-    print("---")
-
-    # coverage_synonymy("TOEFL", vocabulary)
-    # coverage_synonymy("ESL", vocabulary)
-
-    # coverage_similarity("RG65", vocabulary)
-    # coverage_similarity("RW", vocabulary)
-    # coverage_similarity("SimLex999", vocabulary)
-    # coverage_similarity("SimVerb3500", vocabulary)
-    # coverage_similarity("WS353", vocabulary, which="all")
-    # coverage_similarity("WS353", vocabulary, which="similarity")
-    # coverage_similarity("WS353", vocabulary, which="relatedness")
-
-    # coverage_similarity("MTurk", vocabulary)
-    # coverage_similarity("MEN", vocabulary, which="all")
-
-    # coverage_mikolov("msr_analogy", vocabulary)
-    # coverage_mikolov("google_analogy", vocabulary)
-    # coverage_wordrep(vocabulary)
-    coverage_BATS(vocabulary)
-    # coverage_semeval_2012_2(vocabulary, "all")
-
-    # coverage_SAT(vocabulary)
-
-    # coverage_categorization("BLESS", vocabulary)
-
-    # coverage_categorization("AP", vocabulary)
-
-    # coverage_categorization("battig", vocabulary)
-    # coverage_categorization("battig2010", vocabulary)
-
-    # coverage_categorization("ESSLLI_1a", vocabulary)
-    # coverage_categorization("ESSLLI_2b", vocabulary)
-    # coverage_categorization("ESSLLI_2c", vocabulary)
-
-
 def calculate_coverage(vocabulary, output_path):
     """
 
@@ -572,6 +530,48 @@ def calculate_coverage(vocabulary, output_path):
         print("Save output :")
         print("---")
         print(output_path)
+
+
+def test_coverage(vocabulary):
+    """
+
+    """
+
+    print("Test - coverage calculation")
+    print("---")
+
+    # coverage_synonymy("TOEFL", vocabulary)
+    # coverage_synonymy("ESL", vocabulary)
+
+    # coverage_similarity("RG65", vocabulary)
+    # coverage_similarity("RW", vocabulary)
+    # coverage_similarity("SimLex999", vocabulary)
+    # coverage_similarity("SimVerb3500", vocabulary)
+    # coverage_similarity("WS353", vocabulary, which="all")
+    # coverage_similarity("WS353", vocabulary, which="similarity")
+    # coverage_similarity("WS353", vocabulary, which="relatedness")
+
+    # coverage_similarity("MTurk", vocabulary)
+    # coverage_similarity("MEN", vocabulary, which="all")
+
+    # coverage_mikolov("msr_analogy", vocabulary)
+    # coverage_mikolov("google_analogy", vocabulary)
+    # coverage_wordrep(vocabulary)
+    # coverage_BATS(vocabulary)
+    # coverage_semeval_2012_2(vocabulary, "all")
+
+    coverage_SAT(vocabulary)
+
+    # coverage_categorization("BLESS", vocabulary)
+
+    # coverage_categorization("AP", vocabulary)
+
+    # coverage_categorization("battig", vocabulary)
+    # coverage_categorization("battig2010", vocabulary)
+
+    # coverage_categorization("ESSLLI_1a", vocabulary)
+    # coverage_categorization("ESSLLI_2b", vocabulary)
+    # coverage_categorization("ESSLLI_2c", vocabulary)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,8 @@ import logging
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering, KMeans
 from six import iteritems
+import six
+import numpy as np
 
 # internal imports
 # ---
@@ -320,6 +322,10 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
     """
     Simple method to score embedding using SimpleAnalogySolver
 
+    used with MSR and GOOGLE datasets
+
+    Other datasets use other evaluation methods
+
     Parameters
     ----------
     w : Embedding or dict
@@ -541,11 +547,13 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
 
         y_pred = solver.predict(X)
 
-        correct[category] = float(np.sum(y_pred == y))
+        nb_correct = float(np.sum(y_pred == y))
+
+        correct[category] = nb_correct
 
         count[category] = nb_questions
 
-        accuracy[category] = float(np.sum(y_pred == y)) / nb_questions
+        accuracy[category] = nb_correct / nb_questions
 
     # Add summary results
     # ---
@@ -705,11 +713,13 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
         y_pred = solver.predict(X)
 
-        correct[category] = float(np.sum(y_pred == y))
+        nb_correct = float(np.sum(y_pred == y))
+
+        correct[category] = nb_correct
 
         count[category] = nb_questions
 
-        accuracy[category] = float(np.sum(y_pred == y)) / nb_questions
+        accuracy[category] = nb_correct / nb_questions
 
     # Add summary results
     # ---
@@ -717,3 +727,179 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     return pd.concat([pd.Series(accuracy, name="accuracy"),
                       pd.Series(correct, name="correct"),
                       pd.Series(count, name="count")], axis=1)
+
+
+def cosine_similarity(vector1, vector2):
+    '''
+    angular difference between two vectors
+    =
+    ratio of the dot product and the product of the magnitudes of vectors
+    v1-v2 / |v1||v2|
+    '''
+
+    dot_product = np.dot(vector1, vector2)
+
+    vector1_mag = np.linalg.norm(vector1)
+
+    vector2_mag = np.linalg.norm(vector2)
+
+    result = dot_product / (vector1_mag * vector2_mag)
+
+    return result
+
+
+def answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver):
+    '''
+
+    '''
+
+    nb_rows = len(bad_answers) + 1
+
+    # init
+    # ---
+    X = np.zeros(shape=(nb_rows, 3), dtype="object")
+
+    y = np.zeros(shape=(nb_rows,), dtype="object")
+
+    # for i in range(nb_rows):
+
+    #     print("triple", i + 1, ":", X[i, ], "candidate:", y[i])
+
+    # filling
+    # ---
+    X[0, 0] = question[0]
+    X[0, 1] = question[1]
+    X[0, 2] = good_answer[0]
+    y[0] = good_answer[1]
+
+    for i, bad_answer in enumerate(bad_answers, 1):
+
+        X[i, 0] = question[0]
+        X[i, 1] = question[1]
+        X[i, 2] = bad_answer[0]
+        y[i] = bad_answer[1]
+
+    # for i in range(nb_rows):
+
+    #     print("triple", i + 1, ":", X[i, ], "candidate:", y[i])
+
+    # prediction through the analogy solver
+    # ---
+
+    y_pred = solver.predict(X)
+
+    selected_answer = None
+    selected_cosine = None
+
+    for i in range(nb_rows):
+
+        # prediction
+        # ---
+
+        predicted_word = y_pred[i]
+
+        predicted_vector = w[predicted_word]
+
+        # candidate
+        # ---
+
+        candidate_word = y[i]
+
+        if candidate_word in w:
+
+            candidate_vector = w[candidate_word]
+
+            cosine = cosine_similarity(predicted_vector, candidate_vector)
+
+            if selected_answer is None or cosine >= selected_cosine:
+
+                selected_answer = i
+                selected_cosine = cosine
+
+        else:
+
+            # print("The candidate word is not in the vocabulary. This item is ignored.")
+
+            cosine = None
+
+        # print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
+
+    i = selected_answer
+
+    # print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
+
+    return i
+
+
+def evaluate_on_SAT(w, solver_kwargs={}):
+    """
+    Evaluate on the SAT dataset
+
+    Parameters
+    ----------
+    w : Embedding or dict
+      Embedding or dict instance.
+
+    solver_kwargs: dict, default: {}
+      Arguments passed to SimpleAnalogySolver. It is suggested to limit number of words
+      in the dictionary.
+
+    References
+    ----------
+    Turney, P. D., Littman, M. L., Bigham, J., & Shnayder, V. (2003). Combining independent modules to solve multiple-choice synonym and analogy problems. In Proceedings of the International Conference on Recent Advances in Natural Language Processing (RANLP-03).
+
+    """
+    if isinstance(w, dict):
+
+        w = Embedding.from_dict(w)
+
+    solver = SimpleAnalogySolver(w=w, **solver_kwargs)
+    # solver = SimpleAnalogySolver(w=w)
+
+    data = fetch_SAT()
+
+    nb_items = len(data.X)
+
+    nb_items_correct = 0
+
+    for i in range(nb_items):
+
+        question = data.X[i].split("_")
+
+        good_answer = data.y[i, 0].split("_")
+
+        bad_answers = data.y[i, 1:]
+
+        '''
+            We split while testing for string to avoid attempting to split
+            nan values, which occurs when there are 4 alternatives instead of 5.
+        '''
+
+        bad_answers = [bad_answer.split("_") for bad_answer in bad_answers
+                       if isinstance(bad_answer, six.string_types)]
+
+        # print(question, good_answer, bad_answers)
+
+        i = answer_SAT_analogy_question(question, good_answer, bad_answers, w, solver)
+
+        # print(i)
+
+        if i == 0:
+            # this is the good answer
+            nb_items_correct += 1
+            # print("\n*** Yes! ***")
+
+    # print("\nNumber of items:", nb_items, "Number of correct answers:", nb_items_correct)
+
+    accuracy = nb_items_correct / nb_items
+
+    results = pd.concat([pd.Series(accuracy, name="accuracy"),
+                         pd.Series(nb_items_correct, name="correct"),
+                         pd.Series(nb_items, name="count")], axis=1)
+
+    return results
+
+
+if __name__ == "__main__":
+
+    print("--- THE END ---")
