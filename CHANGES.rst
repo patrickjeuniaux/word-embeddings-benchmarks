@@ -8,6 +8,12 @@ Patrick Jeuniaux
 University of Pisa
 
 
+Standardization of the output
+-----------------------------
+2019-03-26
+
+Most of the work was done in `web.evaluate <web/evaluate.py>`.
+
 
 
 New synonymy datasets 'TOEFL' and 'ESL'
