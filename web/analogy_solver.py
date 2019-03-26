@@ -117,6 +117,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
             logger.warning("Missing {} words. Will replace them with mean vector".format(missing_words))
 
         # Batch due to memory constraints (in dot operation)
+        # ---
 
         for id_batch, batch in enumerate(batched(range(len(X)), self.batch_size)):
 
@@ -152,6 +153,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
                 raise RuntimeError("Unrecognized method parameter")
 
             # Remove words that were originally in the query
+            # ---
 
             for id, row in enumerate(X_b):
 
@@ -161,7 +163,15 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
 
             output.append([words[id] for id in D.argmax(axis=0)])
 
-        return np.array([item for sublist in output for item in sublist])
+        predictions = np.array([item for sublist in output for item in sublist])
+
+        # example:
+        # ---
+        # ['mammal' 'dog' 'shark' 'elephant' 'cat']
+
+        results = {'predictions': predictions, 'missing_words': missing_words}
+
+        return results
 
 
 if __name__ == "__main__":

@@ -33,13 +33,13 @@ logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=loggin
 # ---
 
 datasets = []
-# datasets.append("SimVerb3500")
-# datasets.append("battig2010")
-# datasets.append("WordRep")
-# datasets.append("BATS")
-# datasets.append("SAT")
-# datasets.append("TOEFL")
-# datasets.append("ESL")
+datasets.append("WordRep")
+datasets.append("SimVerb3500")
+datasets.append("battig2010")
+datasets.append("BATS")
+datasets.append("SAT")
+datasets.append("TOEFL")
+datasets.append("ESL")
 
 
 # Word embeddings
@@ -78,9 +78,15 @@ if "SimVerb3500" in datasets:
     print("\nEvaluation of similarity:")
     print("---")
 
-    correlation = evaluate_similarity(w, data.X, data.y)
+    results = evaluate_similarity(w, data.X, data.y)
+
+    correlation = results['correlation']
+    nb_items = results['count']
+    missing_words = results['missing']
 
     print("\nSpearman correlation = ", correlation)
+    print("Number of items = ", nb_items)
+    print("Missing words = ", missing_words)
 
 
 # Battig2010
@@ -102,9 +108,17 @@ if "battig2010" in datasets:
     print("\nEvaluation of categorization:")
     print("---")
 
-    purity = evaluate_categorization(w, data.X, data.y)
+    results = evaluate_categorization(w, data.X, data.y)
+
+    purity = results['purity']
+
+    nb_items = results['count']
+
+    missing = results['missing']
 
     print("\nCluster purity = ", purity)
+    print("nb items = ", nb_items)
+    print("Missing = ", missing)
 
 
 if "WordRep" in datasets:

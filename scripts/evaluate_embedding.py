@@ -65,7 +65,8 @@ if __name__ == "__main__":
 
   if not fname:
 
-    w = fetch_GloVe(corpus="wiki-6B", dim=300)
+    #w = fetch_GloVe(corpus="wiki-6B", dim=300)
+    w = fetch_GloVe(corpus="wiki-6B", dim=50)
 
   else:
 

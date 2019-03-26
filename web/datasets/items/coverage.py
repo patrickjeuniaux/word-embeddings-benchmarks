@@ -251,6 +251,7 @@ def coverage_similarity(dataset_name, vocabulary, **kwargs):
     data = getattr(web.datasets.similarity, fetch_function_name)(**kwargs)
 
     # the word pair
+    # ---
     X = data.X
 
     nb_items = data.X.shape[0]
@@ -282,9 +283,11 @@ def coverage_synonymy(dataset_name, vocabulary):
     data = getattr(web.datasets.synonymy, fetch_function_name)()
 
     # the question
+    # ---
     X = data.X
 
     # the answers
+    # ---
     y = data.y
 
     nb_items = data.X.shape[0]
@@ -333,6 +336,7 @@ def coverage_categorization(dataset_name, vocabulary):
     data = getattr(web.datasets.categorization, fetch_function_name)()
 
     # the question
+    # ---
     X = data.X
 
     nb_items = data.X.shape[0]
@@ -360,9 +364,11 @@ def coverage_SAT(vocabulary):
     data = web.datasets.analogy.fetch_SAT()
 
     # the question
+    # ---
     X = data.X
 
     # the answers
+    # ---
     y = data.y
 
     nb_items = data.X.shape[0]
@@ -372,6 +378,7 @@ def coverage_SAT(vocabulary):
     def pair_in_vocab(pair, vocabulary):
 
         # if not a string (ex: if NaN)
+        # ---
         if not isinstance(pair, six.string_types):
 
             # https://pythonhosted.org/six/#constants
