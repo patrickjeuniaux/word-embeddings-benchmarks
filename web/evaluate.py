@@ -78,15 +78,15 @@ def evaluate_on_all(w):
 
     similarity_datasets = []
 
-    similarity_datasets.append("MEN")
-    similarity_datasets.append("WS353")
-    similarity_datasets.append("WS353S")
-    similarity_datasets.append("WS353R")
-    similarity_datasets.append("SimLex999")
-    similarity_datasets.append("RW")
-    similarity_datasets.append("RG65")
-    similarity_datasets.append("MTurk")
-    similarity_datasets.append("TR9856")
+    # similarity_datasets.append("MEN")
+    # similarity_datasets.append("WS353")
+    # similarity_datasets.append("WS353S")
+    # similarity_datasets.append("WS353R")
+    # similarity_datasets.append("SimLex999")
+    # similarity_datasets.append("RW")
+    # similarity_datasets.append("RG65")
+    # similarity_datasets.append("MTurk")
+    # similarity_datasets.append("TR9856")
     similarity_datasets.append("SimVerb3500")  # *new*
 
     # Analogy tasks
@@ -95,10 +95,10 @@ def evaluate_on_all(w):
     analogy_datasets = []
 
     analogy_datasets.append("Google")
-    analogy_datasets.append("MSR")
-    analogy_datasets.append("SemEval")
-    analogy_datasets.append("WordRep")
-    analogy_datasets.append("SAT")
+    # analogy_datasets.append("MSR")
+    # analogy_datasets.append("SemEval")
+    # analogy_datasets.append("WordRep")
+    # analogy_datasets.append("SAT")
 
     # Categorization tasks
     # ---
@@ -189,10 +189,14 @@ def evaluate_on_all(w):
             data = fetch_google_analogy()
             df = evaluate_analogy(w, data.X, data.y, category=data.category)
 
+            df['dataset'] = dataset
+
         elif dataset == "MSR":
 
             data = fetch_msr_analogy()
             df = evaluate_analogy(w, data.X, data.y, category=data.category)
+
+            df['dataset'] = dataset
 
         elif dataset == "SemEval":
 
@@ -200,7 +204,7 @@ def evaluate_on_all(w):
 
         elif dataset == "SAT":
 
-            result = evaluate_on_SAT(w)
+            df = evaluate_on_SAT(w)
 
         elif dataset == "WordRep":
 
@@ -215,11 +219,6 @@ def evaluate_on_all(w):
         print(msg)
 
         logger.info(msg)
-
-        df['category'] = df.index
-
-        df['dataset'] = dataset
-        df['task'] = 'analogy'
 
         results[dataset] = df
 
@@ -261,6 +260,8 @@ def evaluate_on_all(w):
 
         print(dataset)
         print("---")
+
+        df.reset_index(inplace=True)
 
         print(df)
         print(df.shape)
@@ -660,12 +661,16 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
             correct[cat] = np.sum(y_pred[category == cat] == y[category == cat])
 
-    result = pd.concat([pd.Series(accuracy, name="accuracy"),
-                        pd.Series(correct, name="correct"),
-                        pd.Series(count, name="count")],
-                       axis=1)
+    df = pd.concat([pd.Series(accuracy, name="accuracy"),
+                    pd.Series(correct, name="correct"),
+                    pd.Series(count, name="count")],
+                   axis=1)
 
-    return result
+    df['category'] = df.index
+
+    df['task'] = 'analogy'
+
+    return df
 
 
 def evaluate_on_semeval_2012_2(w):
@@ -733,7 +738,17 @@ def evaluate_on_semeval_2012_2(w):
 
         final_results[k] = sum(results[k]) / len(results[k])
 
-    return pd.Series(final_results)
+    series = pd.Series(final_results)
+
+    df = series.to_frame(name='accuracy')
+
+    df['category'] = df.index
+
+    df['dataset'] = 'SemEval'
+
+    df['task'] = 'analogy'
+
+    return df
 
 
 def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
@@ -868,9 +883,15 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
             pd.Series(count, name="count"),
             pd.Series(missing, name="missing")]
 
-    results = pd.concat(data, axis=1)
+    df = pd.concat(data, axis=1)
 
-    return results
+    df['category'] = df.index
+
+    df['dataset'] = 'WordRep'
+
+    df['task'] = 'analogy'
+
+    return df
 
 
 def evaluate_on_BATS(w, solver_kwargs={}):
@@ -1204,9 +1225,13 @@ def evaluate_on_SAT(w, solver_kwargs={}):
             pd.Series(nb_items, name="count"),
             pd.Series(missing_words, name="missing")]
 
-    results = pd.concat(data, axis=1)
+    df = pd.concat(data, axis=1)
 
-    return results
+    df['dataset'] = 'SAT'
+
+    df['task'] = 'analogy'
+
+    return df
 
 
 def answer_synonymy_question(question, answers, w):
