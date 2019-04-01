@@ -9,11 +9,13 @@
 
 import logging
 from six import iteritems
+import os
 
 # internal imports
 # ---
 
 from web.embeddings import fetch_GloVe
+from web.embeddings import load_embedding
 
 from web.evaluate import evaluate_similarity
 from web.evaluate import evaluate_categorization
@@ -21,6 +23,8 @@ from web.evaluate import evaluate_on_WordRep
 from web.evaluate import evaluate_on_BATS
 from web.evaluate import evaluate_on_SAT
 from web.evaluate import evaluate_on_synonyms
+from web.evaluate import evaluate_on_semeval_2012_2
+
 
 from web.datasets.similarity import fetch_SimVerb3500
 from web.datasets.categorization import fetch_battig2010
@@ -33,13 +37,14 @@ logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=loggin
 # ---
 
 datasets = []
-datasets.append("WordRep")
-datasets.append("SimVerb3500")
-datasets.append("battig2010")
-datasets.append("BATS")
-datasets.append("SAT")
-datasets.append("TOEFL")
-datasets.append("ESL")
+# datasets.append("WordRep")
+# datasets.append("SimVerb3500")
+# datasets.append("battig2010")
+# datasets.append("BATS")
+# datasets.append("SAT")
+# datasets.append("TOEFL")
+# datasets.append("ESL")
+datasets.append("SemEval")
 
 
 # Word embeddings
@@ -52,8 +57,22 @@ if datasets != []:
     print("---")
 
     # Fetch GloVe embedding
-    w = fetch_GloVe(corpus="wiki-6B", dim=50)
+    # ---
+
+    # w = fetch_GloVe(corpus="wiki-6B", dim=50)
     # w = fetch_GloVe(corpus="wiki-6B", dim=300)
+
+    input_path = '~/web_data/embeddings/glove.6B/glove.6B.50d.SAMPLE.txt'
+    fname = os.path.expanduser(input_path)
+
+    load_kwargs = {"vocab_size": 50000, "dim": 50}
+
+    w = load_embedding(fname=fname,
+                       format="glove",
+                       normalize=True,
+                       lower=False,
+                       clean_words=False,
+                       load_kwargs=load_kwargs)
 
 else:
     print("\nThere are no datasets to evaluate...")
@@ -191,6 +210,18 @@ if "ESL" in datasets:
     df = evaluate_on_synonyms(w, "ESL")
 
     print(df)
+
+# SemEval2012
+# ---
+
+if "SemEval" in datasets:
+
+    print("\nLaunch evaluation on SemEval 2012")
+    print("---")
+
+    results = evaluate_on_semeval_2012_2(w)
+
+    print(results)
 
 
 print("\n--- THE END ---")

@@ -12,6 +12,7 @@ from sklearn.cluster import AgglomerativeClustering, KMeans
 from six import iteritems
 import six
 import numpy as np
+import importlib
 
 # internal imports
 # ---
@@ -64,94 +65,215 @@ def evaluate_on_all(w):
 
         w = Embedding.from_dict(w)
 
+    # Synonyms tasks
+    # ---
+
+    synonymy_datasets = []
+
+    synonymy_datasets.append("TOEFL")  # *new*
+    synonymy_datasets.append("ESL")  # *new*
+
+    # Similarity tasks
+    # ---
+
+    similarity_datasets = []
+
+    similarity_datasets.append("MEN")
+    similarity_datasets.append("WS353")
+    similarity_datasets.append("WS353S")
+    similarity_datasets.append("WS353R")
+    similarity_datasets.append("SimLex999")
+    similarity_datasets.append("RW")
+    similarity_datasets.append("RG65")
+    similarity_datasets.append("MTurk")
+    similarity_datasets.append("TR9856")
+    similarity_datasets.append("SimVerb3500")  # *new*
+
+    # Analogy tasks
+    # ---
+
+    analogy_datasets = []
+
+    analogy_datasets.append("Google")
+    analogy_datasets.append("MSR")
+    analogy_datasets.append("SemEval")
+    analogy_datasets.append("WordRep")
+    analogy_datasets.append("SAT")
+
+    # Categorization tasks
+    # ---
+
+    categorization_datasets = []
+
+    # categorization_datasets.append("AP")
+    # categorization_datasets.append("BLESS")
+    # categorization_datasets.append("battig")
+    # categorization_datasets.append("battig2010")  # *new*
+    # categorization_datasets.append("ESSLLI_1a")
+    # categorization_datasets.append("ESSLLI_2b")
+    # categorization_datasets.append("ESSLLI_2c")
+    # categorization_datasets.append("BATS")  # *new*
+
+    # Calculate results on synonymy
+    # ---
+
+    logger.info("\nCalculating synonymy benchmarks")
+
+    results = {}
+
+    for dataset in synonymy_datasets:
+
+        df = evaluate_on_synonyms(w, dataset)
+
+        msg = "\nResults for {}\n---\n{}".format(dataset, df)
+
+        print(msg)
+
+        logger.info(msg)
+
+        df['task'] = 'synonymy'
+        df['dataset'] = dataset
+
+        results[dataset] = df
+
     # Calculate results on similarity
     # ---
 
-    logger.info("Calculating similarity benchmarks")
+    logger.info("\nCalculating similarity benchmarks")
 
-    similarity_tasks = {
-        "MEN": fetch_MEN(),
-        "WS353": fetch_WS353(),
-        "WS353R": fetch_WS353(which="relatedness"),
-        "WS353S": fetch_WS353(which="similarity"),
-        "SimLex999": fetch_SimLex999(),
-        "RW": fetch_RW(),
-        "RG65": fetch_RG65(),
-        "MTurk": fetch_MTurk(),
-        "TR9856": fetch_TR9856(),
-        "SimVerb3500": fetch_SimVerb3500(),
-    }
+    for dataset in similarity_datasets:
 
-    similarity_results = {}
+        if dataset == 'WS353R':
 
-    for name, data in iteritems(similarity_tasks):
+            mydataset = 'WS353'
 
-        # compute Spearkan correlation
-        # ---
-        similarity_results[name] = evaluate_similarity(w, data.X, data.y)
+            kwargs = {'which': 'relatedness'}
 
-        logger.info("Spearman correlation of scores on {} {}".format(name, similarity_results[name]))
+        elif dataset == 'WS353S':
 
-    return
+            mydataset = 'WS353'
+
+            kwargs = {'which': 'similarity'}
+
+        else:
+            mydataset = dataset
+
+            kwargs = {}
+
+        fetch_function_name = "fetch_" + mydataset
+        module = importlib.import_module("web.datasets.similarity")
+        data = getattr(module, fetch_function_name)(**kwargs)
+
+        df = evaluate_similarity(w, data.X, data.y)
+
+        msg = "\nResults for {}\n---\n{}".format(dataset, df)
+
+        print(msg)
+
+        logger.info(msg)
+
+        df['dataset'] = dataset
+        df['task'] = 'similarity'
+
+        results[dataset] = df
 
     # Calculate results on analogy
     # ---
 
-    logger.info("Calculating analogy benchmarks")
+    logger.info("\nCalculating analogy benchmarks")
 
-    analogy_tasks = {
-        "Google": fetch_google_analogy(),
-        "MSR": fetch_msr_analogy()
-    }
+    for dataset in analogy_datasets:
 
-    analogy_results = {}
+        if dataset == "Google":
 
-    for name, data in iteritems(analogy_tasks):
+            data = fetch_google_analogy()
+            df = evaluate_analogy(w, data.X, data.y, category=data.category)
 
-        analogy_results[name] = evaluate_analogy(w, data.X, data.y)
+        elif dataset == "MSR":
 
-        logger.info("Analogy prediction accuracy on {} {}".format(name, analogy_results[name]))
+            data = fetch_msr_analogy()
+            df = evaluate_analogy(w, data.X, data.y, category=data.category)
 
-    analogy_results["SemEval2012_2"] = evaluate_on_semeval_2012_2(w)['all']
+        elif dataset == "SemEval":
 
-    logger.info("Analogy prediction accuracy on {} {}".format("SemEval2012", analogy_results["SemEval2012_2"]))
+            df = evaluate_on_semeval_2012_2(w)
+
+        elif dataset == "SAT":
+
+            result = evaluate_on_SAT(w)
+
+        elif dataset == "WordRep":
+
+            df = evaluate_on_WordRep(w, max_pairs=10)
+
+        else:
+
+            continue
+
+        msg = "\nResults for {}\n---\n{}".format(dataset, df)
+
+        print(msg)
+
+        logger.info(msg)
+
+        df['category'] = df.index
+
+        df['dataset'] = dataset
+        df['task'] = 'analogy'
+
+        results[dataset] = df
 
     # Calculate results on categorization
     # ---
 
-    logger.info("Calculating categorization benchmarks")
+    logger.info("\nCalculating categorization benchmarks")
 
-    categorization_tasks = {
-        "AP": fetch_AP(),
-        "BLESS": fetch_BLESS(),
-        "Battig": fetch_battig(),
-        "ESSLLI_2c": fetch_ESSLLI_2c(),
-        "ESSLLI_2b": fetch_ESSLLI_2b(),
-        "ESSLLI_1a": fetch_ESSLLI_1a()
-    }
+    for dataset in categorization_datasets:
 
-    categorization_results = {}
+        if dataset == 'BATS':
 
-    # Calculate results using helper function
+            result = evaluate_on_BATS(w)
+
+        else:
+
+            fetch_function_name = "fetch_" + dataset
+
+            module = importlib.import_module("web.datasets.categorization")
+
+            data = getattr(module, fetch_function_name)()
+
+            result = evaluate_categorization(w, data.X, data.y)
+
+        msg = "\nResults for {}\n---\n{}".format(dataset, result)
+
+        print(msg)
+
+        logger.info(msg)
+
+        results[dataset] = result
+
+    # Construct pandas table
     # ---
 
-    for name, data in iteritems(categorization_tasks):
+    dfs = None
 
-        categorization_results[name] = evaluate_categorization(w, data.X, data.y)
+    for dataset, df in results.items():
 
-        logger.info("Cluster purity on {} {}".format(name, categorization_results[name]))
+        print(dataset)
+        print("---")
 
-    # Construct pd table
+        print(df)
+        print(df.shape)
 
-    cat = pd.DataFrame([categorization_results])
+        if dfs is None:
 
-    analogy = pd.DataFrame([analogy_results])
+            dfs = df
 
-    sim = pd.DataFrame([similarity_results])
+        else:
 
-    results = cat.join(sim).join(analogy)
+            dfs = pd.concat([dfs, df], axis=0, ignore_index=True)
 
-    return results
+    return dfs
 
 
 def evaluate_on_all_fast(w):
@@ -218,7 +340,11 @@ def evaluate_on_all_fast(w):
 
         logger.info("Analogy prediction accuracy on {} {}".format(name, analogy_results[name]))
 
-    analogy_results["SemEval2012_2"] = evaluate_on_semeval_2012_2(w)['all']
+    SemEval = evaluate_on_semeval_2012_2(w)
+
+    for k in SemEval:
+
+        analogy_results[k] = SemEval[k]
 
     logger.info("Analogy prediction accuracy on {} {}".format("SemEval2012", analogy_results["SemEval2012_2"]))
 
@@ -512,34 +638,34 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
     solver = SimpleAnalogySolver(w=w, method=method, batch_size=batch_size, k=k)
 
-    results = solver.predict(X)
+    predictions = solver.predict(X)
 
-    y_pred = results['predictions']
+    # print(predictions)
+
+    y_pred = predictions['predictions']
+
+    accuracy = OrderedDict({"all": np.mean(y_pred == y)})
+
+    count = OrderedDict({"all": len(y_pred)})
+
+    correct = OrderedDict({"all": np.sum(y_pred == y)})
 
     if category is not None:
 
-        results = OrderedDict({"all": np.mean(y_pred == y)})
-
-        count = OrderedDict({"all": len(y_pred)})
-
-        correct = OrderedDict({"all": np.sum(y_pred == y)})
-
         for cat in set(category):
 
-            results[cat] = np.mean(y_pred[category == cat] == y[category == cat])
+            accuracy[cat] = np.mean(y_pred[category == cat] == y[category == cat])
 
             count[cat] = np.sum(category == cat)
 
             correct[cat] = np.sum(y_pred[category == cat] == y[category == cat])
 
-        return pd.concat([pd.Series(results, name="accuracy"),
-                          pd.Series(correct, name="correct"),
-                          pd.Series(count, name="count")],
-                         axis=1)
+    result = pd.concat([pd.Series(accuracy, name="accuracy"),
+                        pd.Series(correct, name="correct"),
+                        pd.Series(count, name="count")],
+                       axis=1)
 
-    else:
-
-        return np.mean(y_pred == y)
+    return result
 
 
 def evaluate_on_semeval_2012_2(w):
@@ -1201,7 +1327,10 @@ def evaluate_on_synonyms(w, dataset_name):
     return results
 
 
-def quick_test():
+def load_toy_embedding():
+    '''
+
+    '''
 
     # from web.embeddings import fetch_GloVe
     # w = fetch_GloVe(corpus="wiki-6B", dim=50)
@@ -1223,14 +1352,208 @@ def quick_test():
                        clean_words=False,
                        load_kwargs=load_kwargs)
 
+    return w
+
+
+def quick_test():
+    '''
+
+    '''
+
+    w = load_toy_embedding()
+
     datasets = []
+
+    # Synonyms tasks
+    # ---
+
+    datasets.append("TOEFL")  # *new*
+    datasets.append("ESL")  # *new*
+
+    # Similarity tasks
+    # ---
+
+    datasets.append("MEN")
+    datasets.append("WS353")
+    datasets.append("WS353S")
+    datasets.append("WS353R")
+    datasets.append("SimLex999")
+    datasets.append("RW")
+    datasets.append("RG65")
+    datasets.append("MTurk")
+    datasets.append("TR9856")
+    datasets.append("SimVerb3500")  # *new*
+
+    # Analogy tasks
+    # ---
+
+    datasets.append("Google")
+    datasets.append("MSR")
+    datasets.append("SemEval")
     datasets.append("WordRep")
-    # datasets.append("SimVerb3500")
-    # datasets.append("battig2010")
-    # datasets.append("BATS")
-    # datasets.append("SAT")
-    # datasets.append("TOEFL")
-    # datasets.append("ESL")
+    datasets.append("SAT")
+
+    # Categorization tasks
+    # ---
+
+    datasets.append("AP")
+    datasets.append("BLESS")
+    datasets.append("Battig")
+    datasets.append("battig2010")  # *new*
+    datasets.append("ESSLLI_1a")
+    datasets.append("ESSLLI_2b")
+    datasets.append("ESSLLI_2c")
+    datasets.append("BATS")  # *new*
+
+    if 'ESSLLI_1a' in datasets:
+
+        data = fetch_ESSLLI_1a()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if 'ESSLLI_2b' in datasets:
+
+        data = fetch_ESSLLI_2b()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if 'ESSLLI_2c' in datasets:
+
+        data = fetch_ESSLLI_2c()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if 'Battig' in datasets:
+
+        data = fetch_battig()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if 'BLESS' in datasets:
+
+        data = fetch_BLESS()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if 'AP' in datasets:
+
+        data = fetch_AP()
+
+        results = evaluate_categorization(w, data.X, data.y)
+
+        print(results)
+
+    if "Google" in datasets:
+
+        data = fetch_google_analogy()
+
+        # categories = np.unique(data.category)
+
+        # print(categories)
+
+        results = evaluate_analogy(w, data.X, data.y, category=data.category)
+
+        print(results)
+
+    if "MSR" in datasets:
+
+        data = fetch_msr_analogy()
+
+        # categories = np.unique(data.category)
+
+        # print(categories)
+
+        results = evaluate_analogy(w, data.X, data.y, category=data.category)
+
+        print(results)
+
+    if "WS353S" in datasets:
+
+        data = fetch_WS353(which="similarity")
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "WS353R" in datasets:
+
+        data = fetch_WS353(which="relatedness")
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "WS353" in datasets:
+
+        data = fetch_WS353()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "MEN" in datasets:
+
+        data = fetch_MEN()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "TR9856" in datasets:
+
+        data = fetch_TR9856()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "MTurk" in datasets:
+
+        data = fetch_MTurk()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "SimLex999" in datasets:
+
+        data = fetch_SimLex999()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "RW" in datasets:
+
+        data = fetch_RW()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "RG65" in datasets:
+
+        data = fetch_RG65()
+
+        results = evaluate_similarity(w, data.X, data.y)
+
+        print(results)
+
+    if "SemEval" in datasets:
+
+        results = evaluate_on_semeval_2012_2(w)
+
+        print(results)
 
     # SimVerb3500 : similarity / Spearman correlation
     # ---
@@ -1387,4 +1710,11 @@ def quick_test():
 
 if __name__ == "__main__":
 
-    quick_test()
+    # quick_test()
+
+    w = load_toy_embedding()
+
+    results = evaluate_on_all(w)
+
+    print("\n\nFINALLY ...\n---\n")
+    print(results)
