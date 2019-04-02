@@ -104,25 +104,25 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
 
         nb_items = X.shape[0]
 
-        nb_missing_words = np.zeros((1, nb_items), dtype=int)
+        nb_missing_words = np.zeros((nb_items,), dtype=int)
 
-        nb_items_covered = np.zeros((1, nb_items), dtype=int)
+        nb_items_covered = np.zeros((nb_items,), dtype=int)
 
         for i, query in enumerate(X):
 
-            nb_words_missing = 0
+            # print(i, query)
+
+            item_words_missing = 0
 
             for query_word in query:
 
                 if query_word not in word_id:
 
-                    nb_words_missing += 1
+                    item_words_missing += 1
 
-            nb_missing_words[i] = nb_words_missing
+            nb_missing_words[i] = item_words_missing
 
-            if nb_words_missing == 0:
-
-                nb_items_covered += 1
+            if item_words_missing == 0:
 
                 nb_items_covered[i] = 1
 
@@ -185,7 +185,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
         # ---
         # ['mammal' 'dog' 'shark' 'elephant' 'cat']
 
-        results = {'predictions': predictions, 'nb_missing_words': nb_missing_words, 'nb_items_covered': nb_items_covered}
+        results = {'predictions': predictions, 'nb_missing_words': nb_missing_words, 'nb_items_covered': nb_items_covered, 'nb_items': nb_items}
 
         return results
 

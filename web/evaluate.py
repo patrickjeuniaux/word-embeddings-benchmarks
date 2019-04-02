@@ -57,35 +57,35 @@ def evaluate_on_all(w):
 
     synonymy_datasets = []
 
-    synonymy_datasets.append("TOEFL")  # *new*
-    synonymy_datasets.append("ESL")  # *new*
+    # synonymy_datasets.append("TOEFL")  # *new*
+    # synonymy_datasets.append("ESL")  # *new*
 
     # Similarity tasks
     # ---
 
     similarity_datasets = []
 
-    similarity_datasets.append("MEN")
-    similarity_datasets.append("WS353")
-    similarity_datasets.append("WS353S")
-    similarity_datasets.append("WS353R")
-    similarity_datasets.append("SimLex999")
-    similarity_datasets.append("RW")
-    similarity_datasets.append("RG65")
-    similarity_datasets.append("MTurk")
-    similarity_datasets.append("TR9856")
-    similarity_datasets.append("SimVerb3500")  # *new*
+    # similarity_datasets.append("MEN")
+    # similarity_datasets.append("WS353")
+    # similarity_datasets.append("WS353S")
+    # similarity_datasets.append("WS353R")
+    # similarity_datasets.append("SimLex999")
+    # similarity_datasets.append("RW")
+    # similarity_datasets.append("RG65")
+    # similarity_datasets.append("MTurk")
+    # similarity_datasets.append("TR9856")
+    # similarity_datasets.append("SimVerb3500")  # *new*
 
     # Analogy tasks
     # ---
 
     analogy_datasets = []
 
-    analogy_datasets.append("Google")
+    # analogy_datasets.append("Google")
     # analogy_datasets.append("MSR")
     # analogy_datasets.append("SemEval")
     # analogy_datasets.append("WordRep")
-    # analogy_datasets.append("SAT")
+    analogy_datasets.append("SAT")
 
     # Categorization tasks
     # ---
@@ -651,19 +651,21 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
     predictions = solver.predict(X)
 
-    print(predictions)
-
     y_pred = predictions['predictions']
 
-    nb_items_covered = predictions['nb_items_covered']
+    nic = predictions['nb_items_covered']
 
-    nb_missing_words = predictions['nb_missing_words']
+    nmw = predictions['nb_missing_words']
 
     accuracy = OrderedDict({"all": np.mean(y_pred == y)})
 
     count = OrderedDict({"all": len(y_pred)})
 
     correct = OrderedDict({"all": np.sum(y_pred == y)})
+
+    nb_items_covered = OrderedDict({"all": np.sum(nic)})
+
+    nb_missing_words = OrderedDict({"all": np.sum(nmw)})
 
     if category is not None:
 
@@ -675,9 +677,16 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
             correct[cat] = np.sum(y_pred[category == cat] == y[category == cat])
 
+            nb_items_covered[cat] = np.sum(nic[category == cat])
+
+            nb_missing_words[cat] = np.sum(nmw[category == cat])
+
     df = pd.concat([pd.Series(accuracy, name="accuracy"),
                     pd.Series(correct, name="performance"),
-                    pd.Series(count, name="items")],
+                    pd.Series(count, name="items"),
+                    pd.Series(nb_items_covered, name="items_covered"),
+                    pd.Series(nb_missing_words, name="missing_words"),
+                    ],
                    axis=1)
 
     df['category'] = df.index
@@ -717,13 +726,40 @@ def evaluate_on_semeval_2012_2(w):
     categories = data.y.keys()
 
     results = defaultdict(list)
+    nb_items = defaultdict(list)
+    nb_missing_words = defaultdict(list)
+    nb_items_covered = defaultdict(list)
 
     for c in categories:
 
-        # Get mean of left and right vector
-        # ---
+        c_name = data.categories_names[c].split("_")[0]
 
         prototypes = data.X_prot[c]
+
+        nmw = 0
+
+        for words in prototypes:
+
+            for word in words:
+
+                if word not in w:
+
+                    nmw += 1
+
+        if nmw > 0:
+
+            nic = 0
+
+        else:
+
+            nic = 1
+
+        nb_missing_words[c_name].append(nmw)
+        nb_items[c_name].append(1)
+        nb_items_covered[c_name].append(nic)
+
+        # Get mean of left and right vector
+        # ---
 
         prot_left = np.mean(np.vstack(w.get(word, mean_vector) for word in prototypes[:, 0]), axis=0)
 
@@ -736,8 +772,6 @@ def evaluate_on_semeval_2012_2(w):
 
         scores = np.dot(prot_left - prot_right, (question_left - question_right).T)
 
-        c_name = data.categories_names[c].split("_")[0]
-
         # NaN happens when there are only 0s,
         # which might happen for very rare words or
         # very insufficient word vocabulary
@@ -748,20 +782,42 @@ def evaluate_on_semeval_2012_2(w):
         results[c_name].append(0 if np.isnan(cor) else cor)
 
     final_results = OrderedDict()
+    final_nb_items = OrderedDict()
+    final_nb_missing_words = OrderedDict()
+    final_nb_items_covered = OrderedDict()
 
+    # average correlation
+    # ---
     final_results['all'] = sum(sum(v) for v in results.values()) / len(categories)
+
+    final_nb_items['all'] = sum(sum(v) for v in nb_items.values())
+    final_nb_missing_words['all'] = sum(sum(v) for v in nb_missing_words.values())
+    final_nb_items_covered['all'] = sum(sum(v) for v in nb_items_covered.values())
 
     for k in results:
 
+        # average correlation
+        # ---
         final_results[k] = sum(results[k]) / len(results[k])
 
-    series = pd.Series(final_results)
+        final_nb_items[k] = sum(nb_items[k])
+        final_nb_missing_words[k] = sum(nb_missing_words[k])
+        final_nb_items_covered[k] = sum(nb_items_covered[k])
 
-    df = series.to_frame(name='performance')
+    df = pd.concat([pd.Series(final_results, name="performance"),
+                    pd.Series(final_nb_items, name="items"),
+                    pd.Series(final_nb_items_covered, name="items_covered"),
+                    pd.Series(final_nb_missing_words, name="missing_words"),
+                    ],
+                   axis=1)
+
+    # series = pd.Series(final_results)
+
+    # df = series.to_frame(name='performance')
 
     df['category'] = df.index
 
-    df['performance_type'] = 'accuracy'
+    df['performance_type'] = 'correlation'
 
     df['dataset'] = 'SemEval'
 
@@ -807,6 +863,8 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
     count = {}
 
     missing = {}
+
+    items_covered = {}
 
     for category in categories:
 
@@ -868,39 +926,50 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
 
         accuracy[category] = nb_correct / nb_questions
 
-        missing[category] = results['missing_words']
+        missing[category] = sum(results['nb_missing_words'])
+
+        items_covered[category] = sum(results['nb_items_covered'])
 
     # Add summary results
     # ---
 
-    missing['wikipedia'] = sum(missing[c] for c in categories if c in data.wikipedia_categories)
+    for summary in ('all', 'wikipedia', 'wordnet'):
 
-    missing['all'] = sum(missing[c] for c in categories)
+        missing[summary] = 0
+        correct[summary] = 0
+        count[summary] = 0
+        items_covered[summary] = 0
 
-    missing['wordnet'] = sum(missing[c] for c in categories if c in data.wordnet_categories)
+    for c in categories:
 
-    correct['wikipedia'] = sum(correct[c] for c in categories if c in data.wikipedia_categories)
+        missing['all'] += missing[c]
+        items_covered['all'] += items_covered[c]
+        correct['all'] += correct[c]
+        count['all'] += count[c]
 
-    correct['all'] = sum(correct[c] for c in categories)
+        if c in data.wikipedia_categories:
 
-    correct['wordnet'] = sum(correct[c] for c in categories if c in data.wordnet_categories)
+            missing['wikipedia'] += missing[c]
+            items_covered['wikipedia'] += items_covered[c]
+            correct['wikipedia'] += correct[c]
+            count['wikipedia'] += count[c]
 
-    count['wikipedia'] = sum(count[c] for c in categories if c in data.wikipedia_categories)
+        if c in data.wordnet_categories:
 
-    count['all'] = sum(count[c] for c in categories)
-
-    count['wordnet'] = sum(count[c] for c in categories if c in data.wordnet_categories)
-
-    accuracy['wikipedia'] = correct['wikipedia'] / count['wikipedia']
+            missing['wordnet'] += missing[c]
+            items_covered['wordnet'] += items_covered[c]
+            correct['wordnet'] += correct[c]
+            count['wordnet'] += count[c]
 
     accuracy['all'] = correct['all'] / count['all']
-
+    accuracy['wikipedia'] = correct['wikipedia'] / count['wikipedia']
     accuracy['wordnet'] = correct['wordnet'] / count['wordnet']
 
     data = [pd.Series(accuracy, name="accuracy"),
             pd.Series(correct, name="performance"),
             pd.Series(count, name="items"),
-            pd.Series(missing, name="missing")]
+            pd.Series(items_covered, name="items_covered"),
+            pd.Series(missing, name="missing_words")]
 
     df = pd.concat(data, axis=1)
 
@@ -1131,7 +1200,8 @@ def answer_SAT_analogy_question(question, answers, w, solver):
     results = solver.predict(X)
 
     y_pred = results['predictions']
-    missing_words = results['missing_words']
+    missing_words = sum(results['nb_missing_words'])
+    items_covered = sum(results['nb_items_covered'])
 
     selected_answer = None
     selected_cosine = None
@@ -1173,7 +1243,7 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
     # print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
 
-    results = {'selected_answer': selected_answer, 'missing_words': missing_words}
+    results = {'selected_answer': selected_answer, 'nb_missing_words': missing_words, 'nb_items_covered': items_covered}
 
     return results
 
@@ -1211,6 +1281,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
     missing_words = 0
 
+    items_covered = 0
+
     for i in range(nb_items):
 
         question = data.X[i].split("_")
@@ -1229,7 +1301,9 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
         response = answer_SAT_analogy_question(question, answers, w, solver)
 
-        missing_words += response['missing_words']
+        missing_words += response['nb_missing_words']
+
+        items_covered += response['nb_items_covered']
 
         i = response['selected_answer']
 
@@ -1247,7 +1321,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
     data = [pd.Series(accuracy, name="accuracy"),
             pd.Series(nb_items_correct, name="performance"),
             pd.Series(nb_items, name="items"),
-            pd.Series(missing_words, name="missing")]
+            pd.Series(items_covered, name="items_covered"),
+            pd.Series(missing_words, name="missing_words")]
 
     df = pd.concat(data, axis=1)
 
