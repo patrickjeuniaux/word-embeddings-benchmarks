@@ -78,15 +78,15 @@ def evaluate_on_all(w):
 
     similarity_datasets = []
 
-    # similarity_datasets.append("MEN")
-    # similarity_datasets.append("WS353")
-    # similarity_datasets.append("WS353S")
-    # similarity_datasets.append("WS353R")
-    # similarity_datasets.append("SimLex999")
-    # similarity_datasets.append("RW")
-    # similarity_datasets.append("RG65")
-    # similarity_datasets.append("MTurk")
-    # similarity_datasets.append("TR9856")
+    similarity_datasets.append("MEN")
+    similarity_datasets.append("WS353")
+    similarity_datasets.append("WS353S")
+    similarity_datasets.append("WS353R")
+    similarity_datasets.append("SimLex999")
+    similarity_datasets.append("RW")
+    similarity_datasets.append("RG65")
+    similarity_datasets.append("MTurk")
+    similarity_datasets.append("TR9856")
     similarity_datasets.append("SimVerb3500")  # *new*
 
     # Analogy tasks
@@ -95,23 +95,23 @@ def evaluate_on_all(w):
     analogy_datasets = []
 
     analogy_datasets.append("Google")
-    # analogy_datasets.append("MSR")
-    # analogy_datasets.append("SemEval")
-    # analogy_datasets.append("WordRep")
-    # analogy_datasets.append("SAT")
+    analogy_datasets.append("MSR")
+    analogy_datasets.append("SemEval")
+    analogy_datasets.append("WordRep")
+    analogy_datasets.append("SAT")
 
     # Categorization tasks
     # ---
 
     categorization_datasets = []
 
-    # categorization_datasets.append("AP")
-    # categorization_datasets.append("BLESS")
-    # categorization_datasets.append("battig")
-    # categorization_datasets.append("battig2010")  # *new*
-    # categorization_datasets.append("ESSLLI_1a")
-    # categorization_datasets.append("ESSLLI_2b")
-    # categorization_datasets.append("ESSLLI_2c")
+    categorization_datasets.append("AP")
+    categorization_datasets.append("BLESS")
+    categorization_datasets.append("battig")
+    categorization_datasets.append("battig2010")  # *new*
+    categorization_datasets.append("ESSLLI_1a")
+    categorization_datasets.append("ESSLLI_2b")
+    categorization_datasets.append("ESSLLI_2c")
     # categorization_datasets.append("BATS")  # *new*
 
     # Calculate results on synonymy
@@ -237,6 +237,9 @@ def evaluate_on_all(w):
 
             result = evaluate_categorization(w, data.X, data.y)
 
+        result['dataset'] = dataset
+        result['task'] = 'comparison'
+
         msg = "\nResults for {}\n---\n{}".format(dataset, result)
 
         logger.info(msg)
@@ -250,13 +253,11 @@ def evaluate_on_all(w):
 
     for dataset, df in results.items():
 
-        print(dataset)
-        print("---")
-
-        df.reset_index(inplace=True)
-
-        print(df)
-        print(df.shape)
+        # print(dataset)
+        # print("---")
+        # df.reset_index(inplace=True)
+        # print(df)
+        # print(df.shape)
 
         if dfs is None:
 
@@ -264,7 +265,9 @@ def evaluate_on_all(w):
 
         else:
 
-            dfs = pd.concat([dfs, df], axis=0, ignore_index=True)
+            # Sorting (sort=True) because non-concatenation axis is not aligned
+            # ---
+            dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=True)
 
     return dfs
 
@@ -431,11 +434,13 @@ def evaluate_similarity(w, X, y):
 
     nb_items = len(y)
 
-    data = [pd.Series(correlation, name="correlation"),
-            pd.Series(nb_items, name="count"),
+    data = [pd.Series(correlation, name="performance"),
+            pd.Series(nb_items, name="items"),
             pd.Series(missing_words, name="missing")]
 
     results = pd.concat(data, axis=1)
+
+    results['performance_type'] = 'correlation'
 
     return results
 
@@ -574,11 +579,13 @@ def evaluate_categorization(w, X, y, method="all", seed=None):
 
     nb_items = len(y)
 
-    data = [pd.Series(best_purity, name="purity"),
-            pd.Series(nb_items, name="count"),
+    data = [pd.Series(best_purity, name="performance"),
+            pd.Series(nb_items, name="items"),
             pd.Series(missing_words, name="missing")]
 
     results = pd.concat(data, axis=1)
+
+    results['performance_type'] = 'purity'
 
     return results
 
@@ -654,11 +661,13 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
             correct[cat] = np.sum(y_pred[category == cat] == y[category == cat])
 
     df = pd.concat([pd.Series(accuracy, name="accuracy"),
-                    pd.Series(correct, name="correct"),
-                    pd.Series(count, name="count")],
+                    pd.Series(correct, name="performance"),
+                    pd.Series(count, name="items")],
                    axis=1)
 
     df['category'] = df.index
+
+    df['performance_type'] = 'items_correct'
 
     df['task'] = 'analogy'
 
@@ -714,7 +723,8 @@ def evaluate_on_semeval_2012_2(w):
 
         c_name = data.categories_names[c].split("_")[0]
 
-        # NaN happens when there are only 0s, which might happen for very rare words or
+        # NaN happens when there are only 0s,
+        # which might happen for very rare words or
         # very insufficient word vocabulary
         # ---
 
@@ -732,9 +742,11 @@ def evaluate_on_semeval_2012_2(w):
 
     series = pd.Series(final_results)
 
-    df = series.to_frame(name='accuracy')
+    df = series.to_frame(name='performance')
 
     df['category'] = df.index
+
+    df['performance_type'] = 'accuracy'
 
     df['dataset'] = 'SemEval'
 
@@ -871,11 +883,13 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
     accuracy['wordnet'] = correct['wordnet'] / count['wordnet']
 
     data = [pd.Series(accuracy, name="accuracy"),
-            pd.Series(correct, name="correct"),
-            pd.Series(count, name="count"),
+            pd.Series(correct, name="performance"),
+            pd.Series(count, name="items"),
             pd.Series(missing, name="missing")]
 
     df = pd.concat(data, axis=1)
+
+    df['performance_type'] = 'items_correct'
 
     df['category'] = df.index
 
@@ -920,8 +934,6 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     correct = {}
 
     count = {}
-
-    missing_words = {}
 
     for category in categories:
 
@@ -1030,17 +1042,22 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
         accuracy[category] = nb_correct / nb_questions
 
-        missing_words[category] = results['missing_words']
-
     # Add summary results
     # ---
 
     data = [pd.Series(accuracy, name="accuracy"),
-            pd.Series(correct, name="correct"),
-            pd.Series(count, name="count"),
-            pd.Series(missing_words, name="missing")]
+            pd.Series(correct, name="performance"),
+            pd.Series(count, name="items_covered")]
 
-    return pd.concat(data, axis=1)
+    df = pd.concat(data, axis=1)
+
+    df['items'] = 2450
+
+    df['category'] = df.index
+
+    df['performance_type'] = 'items_correct'
+
+    return df
 
 
 def cosine_similarity(vector1, vector2):
@@ -1213,8 +1230,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
     accuracy = nb_items_correct / nb_items
 
     data = [pd.Series(accuracy, name="accuracy"),
-            pd.Series(nb_items_correct, name="correct"),
-            pd.Series(nb_items, name="count"),
+            pd.Series(nb_items_correct, name="performance"),
+            pd.Series(nb_items, name="items"),
             pd.Series(missing_words, name="missing")]
 
     df = pd.concat(data, axis=1)
@@ -1222,6 +1239,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
     df['dataset'] = 'SAT'
 
     df['task'] = 'analogy'
+
+    df['performance_type'] = 'items_correct'
 
     return df
 
@@ -1335,24 +1354,29 @@ def evaluate_on_synonyms(w, dataset_name):
     accuracy = nb_items_correct / nb_items
 
     data = [pd.Series(accuracy, name="accuracy"),
-            pd.Series(nb_items_correct, name="correct"),
-            pd.Series(nb_items, name="count"),
+            pd.Series(nb_items_correct, name="performance"),
+            pd.Series(nb_items, name="items"),
             pd.Series(missing, name="missing")]
 
-    results = pd.concat(data, axis=1)
+    df = pd.concat(data, axis=1)
 
-    return results
+    df['performance_type'] = 'items_correct'
+
+    return df
 
 
 if __name__ == "__main__":
 
-    logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+    # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
     logger = logging.getLogger(__name__)
 
     w = load_toy_embedding()
 
     results = evaluate_on_all(w)
+
+    output_path = os.path.expanduser("~/Downloads/results.csv")
+    results.to_csv(output_path)
 
     print("\n\nFINAL RESULTS\n---\n")
     print(results)
