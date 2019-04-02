@@ -3,9 +3,40 @@
  Fetchers for publicly available pretrained embeddings
 """
 from six.moves import cPickle as pickle
-from os import path
+import os
 from .datasets.utils import _get_dataset_dir, _fetch_file
 from .embedding import Embedding
+
+
+def load_toy_embedding():
+  '''
+
+  '''
+
+  # from web.embeddings import fetch_GloVe
+  # w = fetch_GloVe(corpus="wiki-6B", dim=50)
+
+  # let's load a smaller file
+  # ---
+
+  input_path = '~/web_data/embeddings/glove.6B/glove.6B.50d.SAMPLE.txt'
+  fname = os.path.expanduser(input_path)
+
+  print("\nLoading TOY embedding ...")
+  print(fname)
+  print("---")
+  print("")
+
+  load_kwargs = {"vocab_size": 50000, "dim": 50}
+
+  w = load_embedding(fname=fname,
+                     format="glove",
+                     normalize=True,
+                     lower=False,
+                     clean_words=False,
+                     load_kwargs=load_kwargs)
+
+  return w
 
 
 def load_embedding(fname, format="word2vec_bin", normalize=True,
@@ -167,7 +198,7 @@ def fetch_GloVe(dim=300, corpus="wiki-6B", normalize=True, lower=False, clean_wo
                   uncompress=True,
                   verbose=1)
 
-  return load_embedding(path.join(_get_dataset_dir("embeddings"), embedding_file[corpus][dim]),
+  return load_embedding(os.path.join(_get_dataset_dir("embeddings"), embedding_file[corpus][dim]),
                         format="glove",
                         normalize=normalize,
                         lower=lower, clean_words=clean_words,
@@ -324,7 +355,7 @@ def fetch_NMT(which="DE", normalize=True, lower=False, clean_words=False):
 
   fname = {"FR": "Trans_embds/D_RNN_500k_144h.pkl", "DE": "Trans_embds/D_german_50k_500k_168h.pkl"}
 
-  return load_embedding(path.join(dirname, fname[which]),
+  return load_embedding(os.path.join(dirname, fname[which]),
                         format="dict",
                         normalize=normalize,
                         lower=lower, clean_words=clean_words)
@@ -616,6 +647,6 @@ def fetch_FastText(lang="en", normalize=True, lower=False, clean_words=False):
 #     Doesn't distinguish between lower and capital letters in embedding.
 #     See scripts used for training on github in scripts/wikipedia/
 #     """
-#     fname = path.join(_get_dataset_dir('embeddings'), "sg-wiki-en-400.bin")
+#     fname = os.path.join(_get_dataset_dir('embeddings'), "sg-wiki-en-400.bin")
 #     return _load_embedding(fname, format="word2vec_binary", normalize=normalize,
 #                            lower=lower, clean_words=clean_words)
