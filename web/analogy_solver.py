@@ -185,7 +185,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
         # ---
         # ['mammal' 'dog' 'shark' 'elephant' 'cat']
 
-        results = {'predictions': predictions, 'missing_words': missing_words}
+        results = {'predictions': predictions, 'nb_missing_words': nb_missing_words, 'nb_items_covered': nb_items_covered}
 
         return results
 

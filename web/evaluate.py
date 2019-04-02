@@ -655,6 +655,10 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
     y_pred = predictions['predictions']
 
+    nb_items_covered = predictions['nb_items_covered']
+
+    nb_missing_words = predictions['nb_missing_words']
+
     accuracy = OrderedDict({"all": np.mean(y_pred == y)})
 
     count = OrderedDict({"all": len(y_pred)})
