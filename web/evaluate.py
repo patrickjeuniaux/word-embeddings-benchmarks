@@ -20,22 +20,9 @@ import os
 
 import web.datasets.synonymy
 
-from web.datasets.similarity import fetch_MEN
-from web.datasets.similarity import fetch_WS353
-from web.datasets.similarity import fetch_SimLex999
-from web.datasets.similarity import fetch_MTurk
-from web.datasets.similarity import fetch_RG65
-from web.datasets.similarity import fetch_RW
-from web.datasets.similarity import fetch_TR9856
-from web.datasets.similarity import fetch_SimVerb3500
+from web.datasets.similarity import *
 
-from web.datasets.categorization import fetch_AP
-from web.datasets.categorization import fetch_battig
-from web.datasets.categorization import fetch_battig2010
-from web.datasets.categorization import fetch_BLESS
-from web.datasets.categorization import fetch_ESSLLI_1a
-from web.datasets.categorization import fetch_ESSLLI_2b
-from web.datasets.categorization import fetch_ESSLLI_2c
+from web.datasets.categorization import *
 
 # import of analogy datasets fetchers
 # and many other things (ex: itertools.product)
@@ -95,23 +82,23 @@ def evaluate_on_all(w):
     analogy_datasets = []
 
     analogy_datasets.append("Google")
-    analogy_datasets.append("MSR")
-    analogy_datasets.append("SemEval")
-    analogy_datasets.append("WordRep")
-    analogy_datasets.append("SAT")
+    # analogy_datasets.append("MSR")
+    # analogy_datasets.append("SemEval")
+    # analogy_datasets.append("WordRep")
+    # analogy_datasets.append("SAT")
 
     # Categorization tasks
     # ---
 
     categorization_datasets = []
 
-    categorization_datasets.append("AP")
-    categorization_datasets.append("BLESS")
-    categorization_datasets.append("battig")
-    categorization_datasets.append("battig2010")  # *new*
-    categorization_datasets.append("ESSLLI_1a")
-    categorization_datasets.append("ESSLLI_2b")
-    categorization_datasets.append("ESSLLI_2c")
+    # categorization_datasets.append("AP")
+    # categorization_datasets.append("BLESS")
+    # categorization_datasets.append("battig")
+    # categorization_datasets.append("battig2010")  # *new*
+    # categorization_datasets.append("ESSLLI_1a")
+    # categorization_datasets.append("ESSLLI_2b")
+    # categorization_datasets.append("ESSLLI_2c")
     # categorization_datasets.append("BATS")  # *new*
 
     # Calculate results on synonymy
@@ -265,9 +252,22 @@ def evaluate_on_all(w):
 
         else:
 
-            # Sorting (sort=True) because non-concatenation axis is not aligned
+            # non-concatenation axis is not aligned
+            # (i.e., columns are not aligned and have to be)
             # ---
-            dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=True)
+
+            # sort = True -> sort the columns
+            # sort = False -> do not sort the columns
+            # ---
+
+            # dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=True)
+            dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=False)
+
+    columns = ['task', 'dataset', 'category',
+               'items', 'items_covered',
+               'performance', 'performance_type', 'accuracy', 'missing_words']
+
+    dfs = dfs.reindex(columns=columns)
 
     return dfs
 
@@ -410,13 +410,23 @@ def evaluate_similarity(w, X, y):
 
     words = w.vocabulary.word_id
 
+    nb_items_covered = 0
+
     for query in X:
+
+        item_fully_covered = True
 
         for query_word in query:
 
             if query_word not in words:
 
                 missing_words += 1
+
+                item_fully_covered = False
+
+        if item_fully_covered:
+
+            nb_items_covered += 1
 
     if missing_words > 0:
 
@@ -436,7 +446,8 @@ def evaluate_similarity(w, X, y):
 
     data = [pd.Series(correlation, name="performance"),
             pd.Series(nb_items, name="items"),
-            pd.Series(missing_words, name="missing")]
+            pd.Series(nb_items_covered, name="items_covered"),
+            pd.Series(missing_words, name="missing_words")]
 
     results = pd.concat(data, axis=1)
 
@@ -640,7 +651,7 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
     predictions = solver.predict(X)
 
-    # print(predictions)
+    print(predictions)
 
     y_pred = predictions['predictions']
 
@@ -1322,7 +1333,9 @@ def evaluate_on_synonyms(w, dataset_name):
 
     nb_items_correct = 0
 
-    missing = 0
+    nb_items_covered = 0
+
+    nb_missing_words = 0
 
     for i in range(nb_items):
 
@@ -1339,24 +1352,30 @@ def evaluate_on_synonyms(w, dataset_name):
 
         # print(i)
 
-        if selected_answer is None:
+        if selected_answer is not None:
 
-            # no answer was given because the word was not in the vocabulary
+            nb_items_covered += 1
+
+            if selected_answer == 0:
+
+                # this is the good answer
+                # ---
+                nb_items_correct += 1
+
+        else:
+
+            # the word is not in the vocabulary
             # ---
 
-            missing += 1
+            nb_missing_words += 1
 
-        elif selected_answer == 0:
-            # this is the good answer
-            # ---
-            nb_items_correct += 1
-
-    accuracy = nb_items_correct / nb_items
+    accuracy = nb_items_correct / nb_items_covered
 
     data = [pd.Series(accuracy, name="accuracy"),
             pd.Series(nb_items_correct, name="performance"),
             pd.Series(nb_items, name="items"),
-            pd.Series(missing, name="missing")]
+            pd.Series(nb_items_covered, name="items_covered"),
+            pd.Series(nb_missing_words, name="missing_words")]
 
     df = pd.concat(data, axis=1)
 

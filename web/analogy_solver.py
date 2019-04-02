@@ -102,19 +102,35 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
 
         output = []
 
-        missing_words = 0
+        nb_items = X.shape[0]
 
-        for query in X:
+        nb_missing_words = np.zeros((1, nb_items), dtype=int)
+
+        nb_items_covered = np.zeros((1, nb_items), dtype=int)
+
+        for i, query in enumerate(X):
+
+            nb_words_missing = 0
 
             for query_word in query:
 
                 if query_word not in word_id:
 
-                    missing_words += 1
+                    nb_words_missing += 1
 
-        if missing_words > 0:
+            nb_missing_words[i] = nb_words_missing
 
-            logger.warning("Missing {} words. Will replace them with mean vector".format(missing_words))
+            if nb_words_missing == 0:
+
+                nb_items_covered += 1
+
+                nb_items_covered[i] = 1
+
+        total_nb_words_missing = np.sum(nb_missing_words)
+
+        if total_nb_words_missing > 0:
+
+            logger.warning("Missing {} words. Will replace them with mean vector".format(total_nb_words_missing))
 
         # Batch due to memory constraints (in dot operation)
         # ---
