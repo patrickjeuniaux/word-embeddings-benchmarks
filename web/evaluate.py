@@ -1024,7 +1024,11 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
     correct = {}
 
-    count = {}
+    items = {}
+
+    items_covered = {}
+
+    missing = {}
 
     for category in categories:
 
@@ -1129,20 +1133,30 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
         correct[category] = nb_correct
 
-        count[category] = nb_questions
+        items[category] = 2450
+
+        items_covered[category] = nb_questions
+
+        missing[category] = np.NaN
 
         accuracy[category] = nb_correct / nb_questions
 
     # Add summary results
     # ---
 
+    correct['all'] = sum(v for v in correct.values())
+    items['all'] = sum(v for v in items.values())
+    items_covered['all'] = sum(v for v in items_covered.values())
+    missing['all'] = sum(v for v in missing.values())
+    accuracy['all'] = correct['all'] / items_covered['all']
+
     data = [pd.Series(accuracy, name="performance2"),
             pd.Series(correct, name="performance"),
-            pd.Series(count, name="nb_items_covered")]
+            pd.Series(missing, name="nb_missing_words"),
+            pd.Series(items, name="nb_items"),
+            pd.Series(items_covered, name="nb_items_covered")]
 
     df = pd.concat(data, axis=1)
-
-    df['nb_items'] = 2450
 
     df['category'] = df.index
 
