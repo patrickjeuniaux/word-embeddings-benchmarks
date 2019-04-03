@@ -57,34 +57,34 @@ def evaluate_on_all(w):
 
     synonymy_datasets = []
 
-    # synonymy_datasets.append("TOEFL")  # *new*
-    # synonymy_datasets.append("ESL")  # *new*
+    synonymy_datasets.append("TOEFL")  # *new*
+    synonymy_datasets.append("ESL")  # *new*
 
     # Similarity tasks
     # ---
 
     similarity_datasets = []
 
-    # similarity_datasets.append("MEN")
-    # similarity_datasets.append("WS353")
-    # similarity_datasets.append("WS353S")
-    # similarity_datasets.append("WS353R")
-    # similarity_datasets.append("SimLex999")
-    # similarity_datasets.append("RW")
-    # similarity_datasets.append("RG65")
-    # similarity_datasets.append("MTurk")
-    # similarity_datasets.append("TR9856")
-    # similarity_datasets.append("SimVerb3500")  # *new*
+    similarity_datasets.append("MEN")
+    similarity_datasets.append("WS353")
+    similarity_datasets.append("WS353S")
+    similarity_datasets.append("WS353R")
+    similarity_datasets.append("SimLex999")
+    similarity_datasets.append("RW")
+    similarity_datasets.append("RG65")
+    similarity_datasets.append("MTurk")
+    similarity_datasets.append("TR9856")
+    similarity_datasets.append("SimVerb3500")  # *new*
 
     # Analogy tasks
     # ---
 
     analogy_datasets = []
 
-    # analogy_datasets.append("Google")
-    # analogy_datasets.append("MSR")
-    # analogy_datasets.append("SemEval")
-    # analogy_datasets.append("WordRep")
+    analogy_datasets.append("Google")
+    analogy_datasets.append("MSR")
+    analogy_datasets.append("SemEval")
+    analogy_datasets.append("WordRep")
     analogy_datasets.append("SAT")
 
     # Categorization tasks
@@ -92,14 +92,14 @@ def evaluate_on_all(w):
 
     categorization_datasets = []
 
-    # categorization_datasets.append("AP")
-    # categorization_datasets.append("BLESS")
-    # categorization_datasets.append("battig")
-    # categorization_datasets.append("battig2010")  # *new*
-    # categorization_datasets.append("ESSLLI_1a")
-    # categorization_datasets.append("ESSLLI_2b")
-    # categorization_datasets.append("ESSLLI_2c")
-    # categorization_datasets.append("BATS")  # *new*
+    categorization_datasets.append("AP")
+    categorization_datasets.append("BLESS")
+    categorization_datasets.append("battig")
+    categorization_datasets.append("battig2010")  # *new*
+    categorization_datasets.append("ESSLLI_1a")
+    categorization_datasets.append("ESSLLI_2b")
+    categorization_datasets.append("ESSLLI_2c")
+    categorization_datasets.append("BATS")  # *new*
 
     # Calculate results on synonymy
     # ---
@@ -225,7 +225,6 @@ def evaluate_on_all(w):
             result = evaluate_categorization(w, data.X, data.y)
 
         result['dataset'] = dataset
-        result['task'] = 'comparison'
 
         msg = "\nResults for {}\n---\n{}".format(dataset, result)
 
@@ -263,9 +262,10 @@ def evaluate_on_all(w):
             # dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=True)
             dfs = pd.concat([dfs, df], axis=0, ignore_index=True, sort=False)
 
-    columns = ['task', 'dataset', 'category',
-               'items', 'items_covered',
-               'performance', 'performance_type', 'accuracy', 'missing_words']
+    columns = ['dataset', 'task', 'category',
+               'nb_items', 'nb_items_covered', 'nb_missing_words',
+               'performance', 'performance_type',
+               'performance2', 'performance_type2']
 
     dfs = dfs.reindex(columns=columns)
 
@@ -445,13 +445,13 @@ def evaluate_similarity(w, X, y):
     nb_items = len(y)
 
     data = [pd.Series(correlation, name="performance"),
-            pd.Series(nb_items, name="items"),
-            pd.Series(nb_items_covered, name="items_covered"),
-            pd.Series(missing_words, name="missing_words")]
+            pd.Series(nb_items, name="nb_items"),
+            pd.Series(nb_items_covered, name="nb_items_covered"),
+            pd.Series(missing_words, name="nb_missing_words")]
 
     results = pd.concat(data, axis=1)
 
-    results['performance_type'] = 'correlation'
+    results['performance_type'] = 'spearman correlation'
 
     return results
 
@@ -590,15 +590,20 @@ def evaluate_categorization(w, X, y, method="all", seed=None):
 
     nb_items = len(y)
 
+    nb_items_covered = nb_items - missing_words
+
     data = [pd.Series(best_purity, name="performance"),
-            pd.Series(nb_items, name="items"),
-            pd.Series(missing_words, name="missing")]
+            pd.Series(nb_items, name="nb_items"),
+            pd.Series(nb_items_covered, name="nb_items_covered"),
+            pd.Series(missing_words, name="nb_missing_words")]
 
-    results = pd.concat(data, axis=1)
+    df = pd.concat(data, axis=1)
 
-    results['performance_type'] = 'purity'
+    df['performance_type'] = 'purity'
 
-    return results
+    df['task'] = 'categorization'
+
+    return df
 
 
 def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=100):
@@ -681,17 +686,18 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 
             nb_missing_words[cat] = np.sum(nmw[category == cat])
 
-    df = pd.concat([pd.Series(accuracy, name="accuracy"),
+    df = pd.concat([pd.Series(accuracy, name="performance2"),
                     pd.Series(correct, name="performance"),
-                    pd.Series(count, name="items"),
-                    pd.Series(nb_items_covered, name="items_covered"),
-                    pd.Series(nb_missing_words, name="missing_words"),
+                    pd.Series(count, name="nb_items"),
+                    pd.Series(nb_items_covered, name="nb_items_covered"),
+                    pd.Series(nb_missing_words, name="nb_missing_words"),
                     ],
                    axis=1)
 
     df['category'] = df.index
 
-    df['performance_type'] = 'items_correct'
+    df['performance_type'] = 'nb_items_correct'
+    df['performance_type2'] = 'accuracy = nb_items_correct / nb_items'
 
     df['task'] = 'analogy'
 
@@ -805,9 +811,9 @@ def evaluate_on_semeval_2012_2(w):
         final_nb_items_covered[k] = sum(nb_items_covered[k])
 
     df = pd.concat([pd.Series(final_results, name="performance"),
-                    pd.Series(final_nb_items, name="items"),
-                    pd.Series(final_nb_items_covered, name="items_covered"),
-                    pd.Series(final_nb_missing_words, name="missing_words"),
+                    pd.Series(final_nb_items, name="nb_items"),
+                    pd.Series(final_nb_items_covered, name="nb_items_covered"),
+                    pd.Series(final_nb_missing_words, name="nb_missing_words"),
                     ],
                    axis=1)
 
@@ -817,7 +823,7 @@ def evaluate_on_semeval_2012_2(w):
 
     df['category'] = df.index
 
-    df['performance_type'] = 'correlation'
+    df['performance_type'] = 'average_correlation'
 
     df['dataset'] = 'SemEval'
 
@@ -965,15 +971,16 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
     accuracy['wikipedia'] = correct['wikipedia'] / count['wikipedia']
     accuracy['wordnet'] = correct['wordnet'] / count['wordnet']
 
-    data = [pd.Series(accuracy, name="accuracy"),
+    data = [pd.Series(accuracy, name="performance2"),
             pd.Series(correct, name="performance"),
-            pd.Series(count, name="items"),
-            pd.Series(items_covered, name="items_covered"),
-            pd.Series(missing, name="missing_words")]
+            pd.Series(count, name="nb_items"),
+            pd.Series(items_covered, name="nb_items_covered"),
+            pd.Series(missing, name="nb_missing_words")]
 
     df = pd.concat(data, axis=1)
 
-    df['performance_type'] = 'items_correct'
+    df['performance_type'] = 'nb_items_correct'
+    df['performance_type2'] = 'accuracy = nb_items_correct / nb_items'
 
     df['category'] = df.index
 
@@ -1129,17 +1136,20 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     # Add summary results
     # ---
 
-    data = [pd.Series(accuracy, name="accuracy"),
+    data = [pd.Series(accuracy, name="performance2"),
             pd.Series(correct, name="performance"),
-            pd.Series(count, name="items_covered")]
+            pd.Series(count, name="nb_items_covered")]
 
     df = pd.concat(data, axis=1)
 
-    df['items'] = 2450
+    df['nb_items'] = 2450
 
     df['category'] = df.index
 
-    df['performance_type'] = 'items_correct'
+    df['task'] = 'categorization'
+
+    df['performance_type'] = 'nb_items_correct'
+    df['performance_type2'] = 'accuracy = nb_items_correct / nb_items'
 
     return df
 
@@ -1301,9 +1311,13 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
         response = answer_SAT_analogy_question(question, answers, w, solver)
 
-        missing_words += response['nb_missing_words']
+        nmw = response['nb_missing_words']
 
-        items_covered += response['nb_items_covered']
+        missing_words += nmw
+
+        if nmw == 0:
+
+            items_covered += 1
 
         i = response['selected_answer']
 
@@ -1318,11 +1332,11 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
     accuracy = nb_items_correct / nb_items
 
-    data = [pd.Series(accuracy, name="accuracy"),
+    data = [pd.Series(accuracy, name="performance2"),
             pd.Series(nb_items_correct, name="performance"),
-            pd.Series(nb_items, name="items"),
-            pd.Series(items_covered, name="items_covered"),
-            pd.Series(missing_words, name="missing_words")]
+            pd.Series(nb_items, name="nb_items"),
+            pd.Series(items_covered, name="nb_items_covered"),
+            pd.Series(missing_words, name="nb_missing_words")]
 
     df = pd.concat(data, axis=1)
 
@@ -1330,7 +1344,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
 
     df['task'] = 'analogy'
 
-    df['performance_type'] = 'items_correct'
+    df['performance_type'] = 'nb_items_correct'
+    df['performance_type2'] = 'accuracy = nb_items_correct / nb_items'
 
     return df
 
@@ -1450,15 +1465,16 @@ def evaluate_on_synonyms(w, dataset_name):
 
     accuracy = nb_items_correct / nb_items_covered
 
-    data = [pd.Series(accuracy, name="accuracy"),
+    data = [pd.Series(accuracy, name="performance2"),
             pd.Series(nb_items_correct, name="performance"),
-            pd.Series(nb_items, name="items"),
-            pd.Series(nb_items_covered, name="items_covered"),
-            pd.Series(nb_missing_words, name="missing_words")]
+            pd.Series(nb_items, name="nb_items"),
+            pd.Series(nb_items_covered, name="nb_items_covered"),
+            pd.Series(nb_missing_words, name="nb_missing_words")]
 
     df = pd.concat(data, axis=1)
 
-    df['performance_type'] = 'items_correct'
+    df['performance_type'] = 'nb_items_correct'
+    df['performance_type2'] = 'accuracy = nb_items_correct / nb_items_covered'
 
     return df
 

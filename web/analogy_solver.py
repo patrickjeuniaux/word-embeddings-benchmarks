@@ -130,7 +130,7 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
 
         if total_nb_words_missing > 0:
 
-            logger.warning("Missing {} words. Will replace them with mean vector".format(total_nb_words_missing))
+            logger.debug("Missing {} words. Will replace them with mean vector".format(total_nb_words_missing))
 
         # Batch due to memory constraints (in dot operation)
         # ---

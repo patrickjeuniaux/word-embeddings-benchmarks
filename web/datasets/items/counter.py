@@ -412,8 +412,8 @@ def count_all():
     # count_mikolov("google_analogy")
     # count_wordrep()
     count_BATS()
-    # count_semeval_2012_2("all")
-    # count_Xy_items("analogy", "SAT")
+    count_semeval_2012_2("all")
+    count_Xy_items("analogy", "SAT")
 
     # count_Xy_items("categorization", "BLESS")
     # count_Xy_items("categorization", "AP")
