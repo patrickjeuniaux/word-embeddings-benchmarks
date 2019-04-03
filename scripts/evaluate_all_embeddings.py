@@ -152,7 +152,7 @@ def run_job(job):
 
         w = getattr(embeddings, fetch_function_name)(**kwargs)
 
-        res = evaluate_on_all(w)
+        res = evaluate_on_all_fast(w)
 
         res.to_csv(outf)
 

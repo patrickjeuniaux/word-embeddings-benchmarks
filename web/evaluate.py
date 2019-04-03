@@ -34,19 +34,31 @@ from web.embedding import Embedding
 from web.embeddings import load_toy_embedding
 
 
-def evaluate_on_all(w):
+def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
     """
     Evaluate Embedding w on all benchmarks
 
-    Parameters
-    ----------
-    w: Embedding or dict
-      Embedding to evaluate.
+    Input
+    -----
 
-    Returns
-    -------
-    results: pandas.DataFrame
-      DataFrame with results, one per column.
+    w:
+
+    Word embedding to evaluate
+    (Embedding object or dict)
+
+    wordrep_max_pairs:
+
+    maximum number of pairs to be considered for the WordRep dataset
+    (integer, ex: 50; the default used by the original authors was 1000)
+
+    Output
+    ------
+
+    dfs:
+
+    Table with results
+    (pandas.DataFrame)
+
     """
     if isinstance(w, dict):
 
@@ -191,7 +203,7 @@ def evaluate_on_all(w):
 
         elif dataset == "WordRep":
 
-            df = evaluate_on_WordRep(w, max_pairs=10)
+            df = evaluate_on_WordRep(w, max_pairs=wordrep_max_pairs)
 
         else:
 
@@ -832,7 +844,7 @@ def evaluate_on_semeval_2012_2(w):
     return df
 
 
-def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
+def evaluate_on_WordRep(w, max_pairs=None, solver_kwargs={}):
     """
     Evaluate on WordRep dataset
 
@@ -841,7 +853,7 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
     w : Embedding or dict
       Embedding or dict instance.
 
-    max_pairs: int, default: 1000
+    max_pairs: int, default: None
       Each category will be constrained to maximum of max_pairs pairs
       (which results in max_pair * (max_pairs - 1) examples)
 
@@ -876,9 +888,11 @@ def evaluate_on_WordRep(w, max_pairs=1000, solver_kwargs={}):
 
         X_cat = data.X[data.category == category]
 
-        # further limit the number of pairs to consider
-        # ---
-        X_cat = X_cat[0:max_pairs]
+        if max_pairs:
+
+            # further limit the number of pairs to consider
+            # ---
+            X_cat = X_cat[0:max_pairs]
 
         nb_pairs = X_cat.shape[0]
 
@@ -1501,7 +1515,7 @@ if __name__ == "__main__":
 
     w = load_toy_embedding()
 
-    results = evaluate_on_all(w)
+    results = evaluate_on_all_datasets(w, wordrep=50)
 
     output_path = os.path.expanduser("~/Downloads/results.csv")
     results.to_csv(output_path)

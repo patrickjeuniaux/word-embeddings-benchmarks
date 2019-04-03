@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
   out_fname = options.output if options.output else "results.csv"
 
-  results = evaluate_on_all(w)
+  results = evaluate_on_all_fast(w)
 
   logger.info("Saving results...")
 
