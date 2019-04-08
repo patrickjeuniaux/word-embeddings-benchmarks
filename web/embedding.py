@@ -142,6 +142,35 @@ class Embedding(object):
 
             yield word, self[word]
 
+    def __str__(self):
+        '''
+            To print a summary and a sample of the word embeddings.
+        '''
+
+        obj_type = str(type(self))
+
+        nb_words = len(self)
+
+        nb_dims = self.vectors.shape[1]
+
+        limit_words = 5
+
+        limit_dims = 10
+
+        string = "\n\n{}\n\nWord embedding of {} words with {} dimensions.\n\nFirst {} words truncated to {} dimensions.".format(obj_type, nb_words, nb_dims, limit_words, limit_dims)
+
+        for i, (word, vector) in enumerate(self, 1):
+
+            if i > limit_words:
+
+                break
+
+            str_vector = " ".join([str(value) for value in vector[:limit_dims]])
+
+            string += "\n\nWord {} '{}' : {}".format(i, word, str_vector)
+
+        return string
+
     @property
     def words(self):
         """

@@ -32,6 +32,7 @@ from web.analogy_solver import *
 
 from web.embedding import Embedding
 from web.embeddings import load_toy_embedding
+from web.embeddings import load_embedding
 
 
 def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
@@ -379,7 +380,7 @@ def evaluate_on_all_fast(w):
 
         logger.info("Cluster purity on {} {}".format(name, categorization_results[name]))
 
-    # Construct pd table
+    # Construct pandas table
 
     cat = pd.DataFrame([categorization_results])
 
@@ -553,7 +554,18 @@ def evaluate_categorization(w, X, y, method="all", seed=None):
 
     assert method in ["all", "kmeans", "agglomerative"], "Uncrecognized method"
 
-    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    '''
+        NaN happens when there are only 0s,
+        which might happen for very rare words or
+        very insufficient word vocabulary
+
+        In order to prevent problems from happening
+        further in the calculation, we use nanmean()
+        instead of mean()
+    '''
+
+    # mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
 
     words = np.vstack(w.get(word, mean_vector) for word in X.flatten())
 
@@ -739,7 +751,18 @@ def evaluate_on_semeval_2012_2(w):
 
     data = fetch_semeval_2012_2()
 
-    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    '''
+        NaN happens when there are only 0s,
+        which might happen for very rare words or
+        very insufficient word vocabulary
+
+        In order to prevent problems from happening
+        further in the calculation, we use nanmean()
+        instead of mean()
+    '''
+
+    # mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
 
     categories = data.y.keys()
 
@@ -785,17 +808,36 @@ def evaluate_on_semeval_2012_2(w):
 
         questions = data.X[c]
 
-        question_left, question_right = np.vstack(w.get(word, mean_vector) for word in questions[:, 0]), \
-            np.vstack(w.get(word, mean_vector) for word in questions[:, 1])
+        question_left = np.vstack(w.get(word, mean_vector) for word in questions[:, 0])
+
+        question_right = np.vstack(w.get(word, mean_vector) for word in questions[:, 1])
 
         scores = np.dot(prot_left - prot_right, (question_left - question_right).T)
 
-        # NaN happens when there are only 0s,
-        # which might happen for very rare words or
-        # very insufficient word vocabulary
-        # ---
+        try:
 
-        cor = scipy.stats.spearmanr(scores, data.y[c]).correlation
+            cor = scipy.stats.spearmanr(scores, data.y[c]).correlation
+
+        except Exception as e:
+
+            print("\n\n\nERROR")
+            print()
+            print(e)
+            print()
+            print("\n\nCategory:\n", c)
+            print("\n\nscores:\n", scores)
+            print("\n\nprot_left:\n", prot_left)
+            print("\n\nprot_right:\n", prot_right)
+            print("\n\nquestion_left:\n", question_left)
+            print("\n\nquestion_right:\n", question_right)
+
+            print("\n\ndata.y[c]:\n", data.y[c])
+
+            print("\n\nMean vector:\n", mean_vector)
+            print("\n\nMean vector 2:\n", mean_vector2)
+            print()
+
+            cor = np.nan
 
         results[c_name].append(0 if np.isnan(cor) else cor)
 
@@ -1174,7 +1216,7 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
     df['category'] = df.index
 
-    df['task'] = 'categorization'
+    df['task'] = 'analogy'
 
     df['performance_type'] = 'nb_items_correct'
     df['performance_type2'] = 'accuracy = nb_items_correct / nb_items'
@@ -1507,7 +1549,12 @@ def evaluate_on_synonyms(w, dataset_name):
     return df
 
 
-if __name__ == "__main__":
+def test1():
+    '''
+
+    '''
+    print("\n\nTest 1")
+    print("---")
 
     # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
@@ -1515,10 +1562,53 @@ if __name__ == "__main__":
 
     w = load_toy_embedding()
 
-    results = evaluate_on_all_datasets(w, wordrep=50)
+    print(w)
+
+    results = evaluate_on_all_datasets(w, wordrep_max_pairs=50)
 
     output_path = os.path.expanduser("~/Downloads/results.csv")
     results.to_csv(output_path)
 
-    print("\n\nFINAL RESULTS\n---\n")
     print(results)
+
+    print("---THE END---")
+
+
+def test2():
+    '''
+
+
+
+    '''
+
+    print("\n\nTest 2")
+    print("---")
+
+    logger = logging.getLogger(__name__)
+
+    input_file = '/media/patrick/my_data/DSM/07_models/RI/2_300_window/text-1.distvecs.decoded'
+
+    w = load_embedding(fname=input_file,
+                       format="word2vec",
+                       normalize=False,
+                       # normalize=True
+                       lower=False,
+                       clean_words=False)
+
+    print(w)
+
+    results = evaluate_on_all_datasets(w, wordrep_max_pairs=50)
+
+    output_path = os.path.expanduser("~/Downloads/results2.csv")
+    results.to_csv(output_path)
+
+    print(results)
+
+    print("---THE END---")
+
+
+if __name__ == "__main__":
+
+    # test1()
+
+    test2()
