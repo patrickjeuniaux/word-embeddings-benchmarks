@@ -13,9 +13,10 @@ Dealing with NaN values
 
 2019-04-08 --- 2019-04-10
 
-A remove_constant_vectors() function is added to
 
-`web.embedding.Embedding <web/embedding.py>`_
+In `web.embedding.Embedding <web/embedding.py>`_, added
+
+    def remove_constant_vectors
 
 in order to remove the vectors that are constants.
 
