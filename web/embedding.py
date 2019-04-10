@@ -16,6 +16,7 @@ https://polyglot.readthedocs.io/en/latest/index.html
 import logging
 from collections import OrderedDict
 
+import os
 import numpy as np
 import sys
 
@@ -32,13 +33,23 @@ from six.moves import range
 # internal imports
 # ---
 
-from .utils import _open
-from .utils import standardize_string
-from .utils import to_utf8
-from .vocabulary import Vocabulary
-from .vocabulary import CountedVocabulary
-from .vocabulary import OrderedVocabulary
+# from .utils import _open
+# from .utils import standardize_string
+# from .utils import to_utf8
+# from .vocabulary import Vocabulary
+# from .vocabulary import CountedVocabulary
+# from .vocabulary import OrderedVocabulary
 
+from web.utils import _open
+from web.utils import standardize_string
+from web.utils import to_utf8
+
+from web.vocabulary import Vocabulary
+from web.vocabulary import CountedVocabulary
+from web.vocabulary import OrderedVocabulary
+
+
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
 
 logger = logging.getLogger(__name__)
 
@@ -157,7 +168,7 @@ class Embedding(object):
 
         limit_dims = 10
 
-        string = "\n\n{}\n\nWord embedding of {} words with {} dimensions.\n\nFirst {} words truncated to {} dimensions.".format(obj_type, nb_words, nb_dims, limit_words, limit_dims)
+        string = "\n\n{}\n\nWord embedding of {} words with {} dimensions.\n\nFor illustration purposes, here are the first {} words truncated to {} dimensions.".format(obj_type, nb_words, nb_dims, limit_words, limit_dims)
 
         for i, (word, vector) in enumerate(self, 1):
 
@@ -393,6 +404,141 @@ class Embedding(object):
 
         return Embedding(vectors=vectors, vocabulary=vocabulary)
 
+    def remove_constant_vectors(self):
+        '''
+            Remove vectors that are constants
+            (i.e., that contain no variation)
+
+            For instance, all values are zeros.
+        '''
+
+        deleted_indices = []
+        deleted_words = []
+
+        for index, (word, vector) in enumerate(self):
+
+            if np.unique(vector).size == 1:
+
+                deleted_indices.append(index)
+                deleted_words.append(word)
+
+        if len(deleted_words) > 1:
+
+            logger.info("The following has been removed:")
+
+            for i, (index, word) in enumerate(zip(deleted_indices, deleted_words), 1):
+
+                msg = "{}: Vector {} corresponding to word '{}'".format(i, index, word)
+
+                logger.info(msg)
+
+                del self[word]
+
+    def _normalization_test(self):
+        '''
+            debugging function
+
+            to uncover the origin of the following Runtime Warnings:
+
+            linalg.py: RuntimeWarning: invalid value encountered in sqrt
+            return sqrt(add.reduce(s, axis=axis, keepdims=keepdims))
+
+            embedding.py: RuntimeWarning: divide by zero encountered in true_divide
+            vectors = self.vectors.T / np.linalg.norm(self.vectors, ord, axis=1)
+
+            embedding.py: RuntimeWarning: invalid value encountered in true_divide
+            vectors = self.vectors.T / np.linalg.norm(self.vectors, ord, axis=1)
+
+        '''
+
+        logger.info("Vectors --- one by one")
+
+        for i, (word, vector) in enumerate(self, 1):
+
+            vector_str = " ".join(str(value) for value in vector)
+
+            # for i, vector in enumerate(self.vectors):
+
+            if np.isnan(vector).any() or not np.isfinite(vector).all():
+                msg = "\nVector {}, for word '{}', contains non-numeric or non-finite values".format(i, word)
+                logger.info(msg)
+                logger.info(vector_str)
+
+            if np.unique(vector).size == 1:
+
+                msg = "\nVector {}, for word '{}', exhibits no variation (i.e., is constant).".format(i, word)
+                logger.info(msg)
+                logger.info(vector_str)
+
+            dot_product = np.dot(vector, vector).real
+
+            if dot_product < 0:
+                msg = "\nVector {}, for word '{}', has negative dot product = {}".format(i, word, dot_product)
+                logger.info(msg)
+                logger.info(vector_str)
+
+            norm = np.core.sqrt(dot_product)
+
+            if norm == 0.0:
+                msg = "\nVector {}, for word '{}', has norm = {}".format(i, word, norm)
+                logger.info(msg)
+                logger.info(vector_str)
+
+        logger.info("Vectors --- linear algebra")
+
+        msg = "vectors.shape : {}".format(self.vectors.shape)
+        logger.info(msg)
+
+        prod_vec = (self.vectors.conj() * self.vectors).real
+
+        msg = "prod_vec.shape : {}".format(prod_vec.shape)
+        logger.info(msg)
+
+        sum_prod = np.core.add.reduce(prod_vec, axis=1, keepdims=False)
+
+        msg = "sum_prod.shape : {}".format(sum_prod.shape)
+        logger.info(msg)
+
+        for i, ((word, old_vector), value) in enumerate(zip(self, sum_prod)):
+
+            if value < 0.0:
+
+                msg = "\nVector {}, for word '{}' has sum_prod = {} < 0".format(i, word, value)
+                logger.info(msg)
+
+        norm = np.core.sqrt(sum_prod)
+
+        msg = "norm.shape : {}".format(norm.shape)
+        logger.info(msg)
+
+        for i, ((word, old_vector), value) in enumerate(zip(self, norm)):
+
+            if value == 0.0:
+
+                msg = "\nVector {}, for word '{}' has norm = {}".format(i, word, value)
+                logger.info(msg)
+
+        vectors = self.vectors.T / norm
+
+        msg = "vectors.shape : {}".format(vectors.shape)
+        logger.info(msg)
+
+        problems = 0
+
+        for i, ((word, old_vector), vector) in enumerate(zip(self, vectors.T)):
+
+            if np.isnan(vector).any() or not np.isfinite(vector).all():
+
+                problems += 1
+
+                msg = "\nProblem {} : Normalized vector {}, for word '{}' contains non-numeric or non-finite values".format(problems, i, word)
+
+                logger.info(msg)
+
+                logger.info(vector)
+
+        return vectors
+
     def normalize_words(self, ord=2, inplace=False):
         """
             Normalize embeddings matrix row-wise.
@@ -403,7 +549,11 @@ class Embedding(object):
         """
         if ord == 2:
 
-            ord = None  # numpy uses this flag to indicate l2.
+            # numpy uses this flag to indicate l2.
+            # ---
+            ord = None
+
+        # vectors = self._normalization_test()
 
         vectors = self.vectors.T / np.linalg.norm(self.vectors, ord, axis=1)
 
@@ -545,6 +695,8 @@ class Embedding(object):
                 words.append(b''.join(word).decode("latin-1"))
 
                 vectors[line_no, :] = np.fromstring(fin.read(binary_len), dtype=np.float32)
+                # vectors[line_no, :] = np.fromstring(fin.read(binary_len), dtype=np.float64)
+                # vectors[line_no, :] = np.fromstring(fin.read(binary_len), dtype=object)
 
             if len(words) < vocab_size:
 
@@ -569,9 +721,12 @@ class Embedding(object):
 
             ignored = 0
 
-            vocab_size, layer1_size = list(map(int, header.split()))  # throws for invalid file format
+            # throws for invalid file format
+            # ---
+            vocab_size, layer1_size = list(map(int, header.split()))
 
             vectors = np.zeros(shape=(vocab_size, layer1_size), dtype=np.float32)
+            # vectors = np.zeros(shape=(vocab_size, layer1_size), dtype=np.float64)
 
             for line_no, line in enumerate(fin):
 
@@ -840,3 +995,59 @@ class Embedding(object):
         with open(fname, 'wb') as f:
 
             pickle.dump(state, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def test1():
+    '''
+
+    '''
+    print("\n\nTest 1")
+    print("---")
+
+    # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+
+    input_path = '~/web_data/embeddings/glove.6B/glove.6B.50d.SAMPLE.txt'
+
+    fname = os.path.expanduser(input_path)
+
+    load_kwargs = {"vocab_size": 50000, "dim": 50}
+
+    w = Embedding.from_glove(fname, **load_kwargs)
+
+    w.remove_constant_vectors()
+
+    w.normalize_words(inplace=True)
+
+    print(w)
+
+    print("---THE END---")
+
+
+def test2():
+    '''
+
+
+
+    '''
+
+    print("\n\nTest 2")
+    print("---")
+
+    # input_file = '/media/patrick/my_data/DSM/07_models/RI/2_300_window/text-1.distvecs.decoded'
+    input_file = '/media/patrick/my_data/DSM/07_models/SVD/PPMI-synt-d300/counts-ppmi-svd.decoded'
+
+    w = Embedding.from_word2vec(input_file, binary=False)
+
+    w.remove_constant_vectors()
+
+    w.normalize_words(inplace=True)
+
+    print(w)
+
+    print("---THE END---")
+
+
+if __name__ == "__main__":
+
+    # test1()
+    test2()

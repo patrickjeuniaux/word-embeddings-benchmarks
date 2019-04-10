@@ -11,9 +11,23 @@ University of Pisa
 Dealing with NaN values
 -----------------------
 
-2019-04-08
+2019-04-08 --- 2019-04-10
 
-Most of the work was done in `web.evaluate <web/evaluate.py>`_.
+A remove_constant_vectors() function is added to
+
+`web.embedding.Embedding <web/embedding.py>`_
+
+in order to remove the vectors that are constants.
+
+This removes vectors that contain no valuable information
+that may complicate the evaluation later on.
+
+This was motivated by the existence of vectors containing only 0s
+which would throw RuntimeWarning during normalization, i.e., when
+attempting to perform:
+
+vectors = self.vectors.T / np.linalg.norm(self.vectors, ord, axis=1)
+
 
 
 Standardization of the output

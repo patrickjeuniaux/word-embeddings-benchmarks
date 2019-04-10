@@ -4,8 +4,11 @@
 """
 from six.moves import cPickle as pickle
 import os
-from .datasets.utils import _get_dataset_dir, _fetch_file
-from .embedding import Embedding
+# from .datasets.utils import _get_dataset_dir, _fetch_file
+# from .embedding import Embedding
+
+from web.datasets.utils import _get_dataset_dir, _fetch_file
+from web.embedding import Embedding
 
 
 def load_toy_embedding():
@@ -94,6 +97,8 @@ def load_embedding(fname, format="word2vec_bin", normalize=True,
     d = pickle.load(open(fname, "rb"), encoding='latin1')
 
     w = Embedding.from_dict(d)
+
+  w.remove_constant_vectors()
 
   if normalize:
 
