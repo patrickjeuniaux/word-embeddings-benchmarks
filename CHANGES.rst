@@ -30,6 +30,13 @@ attempting to perform:
     vectors = self.vectors.T / np.linalg.norm(self.vectors, ord, axis=1)
 
 
+Within `web.embeddings.load_embedding() <web/embeddings.py>`_,
+
+    remove_constant_vectors()
+
+is applied systematically.
+
+
 
 Standardization of the output
 -----------------------------
