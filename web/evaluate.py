@@ -395,7 +395,8 @@ def evaluate_on_all_fast(w):
 
 def evaluate_similarity(w, X, y):
     """
-    Calculate Spearman correlation between cosine similarity of the model
+    Calculate Spearman correlation
+    between cosine similarity of the model
     and human rated similarity of word pairs
 
     Parameters
@@ -560,12 +561,12 @@ def evaluate_categorization(w, X, y, method="all", seed=None):
         very insufficient word vocabulary
 
         In order to prevent problems from happening
-        further in the calculation, we use nanmean()
+        further in the calculation, we could use nanmean()
         instead of mean()
     '''
 
-    # mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
-    mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
+    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    # mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
 
     words = np.vstack(w.get(word, mean_vector) for word in X.flatten())
 
@@ -757,12 +758,12 @@ def evaluate_on_semeval_2012_2(w):
         very insufficient word vocabulary
 
         In order to prevent problems from happening
-        further in the calculation, we use nanmean()
+        further in the calculation, we could use nanmean()
         instead of mean()
     '''
 
-    # mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
-    mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
+    mean_vector = np.mean(w.vectors, axis=0, keepdims=True)
+    # mean_vector = np.nanmean(w.vectors, axis=0, keepdims=True)
 
     categories = data.y.keys()
 
@@ -834,7 +835,6 @@ def evaluate_on_semeval_2012_2(w):
             print("\n\ndata.y[c]:\n", data.y[c])
 
             print("\n\nMean vector:\n", mean_vector)
-            print("\n\nMean vector 2:\n", mean_vector2)
             print()
 
             cor = np.nan
