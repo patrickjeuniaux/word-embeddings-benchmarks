@@ -40,7 +40,8 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
       Batch size to use while computing accuracy. This is because of extensive memory usage.
 
     k: int
-      If not None will select k top most frequent words from embedding before doing analogy prediction
+      If not None will select k top most frequent words
+      from embedding before doing analogy prediction
       (this can offer significant speedups)
 
     Note
@@ -92,6 +93,10 @@ class SimpleAnalogySolver(sklearn.base.BaseEstimator):
         y_pred : array-like, shape (n_samples, )
           Predicted words.
         """
+
+        # reduce the embedding to the k most frequent words
+        # if k has been set during initialization
+        # ---
         w = self.w.most_frequent(self.k) if self.k else self.w
 
         words = self.w.vocabulary.words

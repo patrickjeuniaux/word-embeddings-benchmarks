@@ -3,13 +3,17 @@
 
 """Utilities for package"""
 
+# external
+# ---
+
 import bz2
 import gzip
 from os import path
 import tarfile
 import io
 from itertools import islice, chain
-from six import string_types, text_type
+from six import string_types
+from six import text_type
 
 
 def any2utf8(text, errors='strict', encoding='utf8'):

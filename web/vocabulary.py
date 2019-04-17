@@ -39,7 +39,7 @@ from six.moves import zip
 # internal imports
 # ---
 
-from .utils import _open
+from web.utils import _open
 
 
 def count(lines):
@@ -132,11 +132,13 @@ class Vocabulary(object):
     def __str__(self):
 
         # if Python 3
+        # ---
         if six.PY3:
 
             return self.__unicode__()
 
         # else (if Python 2...)
+        # ---
         return self.__unicode__().encode("utf-8")
 
     def __getitem__(self, word):

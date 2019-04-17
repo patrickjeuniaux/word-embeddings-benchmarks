@@ -99,6 +99,7 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
     analogy_datasets.append("SemEval")
     analogy_datasets.append("WordRep")
     analogy_datasets.append("SAT")
+    analogy_datasets.append("BATS")  # *new*
 
     # Categorization tasks
     # ---
@@ -112,7 +113,6 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
     categorization_datasets.append("ESSLLI_1a")
     categorization_datasets.append("ESSLLI_2b")
     categorization_datasets.append("ESSLLI_2c")
-    categorization_datasets.append("BATS")  # *new*
 
     # Calculate results on synonymy
     # ---
@@ -123,7 +123,7 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     for dataset in synonymy_datasets:
 
-        df = evaluate_on_synonyms(w, dataset)
+        df = evaluate_synonymy(w, dataset)
 
         msg = "\nResults for {}\n---\n{}".format(dataset, df)
 
@@ -202,6 +202,10 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
             df = evaluate_on_SAT(w)
 
+        elif dataset == 'BATS':
+
+            df = evaluate_on_BATS(w)
+
         elif dataset == "WordRep":
 
             df = evaluate_on_WordRep(w, max_pairs=wordrep_max_pairs)
@@ -223,19 +227,13 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     for dataset in categorization_datasets:
 
-        if dataset == 'BATS':
+        fetch_function_name = "fetch_" + dataset
 
-            result = evaluate_on_BATS(w)
+        module = importlib.import_module("web.datasets.categorization")
 
-        else:
+        data = getattr(module, fetch_function_name)()
 
-            fetch_function_name = "fetch_" + dataset
-
-            module = importlib.import_module("web.datasets.categorization")
-
-            data = getattr(module, fetch_function_name)()
-
-            result = evaluate_categorization(w, data.X, data.y)
+        result = evaluate_categorization(w, data.X, data.y)
 
         result['dataset'] = dataset
 
@@ -732,7 +730,9 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
 def evaluate_on_semeval_2012_2(w):
     """
     Simple method to score embedding
-    Note: it is NOT using SimpleAnalogySolver
+
+    Note:
+    it is NOT using SimpleAnalogySolver
     but another method
 
     Parameters
@@ -743,8 +743,11 @@ def evaluate_on_semeval_2012_2(w):
     Returns
     -------
     result: pandas.DataFrame
-      Results with spearman correlation per broad category with special key "all" for summary
-      spearman correlation
+
+      Results with spearman correlation
+      per broad category
+      with special key "all" for summary
+
     """
     if isinstance(w, dict):
 
@@ -1057,8 +1060,8 @@ def evaluate_on_BATS(w, solver_kwargs={}):
       Embedding or dict instance.
 
     solver_kwargs: dict, default: {}
-      Arguments passed to SimpleAnalogySolver. It is suggested to limit number of words
-      in the dictionary.
+      Arguments passed to SimpleAnalogySolver.
+      Note: It is suggested to limit number of words in the dictionary.
 
     References
     ----------
@@ -1224,12 +1227,25 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     return df
 
 
-def cosine_similarity(vector1, vector2):
+def cosine_similarity_dense(vector1, vector2):
     '''
-    angular difference between two vectors
-    =
-    ratio of the dot product and the product of the magnitudes of vectors
-    v1-v2 / |v1||v2|
+
+    Takes a input dense vectors.
+
+    Returns the angular difference between two vectors.
+
+    It is calculated as the ratio of
+    the dot product and
+    the product of the magnitudes (norms) of the vectors.
+
+    cos = v1 - v2 / |v1| * |v2|
+
+    Note:
+
+    it is useless to divide by the product of the norms if
+    the vectors are already normalized.
+
+    In the case where vectors are already normalized, the dot product suffices.
     '''
 
     dot_product = np.dot(vector1, vector2)
@@ -1304,7 +1320,7 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
             candidate_vector = w[candidate_word]
 
-            cosine = cosine_similarity(predicted_vector, candidate_vector)
+            cosine = cosine_similarity_dense(predicted_vector, candidate_vector)
 
             if selected_answer is None or cosine >= selected_cosine:
 
@@ -1323,7 +1339,9 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
     # print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
 
-    results = {'selected_answer': selected_answer, 'nb_missing_words': missing_words, 'nb_items_covered': items_covered}
+    results = {'selected_answer': selected_answer,
+               'nb_missing_words': missing_words,
+               'nb_items_covered': items_covered}
 
     return results
 
@@ -1430,9 +1448,12 @@ def answer_synonymy_question(question, answers, w):
         question_vector = w[question]
 
     else:
-        # if we do not have a vector for the question
-        # we cannot answer it
-        # ---
+        '''
+        If we do not have a vector for the question,
+        we cannot answer it.
+        We do not try responding at random.
+        The selected answer is therefore 'None'.
+        '''
 
         response = {'selected_answer': None, 'selected_cosine': None}
 
@@ -1455,9 +1476,14 @@ def answer_synonymy_question(question, answers, w):
 
             answer_vector = w[answer]
 
-            cosine = cosine_similarity(question_vector, answer_vector)
+            cosine = cosine_similarity_dense(question_vector, answer_vector)
 
             if selected_answer is None or cosine >= selected_cosine:
+
+                '''
+                We keep the first answer found
+                or the one that has the highest cosine.
+                '''
 
                 selected_answer = i
 
@@ -1468,8 +1494,10 @@ def answer_synonymy_question(question, answers, w):
     return response
 
 
-def evaluate_on_synonyms(w, dataset_name):
+def evaluate_synonymy(w, dataset_name):
     '''
+
+    Evaluate the words embedding on a synonymy dataset
 
     '''
 
@@ -1494,6 +1522,13 @@ def evaluate_on_synonyms(w, dataset_name):
     y = data.y
 
     nb_items = data.X.shape[0]
+
+    # TEMP ---
+    nb_questions = len(X)
+    nb_answers = data.y.shape[1]
+    print(nb_items, "items, i.e., ", nb_questions, "questions:", X)
+    print(nb_answers, "answers per items:", y)
+    # --- TEMP
 
     nb_items_correct = 0
 
@@ -1549,11 +1584,36 @@ def evaluate_on_synonyms(w, dataset_name):
     return df
 
 
-def test1():
+def test_toy_synonymy():
     '''
 
     '''
-    print("\n\nTest 1")
+    print("\n\nTest toy words embeddings on synonymy")
+    print("---")
+
+    # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
+
+    logger = logging.getLogger(__name__)
+
+    w = load_toy_embedding()
+
+    print(w)
+
+    results = evaluate_synonymy(w, "ESL")
+
+    output_path = os.path.expanduser("~/Downloads/results.csv")
+    results.to_csv(output_path)
+
+    print(results)
+
+    print("---THE END---")
+
+
+def test_toy_all():
+    '''
+
+    '''
+    print("\n\nTest toy words embeddings on all datasets")
     print("---")
 
     # logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG, datefmt='%I:%M:%S')
@@ -1574,14 +1634,14 @@ def test1():
     print("---THE END---")
 
 
-def test2():
+def test_ri_all():
     '''
 
 
 
     '''
 
-    print("\n\nTest 2")
+    print("\n\nTests RI words embedding on all datasets")
     print("---")
 
     logger = logging.getLogger(__name__)
@@ -1609,6 +1669,8 @@ def test2():
 
 if __name__ == "__main__":
 
-    # test1()
+    test_toy_synonymy()
 
-    test2()
+    # test_ri_all()
+
+    # test_toy_all()

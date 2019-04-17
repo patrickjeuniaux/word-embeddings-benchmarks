@@ -72,13 +72,17 @@ class Embedding(object):
 
         self.vocabulary = vocabulary
 
+        # Convert the input to an array
+        # https://docs.scipy.org/doc/numpy/reference/generated/numpy.asarray.html
+        # ---
+
         self.vectors = np.asarray(vectors)
 
         if len(self.vocabulary) != self.vectors.shape[0]:
 
-            raise ValueError("Vocabulary has {} items but we have {} "
-                             "vectors."
-                             .format(len(vocabulary), self.vectors.shape[0]))
+            msg = "Vocabulary has {} items but we have {} vectors.".format(len(vocabulary), self.vectors.shape[0])
+
+            raise ValueError(msg)
 
         if len(self.vocabulary.words) != len(set(self.vocabulary.words)):
 
@@ -98,22 +102,27 @@ class Embedding(object):
 
         if not vector.shape[0] == self.vectors.shape[1]:
 
-            raise RuntimeError("Please pass vector of len {}".format(self.vectors.shape[1]))
+            msg = "Please pass vector of len {}".format(self.vectors.shape[1])
+
+            raise RuntimeError(msg)
 
         if word not in self.vocabulary:
 
             # If the word is not in the vocabulary,
-            # add it !
+            # add it to the vocabulary
+            # ---
 
             self.vocabulary.add(word)
 
             # and stack the new vector on top of those that are already there
+            # ---
 
             self.vectors = np.vstack([self.vectors, vector.reshape(1, -1)])
         else:
 
             # the word already exists
             # replace its vector by the new vector
+            # ---
 
             self.vectors[self.vocabulary[word]] = vector
 
@@ -129,7 +138,8 @@ class Embedding(object):
             Remove the word and its vector from the embedding.
 
             Note:
-             This operation costs \\theta(n). Be careful putting it in a loop.
+             This operation costs \\theta(n).
+             Be careful putting it in a loop.
         """
         id = self.vocabulary[word]
 
@@ -141,7 +151,10 @@ class Embedding(object):
         """
             Return the number of words in the vocabulary
         """
-        return len(self.vocabulary)
+
+        nb_words = len(self.vocabulary)
+
+        return nb_words
 
     def __iter__(self):
         """
@@ -229,11 +242,14 @@ class Embedding(object):
     def transform_words(self, f, inplace=False, lower=False):
         """
             Transform words in vocabulary according to following strategy:
-            Prefer shortest and most often occurring words - after transforming by some (lambda f) function.
+
+            Prefer shortest and most often occurring words
+            - after transforming by some (lambda f) function.
 
             This allows the elimination of noisy and wrongly coded words.
 
-            Strategy is implemented for all types of Vocabulary - they can be polymorphicaly extended.
+            Strategy is implemented for all types of Vocabulary
+            - they can be polymorphicaly extended.
 
             Parameters
             ----------
@@ -410,6 +426,10 @@ class Embedding(object):
             (i.e., that contain no variation)
 
             For instance, all values are zeros.
+
+            This function is used in
+
+            web.embeddings.load_embedding()
         '''
 
         deleted_indices = []
@@ -614,6 +634,8 @@ class Embedding(object):
     def from_gensim(model):
         """
 
+        Return an Embedding based on a Gensim model
+
         """
 
         word_count = {}
@@ -659,7 +681,7 @@ class Embedding(object):
     @staticmethod
     def _from_word2vec_binary(fname):
         """
-
+            Returns words and vectors from a word2vec file in binary format
         """
         with _open(fname, 'rb') as fin:
 
@@ -678,6 +700,8 @@ class Embedding(object):
             for line_no in range(vocab_size):
 
                 # mixed text and binary: read text first, then binary
+                # ---
+
                 word = []
 
                 while True:
@@ -711,6 +735,8 @@ class Embedding(object):
     @staticmethod
     def _from_word2vec_text(fname):
         """
+
+        Return the words and vectors by loading a word2vec file in text format
 
         """
         with _open(fname, 'r') as fin:
@@ -806,6 +832,8 @@ class Embedding(object):
     def from_glove(fname, vocab_size, dim):
         """
 
+        Return an Embedding loading a GloVe file.
+
         """
         with _open(fname, 'r') as fin:
 
@@ -835,8 +863,9 @@ class Embedding(object):
 
                     ignored += 1
 
-                    logger.warning("We ignored line number {} because of errors in parsing"
-                                   "\n{}".format(line_no, e))
+                    msg = "We ignored line number {} because of errors in parsing \n{}".format(line_no, e)
+
+                    logger.warning(msg)
 
                     continue
 
@@ -854,22 +883,24 @@ class Embedding(object):
 
                         ignored += 1
 
-                        logger.warning(
-                            "We ignored line number {} - following word is duplicated in file:\n{}\n".format(line_no,
-                                                                                                             parts[0]))
+                        msg = "We ignored line number {} - following word is duplicated in file:\n{}\n".format(line_no, parts[0])
+
+                        logger.warning(msg)
 
                 except Exception as e:
 
                     ignored += 1
 
-                    logger.warning("We ignored line number {} because of errors in parsing"
-                                   "\n{}".format(line_no, e))
+                    msg = "We ignored line number {} because of errors in parsing \n{}".format(line_no, e)
+
+                    logger.warning(msg)
 
             return Embedding(vocabulary=OrderedVocabulary(words), vectors=vectors[0:len(words)])
 
     @staticmethod
     def from_dict(d):
         """
+            Make an Embedding from a dictionary
 
         """
         for k in d:  # Standardize
@@ -899,6 +930,8 @@ class Embedding(object):
             fout.write(to_utf8("%s %s\n" % w.vectors.shape))
 
             # store in sorted order: most frequent words at the top
+            # ---
+
             for word, vector in zip(w.vocabulary.words, w.vectors):
 
                 if binary:
@@ -912,7 +945,10 @@ class Embedding(object):
     @staticmethod
     def from_word2vec(fname, fvocab=None, binary=False):
         """
-            Load the input-hidden weight matrix from the original C word2vec-tool format.
+
+            Return an Embedding by loading
+            the input-hidden weight matrix
+            from the original C word2vec-tool format.
 
             `binary` is a boolean indicating whether the data is in binary word2vec format.
             Word counts are read from `fvocab` filename, if set (this is the file generated
@@ -943,19 +979,26 @@ class Embedding(object):
 
         if len(words) != len(set(words)):
 
-            raise RuntimeError("Vocabulary has duplicates")
+            msg = "Vocabulary has duplicates"
 
-        e = Embedding(vocabulary=vocabulary, vectors=vectors)
+            raise RuntimeError(msg)
 
-        return e
+        return Embedding(vocabulary=vocabulary, vectors=vectors)
 
     @staticmethod
-    def load(fname):
+    def load(input_file):
         """
             Load an embedding dump generated by `save`
+
+            What is loaded is the (vocabulary, vectors) tuple.
+
+            The vocabulary itself might be made of one or two objects.
+
+            If only one object: the words
+            If two objects: the words and their frequencies (counts)
         """
 
-        content = _open(fname).read()
+        content = _open(input_file).read()
 
         if PY2:
 
@@ -981,9 +1024,12 @@ class Embedding(object):
 
         return Embedding(vocabulary=vocab, vectors=vec)
 
-    def save(self, fname):
+    def save(self, output_file):
         """
-            Save a pickled version of the embedding into `fname`.
+            Save a pickled version of the embedding.
+
+            The object being saved is a binary tuple (voc, vec)
+            including the vocabulary and the vectors.
         """
 
         vec = self.vectors
@@ -992,7 +1038,7 @@ class Embedding(object):
 
         state = (voc, vec)
 
-        with open(fname, 'wb') as f:
+        with open(output_file, 'wb') as f:
 
             pickle.dump(state, f, protocol=pickle.HIGHEST_PROTOCOL)
 
