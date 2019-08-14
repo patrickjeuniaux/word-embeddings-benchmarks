@@ -1465,7 +1465,7 @@ def answer_synonymy_question(question, answers, w):
 
     nb_answers = len(answers)
 
-    # chose the answer which has the highest cosine
+    # choose the answer which has the highest cosine
     # ---
 
     for i in range(nb_answers):
