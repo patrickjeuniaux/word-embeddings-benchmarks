@@ -1348,7 +1348,7 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
 def evaluate_on_SAT(w, solver_kwargs={}):
     """
-    Evaluate on the SAT dataset
+    Evaluate on the SAT analogy dataset
 
     Parameters
     ----------
