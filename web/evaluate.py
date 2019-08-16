@@ -70,8 +70,8 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     synonymy_datasets = []
 
-    synonymy_datasets.append("TOEFL")  # *new*
-    synonymy_datasets.append("ESL")  # *new*
+    # synonymy_datasets.append("TOEFL")  # *new*
+    # synonymy_datasets.append("ESL")  # *new*
 
     # Similarity tasks
     # ---
@@ -94,7 +94,7 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     analogy_datasets = []
 
-    # analogy_datasets.append("Google")
+    analogy_datasets.append("Google")
     # analogy_datasets.append("MSR")
     # analogy_datasets.append("SemEval")
     # analogy_datasets.append("WordRep")
@@ -214,9 +214,19 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
             continue
 
-        msg = "\nResults for {}\n---\n{}".format(dataset, df)
+        # msg = "\nResults for {}\n---\n{}".format(dataset, df)
+        msg = "\n\nResults for {}\n---\n".format(dataset)
 
         logger.info(msg)
+
+        # print first four columns
+        # ---
+
+        print("")
+        print(df.iloc[:, 0:2])
+        print("")
+        print(df.iloc[:, 2:4])
+        print("")
 
         results[dataset] = df
 
@@ -669,6 +679,11 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
       Results, where each key is for given category and special empty key "" stores
       summarized accuracy across categories
     """
+
+    print("\nAnalogy task\n---\n")
+
+    print("Note: * indicates a missing word (i.e., a word not in the semantic space)")
+
     if isinstance(w, dict):
 
         w = Embedding.from_dict(w)
@@ -684,6 +699,38 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
     nic = predictions['nb_items_covered']
 
     nmw = predictions['nb_missing_words']
+
+    # informative message
+    # ---
+
+    for i, (my_X, my_pred, my_y) in enumerate(zip(X, y_pred, y)):
+
+        msg = " - Item " + str(i) + " : "
+
+        msg += " - ".join([x if x in w else x + "*" for x in my_X])
+
+        msg += " : ... " + my_pred + " ?"
+
+        if my_pred == my_y:
+
+            msg += "   CORRECT "
+
+        else:
+
+            if my_y in w:
+
+                my_y_str = my_y
+
+            else:
+
+                my_y_str = my_y + "*"
+
+            msg += "   incorrect (Good answer: " + my_y_str + ")"
+
+        print(msg)
+
+    # calculate performance
+    # ---
 
     accuracy = OrderedDict({"all": np.mean(y_pred == y)})
 
