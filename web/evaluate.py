@@ -78,41 +78,41 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     similarity_datasets = []
 
-    similarity_datasets.append("MEN")
-    similarity_datasets.append("WS353")
-    similarity_datasets.append("WS353S")
-    similarity_datasets.append("WS353R")
-    similarity_datasets.append("SimLex999")
-    similarity_datasets.append("RW")
-    similarity_datasets.append("RG65")
-    similarity_datasets.append("MTurk")
-    similarity_datasets.append("TR9856")
-    similarity_datasets.append("SimVerb3500")  # *new*
+    # similarity_datasets.append("MEN")
+    # similarity_datasets.append("WS353")
+    # similarity_datasets.append("WS353S")
+    # similarity_datasets.append("WS353R")
+    # similarity_datasets.append("SimLex999")
+    # similarity_datasets.append("RW")
+    # similarity_datasets.append("RG65")
+    # similarity_datasets.append("MTurk")
+    # similarity_datasets.append("TR9856")
+    # similarity_datasets.append("SimVerb3500")  # *new*
 
     # Analogy tasks
     # ---
 
     analogy_datasets = []
 
-    analogy_datasets.append("Google")
-    analogy_datasets.append("MSR")
-    analogy_datasets.append("SemEval")
-    analogy_datasets.append("WordRep")
-    analogy_datasets.append("SAT")
-    analogy_datasets.append("BATS")  # *new*
+    # analogy_datasets.append("Google")
+    # analogy_datasets.append("MSR")
+    # analogy_datasets.append("SemEval")
+    # analogy_datasets.append("WordRep")
+    # analogy_datasets.append("SAT")
+    # analogy_datasets.append("BATS")  # *new*
 
     # Categorization tasks
     # ---
 
     categorization_datasets = []
 
-    categorization_datasets.append("AP")
-    categorization_datasets.append("BLESS")
-    categorization_datasets.append("battig")
-    categorization_datasets.append("battig2010")  # *new*
-    categorization_datasets.append("ESSLLI_1a")
-    categorization_datasets.append("ESSLLI_2b")
-    categorization_datasets.append("ESSLLI_2c")
+    # categorization_datasets.append("AP")
+    # categorization_datasets.append("BLESS")
+    # categorization_datasets.append("battig")
+    # categorization_datasets.append("battig2010")  # *new*
+    # categorization_datasets.append("ESSLLI_1a")
+    # categorization_datasets.append("ESSLLI_2b")
+    # categorization_datasets.append("ESSLLI_2c")
 
     # Calculate results on synonymy
     # ---
@@ -1443,6 +1443,8 @@ def answer_synonymy_question(question, answers, w):
 
     '''
 
+    print("\nWhat is the synonym of: ", question, " ?\n---\n")
+
     if question in w:
 
         question_vector = w[question]
@@ -1456,6 +1458,8 @@ def answer_synonymy_question(question, answers, w):
         '''
 
         response = {'selected_answer': None, 'selected_cosine': None}
+
+        print("We don't know, because it is NOT in the word embedding.", "\n")
 
         return response
 
@@ -1472,11 +1476,15 @@ def answer_synonymy_question(question, answers, w):
 
         answer = answers[i]
 
+        msg = "- answer " + str(i) + ": " + answer
+
         if answer in w:
 
             answer_vector = w[answer]
 
             cosine = cosine_similarity_dense(question_vector, answer_vector)
+
+            msg += " (cosine : " + str(round(cosine, 3)) + ") "
 
             if selected_answer is None or cosine >= selected_cosine:
 
@@ -1488,6 +1496,14 @@ def answer_synonymy_question(question, answers, w):
                 selected_answer = i
 
                 selected_cosine = cosine
+
+                msg += " SELECTED "
+
+        else:
+
+            msg += " NOT in the word embedding! "
+
+        print(msg)
 
     response = {'selected_answer': selected_answer, 'selected_cosine': selected_cosine}
 
@@ -1526,8 +1542,8 @@ def evaluate_synonymy(w, dataset_name):
     # TEMP ---
     nb_questions = len(X)
     nb_answers = data.y.shape[1]
-    print(nb_items, "items, i.e., ", nb_questions, "questions:", X)
-    print(nb_answers, "answers per items:", y)
+    print(nb_items, "items, i.e., ", nb_questions, "questions:", X, "\n")
+    print(nb_answers, "answers per items:", y, "\n")
     # --- TEMP
 
     nb_items_correct = 0
@@ -1561,6 +1577,12 @@ def evaluate_synonymy(w, dataset_name):
                 # ---
                 nb_items_correct += 1
 
+                print("\nGOOD answer.\n")
+
+            else:
+
+                print("\nIncorrect answer!\n")
+
         else:
 
             # the word is not in the vocabulary
@@ -1569,6 +1591,12 @@ def evaluate_synonymy(w, dataset_name):
             nb_missing_words += 1
 
     accuracy = nb_items_correct / nb_items_covered
+
+    print("\nPerformance to the synonym task\n---\n")
+    print("Number of good answers = ", str(nb_items_correct), "\n")
+    print("Number of items = ", str(nb_items), "\n")
+    print("Number of items covered = ", str(nb_items_covered), "\n")
+    print("Accuracy = nb items correct / nb items covered = ", str(accuracy), "\n")
 
     data = [pd.Series(accuracy, name="performance2"),
             pd.Series(nb_items_correct, name="performance"),
