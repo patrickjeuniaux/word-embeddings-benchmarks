@@ -162,9 +162,9 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
     """
     scores : dict of dict from category codes to a list of scores
     ---
-    '3_f': ['41.7', '47.9', '41.7', '28.6', '28.0']
-    '8_f': ['62.0', '52.7', '50.0', '44.0', '40.0']
-    '9_i': ['56.0', '48.0', '46.0', '38.0', '38.0']
+    '3_f': [41.7, 47.9, 41.7, 28.6, 28.0]
+    '8_f': [62.0, 52.7, 50.0, 44.0, 40.0]
+    '9_i': [56.0, 48.0, 46.0, 38.0, 38.0]
 
     NOTE: the scores are either of type 'golden' or 'platinium'
     In the example above they are of the type 'golden'
@@ -216,13 +216,20 @@ def fetch_semeval_2012_2(which="all", which_scoring="golden"):
 
             questions[c].append([standardize_string(w) for w in word_pair.split(":")])
 
-            platinium_scores[c][word_pair] = score
+            # platinium_scores[c][word_pair] = score
+
+            platinium_scores[c][word_pair] = float(score)
+
+            # Note: not converting the string score to a float
+            # will falsify the Spearman correlation
 
         for line_g in golden[1:]:
 
             word_pair, score = line_g.split()
 
-            golden_scores[c][word_pair] = score
+            # golden_scores[c][word_pair] = score
+
+            golden_scores[c][word_pair] = float(score)
 
         # Make scores a list
 

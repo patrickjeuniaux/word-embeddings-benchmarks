@@ -8,6 +8,33 @@ Patrick Jeuniaux
 University of Pisa
 
 
+
+Use floats instead of strings for scores of SemEval 2012
+--------------------------------------------------------
+
+2019-08-17
+
+
+In `web.datasets.analogy.fetch_semeval_2012_2() <web/datasets/analogy.py>`_,
+
+converted to string scores to float:
+
+    # platinium_scores[c][word_pair] = score
+    platinium_scores[c][word_pair] = float(score)
+
+    # golden_scores[c][word_pair] = score
+    golden_scores[c][word_pair] = float(score)
+
+This change affects the calculation of the Spearman coefficient correlation
+
+in `web.evaluate.evaluate_on_semeval_2012_2() <web/evaluate.py>`_,
+
+
+cor = scipy.stats.spearmanr(scores, data.y[c]).correlation
+
+
+
+
 Dealing with NaN values
 -----------------------
 

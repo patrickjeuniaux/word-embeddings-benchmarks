@@ -825,11 +825,15 @@ def evaluate_on_semeval_2012_2(w):
     nb_missing_words = defaultdict(list)
     nb_items_covered = defaultdict(list)
 
+    j = 0
+
     for c in categories:
 
         c_name = data.categories_names[c].split("_")[0]
 
-        print("\nCategory: {} --- {}".format(c, c_name))
+        j += 1
+
+        print("\n{}) Category {} : {}\n---".format(j, c, c_name))
 
         prototypes = data.X_prot[c]
 
@@ -870,6 +874,9 @@ def evaluate_on_semeval_2012_2(w):
 
         scores = np.dot(prot_left - prot_right, (question_left - question_right).T)
 
+        # print(scores)
+        # print(data.y[c])
+
         try:
 
             cor = scipy.stats.spearmanr(scores, data.y[c]).correlation
@@ -896,7 +903,7 @@ def evaluate_on_semeval_2012_2(w):
 
         results[c_name].append(0 if np.isnan(cor) else cor)
 
-        for i, (pl, pr, ql, qr, s, d) in enumerate(zip(prototypes[:, 0], prototypes[:, 1], questions[:, 0], questions[:, 1], scores, data.y[c])):
+        for i, (pl, pr) in enumerate(zip(prototypes[:, 0], prototypes[:, 1])):
 
             if pl not in w:
                 pl = pl + "*"
@@ -904,15 +911,23 @@ def evaluate_on_semeval_2012_2(w):
             if pr not in w:
                 pr = pr + "*"
 
+            print("- Prototypes {} : ('{}' - '{}') ".format(i, pl, pr))
+
+        for i, (ql, qr, s, d) in enumerate(zip(questions[:, 0], questions[:, 1], scores, data.y[c])):
+
             if ql not in w:
                 ql = ql + "*"
 
             if qr not in w:
                 qr = qr + "*"
 
-            print("- Item {} : ('{}' - '{}') x ('{}' - '{}') = {} compared to {}".format(i, pl, pr, ql, qr, s, d))
+            print("- Item {0} : ('{1}' - '{2}') = {3:.2f} --- {4}".format(i, ql, qr, s, d))
 
-        print("Spearman correlation = ", cor)
+        if cor is not np.nan:
+
+            cor = round(cor, 3)
+
+        print("---\nSpearman correlation = ", cor)
 
     final_results = OrderedDict()
     final_nb_items = OrderedDict()
