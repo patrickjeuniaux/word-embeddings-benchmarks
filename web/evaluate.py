@@ -94,9 +94,9 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     analogy_datasets = []
 
-    analogy_datasets.append("Google")
+    # analogy_datasets.append("Google")
     # analogy_datasets.append("MSR")
-    # analogy_datasets.append("SemEval")
+    analogy_datasets.append("SemEval")
     # analogy_datasets.append("WordRep")
     # analogy_datasets.append("SAT")
     # analogy_datasets.append("BATS")  # *new*
@@ -680,7 +680,7 @@ def evaluate_analogy(w, X, y, method="add", k=None, category=None, batch_size=10
       summarized accuracy across categories
     """
 
-    print("\nAnalogy task\n---\n")
+    print("\nGoogle or MSR analogy task\n---\n")
 
     print("Note: * indicates a missing word (i.e., a word not in the semantic space)")
 
@@ -796,6 +796,9 @@ def evaluate_on_semeval_2012_2(w):
       with special key "all" for summary
 
     """
+
+    print("\nSemEval 2012 analogy task\n---\n")
+
     if isinstance(w, dict):
 
         w = Embedding.from_dict(w)
@@ -825,6 +828,8 @@ def evaluate_on_semeval_2012_2(w):
     for c in categories:
 
         c_name = data.categories_names[c].split("_")[0]
+
+        print("\nCategory: {} --- {}".format(c, c_name))
 
         prototypes = data.X_prot[c]
 
@@ -890,6 +895,24 @@ def evaluate_on_semeval_2012_2(w):
             cor = np.nan
 
         results[c_name].append(0 if np.isnan(cor) else cor)
+
+        for i, (pl, pr, ql, qr, s, d) in enumerate(zip(prototypes[:, 0], prototypes[:, 1], questions[:, 0], questions[:, 1], scores, data.y[c])):
+
+            if pl not in w:
+                pl = pl + "*"
+
+            if pr not in w:
+                pr = pr + "*"
+
+            if ql not in w:
+                ql = ql + "*"
+
+            if qr not in w:
+                qr = qr + "*"
+
+            print("- Item {} : ('{}' - '{}') x ('{}' - '{}') = {} compared to {}".format(i, pl, pr, ql, qr, s, d))
+
+        print("Spearman correlation = ", cor)
 
     final_results = OrderedDict()
     final_nb_items = OrderedDict()
