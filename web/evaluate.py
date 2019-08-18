@@ -96,10 +96,10 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     # analogy_datasets.append("Google")
     # analogy_datasets.append("MSR")
-    analogy_datasets.append("SemEval")
+    # analogy_datasets.append("SemEval")
     # analogy_datasets.append("WordRep")
-    # analogy_datasets.append("SAT")
-    # analogy_datasets.append("BATS")  # *new*
+    # analogy_datasets.append("SAT") # *new*
+    analogy_datasets.append("BATS")  # *new*
 
     # Categorization tasks
     # ---
@@ -996,6 +996,9 @@ def evaluate_on_WordRep(w, max_pairs=None, solver_kwargs={}):
     Bin Gao, Jiang Bian, Tie-Yan Liu (2015)
      "WordRep: A Benchmark for Research on Learning Word Representations"
     """
+
+    print("\nEvaluation of WordRep analogy with max_pairs = ", max_pairs, "\n---")
+
     if isinstance(w, dict):
 
         w = Embedding.from_dict(w)
@@ -1015,6 +1018,8 @@ def evaluate_on_WordRep(w, max_pairs=None, solver_kwargs={}):
     items_covered = {}
 
     for category in categories:
+
+        print("Category : ", category, "\n---")
 
         X_cat = data.X[data.category == category]
 
@@ -1069,6 +1074,30 @@ def evaluate_on_WordRep(w, max_pairs=None, solver_kwargs={}):
         y_pred = results['predictions']
 
         nb_correct = float(np.sum(y_pred == y))
+
+        for i, (x1,x2,x3,y_obs,y_true) in enumerate(zip(X[:,0],X[:,1],X[:,2], y_pred, y)):
+
+            if x1 not in w:
+                x1 = x1 + "*"
+
+            if x2 not in w:
+                x2 = x2 + "*"
+
+            if x3 not in w:
+                x3 = x3 + "*"
+
+            if y_true not in w:
+                y_true = y_true + "*"
+
+            if y_obs == y_true:
+
+                cor_msg = "OK"
+
+            else:
+
+                cor_msg = "---> wrong ! Correct : " + y_true
+
+            print("- Item {} : {} - {}, {} - ... {} ? {}".format(i, x1,x2,x3,y_obs,cor_msg))
 
         correct[category] = nb_correct
 
@@ -1153,6 +1182,9 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     Gladkova, A., Drozd, A., & Matsuoka, S. (2016). Analogy-Based Detection of Morphological and Semantic Relations with Word Embeddings: What Works and What Doesn’t. In Proceedings of the NAACL-HLT SRW (pp. 47–54). San Diego, California, June 12-17, 2016: ACL. https://doi.org/10.18653/v1/N16-2002
 
     """
+
+    print("\nEvaluation of BATS analogy\n---")
+
     if isinstance(w, dict):
 
         w = Embedding.from_dict(w)
@@ -1175,6 +1207,8 @@ def evaluate_on_BATS(w, solver_kwargs={}):
     missing = {}
 
     for category in categories:
+
+        print("\nCategory : " + category)
 
         pairs = data.X[data.category == category]
 
@@ -1273,6 +1307,32 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
         results = solver.predict(X)
 
+
+        for i, (x1,x2,x3,y_obs,y_true) in enumerate(zip(X[:,0],X[:,1],X[:,2], results['predictions'], y)):
+
+            if x1 not in w:
+                x1 = x1 + "*"
+
+            if x2 not in w:
+                x2 = x2 + "*"
+
+            if x3 not in w:
+                x3 = x3 + "*"
+
+            if y_true not in w:
+                y_true = y_true + "*"
+
+            if y_obs == y_true:
+
+                cor_msg = "OK"
+
+            else:
+
+                cor_msg = "---> wrong ! Correct : " + y_true
+
+            print("- Item {} : {} - {}, {} - ... {} ? {}".format(i, x1,x2,x3,y_obs,cor_msg))
+
+
         nb_correct = float(np.sum(results['predictions'] == y))
 
         correct[category] = nb_correct
@@ -1281,7 +1341,9 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
         items_covered[category] = nb_questions
 
-        missing[category] = np.NaN
+        # missing[category] = np.NaN
+
+        missing[category] = np.sum(results['nb_missing_words'])
 
         accuracy[category] = nb_correct / nb_questions
 
@@ -1371,9 +1433,9 @@ def answer_SAT_analogy_question(question, answers, w, solver):
         X[i, 2] = answer[0]
         y[i] = answer[1]
 
-    # for i in range(nb_rows):
+    for i in range(nb_rows):
 
-    #     print("triple", i + 1, ":", X[i, ], "candidate:", y[i])
+        print("- triple", i + 1, ":", X[i, ], "candidate:", y[i])
 
     # prediction through the analogy solver
     # ---
@@ -1418,7 +1480,7 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
             pass
 
-        # print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
+        print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
 
     # i = selected_answer
 
