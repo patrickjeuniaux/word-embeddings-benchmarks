@@ -1366,6 +1366,8 @@ def evaluate_on_BATS(w, solver_kwargs={}):
 
     df['category'] = df.index
 
+    df['dataset'] = 'BATS'
+
     df['task'] = 'analogy'
 
     df['performance_type'] = 'nb_items_correct'
