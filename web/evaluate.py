@@ -94,11 +94,11 @@ def evaluate_on_all_datasets(w, wordrep_max_pairs=None):
 
     analogy_datasets = []
 
-    # analogy_datasets.append("Google")
-    # analogy_datasets.append("MSR")
-    # analogy_datasets.append("SemEval")
-    # analogy_datasets.append("WordRep")
-    # analogy_datasets.append("SAT") # *new*
+    analogy_datasets.append("Google")
+    analogy_datasets.append("MSR")
+    analogy_datasets.append("SemEval")
+    analogy_datasets.append("WordRep")
+    analogy_datasets.append("SAT") # *new*
     analogy_datasets.append("BATS")  # *new*
 
     # Categorization tasks
@@ -1435,9 +1435,9 @@ def answer_SAT_analogy_question(question, answers, w, solver):
         X[i, 2] = answer[0]
         y[i] = answer[1]
 
-    for i in range(nb_rows):
+    # for i in range(nb_rows):
 
-        print("- triple", i + 1, ":", X[i, ], "candidate:", y[i])
+    #     print("- triple", i + 1, ":", X[i, ], "candidate:", y[i])
 
     # prediction through the analogy solver
     # ---
@@ -1465,6 +1465,10 @@ def answer_SAT_analogy_question(question, answers, w, solver):
 
         candidate_word = y[i]
 
+        cosine = None
+
+        selected = ""
+
         if candidate_word in w:
 
             candidate_vector = w[candidate_word]
@@ -1476,17 +1480,40 @@ def answer_SAT_analogy_question(question, answers, w, solver):
                 selected_answer = i
                 selected_cosine = cosine
 
+                selected = "SELECTED"
+
         else:
 
             # print("The candidate word is not in the vocabulary. This item is ignored.")
 
-            pass
+            candidate_word += "*"
 
-        print("triple", i + 1, ":", X[i, ], ", candidate:", candidate_word, ", prediction:", predicted_word, ", cosine:", cosine)
+
+        myX = [x if x in w else x+"*" for x in X[i, ]]
+
+        myX = myX[0] + " - " + myX[1] + ", " + myX[2]
+
+        if cosine is not None:
+
+            cosine = round(cosine, 3)
+
+        else:
+
+            cosine = "?"
+
+        print("- triple", i + 1, ":", myX, " ... ", candidate_word, "? ---> prediction:", predicted_word, ", cosine:", cosine, selected)
 
     # i = selected_answer
 
     # print("\nSelected answer: triple", i + 1, ":", X[i, ], ", candidate:", y[i])
+
+    if selected_answer == 0:
+
+        print(" OK ")
+
+    else:
+
+        print(" --- incorrect --- ")
 
     results = {'selected_answer': selected_answer,
                'nb_missing_words': missing_words,
@@ -1531,6 +1558,8 @@ def evaluate_on_SAT(w, solver_kwargs={}):
     items_covered = 0
 
     for i in range(nb_items):
+
+        print("\nSAT analogy question {}\n---".format(i))
 
         question = data.X[i].split("_")
 
