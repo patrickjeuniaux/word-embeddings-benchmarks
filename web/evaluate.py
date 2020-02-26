@@ -11,7 +11,6 @@ import numpy as np
 from sklearn.cluster import AgglomerativeClustering, KMeans
 from six import iteritems
 import six
-import numpy as np
 import importlib
 import os
 
@@ -488,18 +487,29 @@ def calculate_purity(y_true, y_pred):
       True cluster labels
 
     y_pred: array, shape: (n_samples, 1)
-      Cluster assingment.
+      Cluster assignment.
 
     Returns
     -------
     purity: float
       Calculated purity.
+
+
+      See:
+      https://stats.stackexchange.com/questions/95731/how-to-calculate-purity
     """
     assert len(y_true) == len(y_pred)
 
-    true_clusters = np.zeros(shape=(len(set(y_true)), len(y_true)))
+    nb_items = len(y_true)
+
+    nb_clusters = len(set(true))
+
+    true_clusters = np.zeros(shape=(nb_clusters, nb_items))
 
     pred_clusters = np.zeros_like(true_clusters)
+
+    # convert the clustering labels to binary format
+    # ---
 
     for id, cl in enumerate(set(y_true)):
 
@@ -511,9 +521,8 @@ def calculate_purity(y_true, y_pred):
 
     M = pred_clusters.dot(true_clusters.T)
 
-    purity = 1. / len(y_true) * np.sum(np.max(M, axis=1))
+    purity = 1. / nb_items * np.sum(np.max(M, axis=1))
 
-    nb_items = len(y_true)
 
     results = {'purity': purity,
                'nb_items': nb_items}

@@ -205,6 +205,8 @@ def coverage_wordrep(vocabulary, subsample=None, rng=None):
 def coverage_mikolov(corpus_name, vocabulary):
     """
 
+    Coverage Mikolov
+
     """
 
     # set the fetch function name
@@ -240,6 +242,8 @@ def coverage_mikolov(corpus_name, vocabulary):
 def coverage_similarity(dataset_name, vocabulary, **kwargs):
     """
 
+    Coverage similarity
+
     """
 
     # set the fetch function name
@@ -272,6 +276,8 @@ def coverage_similarity(dataset_name, vocabulary, **kwargs):
 def coverage_synonymy(dataset_name, vocabulary):
     """
 
+    Coverage synonymy
+
     """
 
     # set the fetch function name
@@ -285,6 +291,9 @@ def coverage_synonymy(dataset_name, vocabulary):
     # the question
     # ---
     X = data.X
+
+    # print(X)
+    # print(vocabulary)
 
     # the answers
     # ---
@@ -434,7 +443,7 @@ def coverage_result(nb_items, nb_items_covered):
     return results
 
 
-def load_vocabulary(input_path):
+def load_vocabulary(input_path, cut=True):
     """
     Return a Set of words found in the file
     - one word per line
@@ -459,7 +468,16 @@ def load_vocabulary(input_path):
     print("---")
     print("File:", input_path)
 
-    vocabulary = set(line.strip() for line in open(input_path))
+    if cut:
+
+        # We take the value of the first column !
+        # columns are delimited by tabulation (\t)
+
+        vocabulary = set(line.strip().split("\t")[0] for line in open(input_path))
+
+    else:
+
+        vocabulary = set(line.strip() for line in open(input_path))
 
     print("---> loaded", len(vocabulary), "words")
 
@@ -473,8 +491,11 @@ def calculate_coverage(vocabulary, output_path):
 
     """
 
+    print("")
     print("Calculate and save coverage")
     print("---")
+
+    # return
 
     def save_results(dataset, results, file):
         """
@@ -547,7 +568,7 @@ def test_coverage(vocabulary):
     print("Test - coverage calculation")
     print("---")
 
-    # coverage_synonymy("TOEFL", vocabulary)
+    coverage_synonymy("TOEFL", vocabulary)
     # coverage_synonymy("ESL", vocabulary)
 
     # coverage_similarity("RG65", vocabulary)

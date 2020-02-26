@@ -39,7 +39,14 @@ if __name__ == "__main__":
     # ---
     vocabulary = load_vocabulary(vocabulary_path)
 
+    # print(vocabulary)
+
     # calculate coverage
     # ---
 
     calculate_coverage(vocabulary, results_path)
+    # test_coverage(vocabulary)
+
+    print("")
+    print("== THE END ==")
+    print("")

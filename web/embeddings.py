@@ -14,10 +14,18 @@ from web.embedding import Embedding
 def load_toy_embedding():
   '''
 
+  Load a sample of a corpus from
+
+  http://nlp.stanford.edu/data/glove.6B.zip
+
+  head -n 50000 glove.6B.50d.txt > glove.6B.50d.SAMPLE.txt
+
+
   '''
 
   # from web.embeddings import fetch_GloVe
   # w = fetch_GloVe(corpus="wiki-6B", dim=50)
+
 
   # let's load a smaller file
   # ---
